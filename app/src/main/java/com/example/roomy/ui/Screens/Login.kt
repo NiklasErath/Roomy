@@ -24,16 +24,25 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.roomy.db.UserRepository
+import com.example.roomy.ui.ViewModels.UserViewModel
+import com.example.roomy.ui.ViewModels.UserViewModelFactory
 
 @Preview
 @Composable
 fun Login(
     modifier: Modifier = Modifier,
+    userRepository: UserRepository
 //    navController: NavController
 ){
     var name by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    val viewModel: UserViewModel = viewModel(
+        factory = UserViewModelFactory(userRepository)  // Correct way to provide the factory
+    )
 
 
     Column(Modifier.fillMaxSize()) {
@@ -59,6 +68,8 @@ fun Login(
 
 
         Button(onClick = {
+            viewModel.logInUser(name, password);
+            viewModel.getUserInformation()
 //        navController.navigate(Screens.Groups.name)
         }) {
             Text(text="Log In")

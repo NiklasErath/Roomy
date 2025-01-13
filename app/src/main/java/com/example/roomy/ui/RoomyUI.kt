@@ -31,6 +31,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.roomy.db.Supabase.supabase
+import com.example.roomy.db.UserRepository
 
 enum class Screens {
     Login, Register, Groups, Home, Balance, Profile
@@ -44,6 +46,8 @@ fun RoomyApp(
 
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val userRepository = UserRepository()
+
 
 
     Scaffold(
@@ -90,7 +94,8 @@ fun RoomyApp(
                 Box(modifier = modifier.padding(innerPadding)) {
                     Login(
                         modifier,
-//                        navController
+//                        navController,
+                        userRepository
                     )
                 }
             }

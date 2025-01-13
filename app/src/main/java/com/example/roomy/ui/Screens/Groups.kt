@@ -11,17 +11,17 @@ import com.example.roomy.ui.Screens
 
 @Composable
 fun Groups(
-    modifier: Modifier = Modifier,
     navController: NavController
 ){
 
     Column (
-        modifier.fillMaxSize()
+        Modifier.fillMaxSize()
     ){
         Text(text="Groups Page")
+        Button(onClick = {navController.navigate(Screens.Home.name)}) {
+            Text(text="Select and enter Group")
+        }
     }
-    Button(onClick = {navController.navigate(Screens.Home.name)}) {
-        Text(text="Select and enter Group")
-    }
+
 
 }

@@ -1,31 +1,38 @@
 package com.example.roomy.ui
 
-import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.core.EaseIn
-import androidx.compose.animation.core.EaseOut
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -45,52 +52,48 @@ fun RoomyApp(
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
+    val currentDestination = navBackStackEntry?.destination?.route
+    val displayBottomBarAndHeader=when(currentDestination){
+        Screens.Login.name, Screens.Register.name, Screens.Groups.name -> false
+        else -> true
+    }
+
 
     Scaffold(
-        bottomBar = {
-            val currentDestination = navBackStackEntry?.destination?.route
 
-            val displayBottomBar=when(currentDestination){
-                Screens.Login.name, Screens.Register.name, Screens.Groups.name -> false
-                else -> true
-            }
-            if(displayBottomBar){
+            bottomBar = {
+            if(displayBottomBarAndHeader){
             BottomNavigationBar(navController,currentDestination) }},
-//        Global Padding applied here
-        modifier = Modifier.fillMaxSize().padding(20.dp),
+
+            topBar = {
+                if(displayBottomBarAndHeader){
+                    Header(navController, currentDestination)
+                }
+
+
+        },
+
+
+
+
+        modifier = Modifier.fillMaxSize(),
+
     ) { innerPadding ->
-        NavHost(navController, startDestination = Screens.Login.name,
-            modifier = Modifier.padding(innerPadding),
-//            enterTransition = {
-//                fadeIn(
-//                    animationSpec = tween(
-//                        300, easing = LinearEasing
-//                    )
-//                ) + slideIntoContainer(
-//                    animationSpec = tween(300, easing = EaseIn),
-//                    towards = AnimatedContentTransitionScope.SlideDirection.Start
-//                )
-//            },
-//            exitTransition = {
-//                fadeOut(
-//                    animationSpec = tween(
-//                        300, easing = LinearEasing
-//                    )
-//                ) + slideOutOfContainer(
-//                    animationSpec = tween(300, easing = EaseOut),
-//                    towards = AnimatedContentTransitionScope.SlideDirection.End
-//                )
-//            }
+        NavHost(
+            navController, startDestination = Screens.Login.name,
+            modifier = Modifier
+                .padding(innerPadding)
+                .padding(horizontal = if(currentDestination == Screens.Home.name) 0.dp else 20.dp),
+
         )
         {
 
             composable(
                 Screens.Login.name,
             ) {
-                Box(modifier = modifier.padding(innerPadding)) {
+                Box {
                     Login(
-                        modifier,
-//                        navController
+                        navController
                     )
                 }
             }
@@ -98,9 +101,9 @@ fun RoomyApp(
             composable(
                 Screens.Register.name,
             ) {
-                Box(modifier = Modifier.padding(innerPadding)) {
-                    Groups(
-                        modifier,
+                Box {
+                    Register(
+
                         navController
                     )
                 }
@@ -109,9 +112,9 @@ fun RoomyApp(
             composable(
                 Screens.Groups.name,
             ) {
-                Box(modifier = Modifier.padding(innerPadding)) {
+                Box {
                     Groups(
-                        modifier,
+
                         navController
                     )
                 }
@@ -120,9 +123,9 @@ fun RoomyApp(
             composable(
                 Screens.Home.name,
             ) {
-                Box(modifier = Modifier.padding(innerPadding)) {
+                Box {
                     Home(
-                        modifier,
+
                         navController
                     )
                 }
@@ -131,9 +134,8 @@ fun RoomyApp(
             composable(
                 Screens.Balance.name,
             ) {
-                Box(modifier = Modifier.padding(innerPadding)) {
+                Box {
                     Balance(
-                        modifier,
                         navController
                     )
                 }
@@ -142,9 +144,8 @@ fun RoomyApp(
             composable(
                 Screens.Profile.name,
             ) {
-                Box(modifier = Modifier.padding(innerPadding)) {
+                Box{
                     Profile(
-                        modifier,
                         navController
                     )
                 }
@@ -182,5 +183,47 @@ fun BottomNavigationBar(
             icon = { Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = "Overview") },
             label = { Text("Profile") }
         )
+    }
+}
+
+@Composable
+fun Header(
+    navController: NavController,
+    currentDestination: String?
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 40.dp)
+    ) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                IconButton(onClick = { navController.navigate(Screens.Groups.name) }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Group",
+                    )
+                }
+                Text(
+                    text = currentDestination ?: "No Destination",
+                    fontSize = 20.sp,
+                )
+                IconButton(onClick = {
+//                Add Members screen
+                                     }) {
+                    Icon(
+                        imageVector = Icons.Filled.AccountCircle,
+                        contentDescription = "Profile",
+                        modifier = Modifier.size(30.dp)
+                    )
+                }
+            }
+        }
     }
 }

@@ -10,17 +10,17 @@ import androidx.navigation.NavController
 
 @Composable
 fun Balance(
-    modifier: Modifier = Modifier,
     navController: NavController
 ){
 
     Column (
-        modifier.fillMaxSize()
+        Modifier.fillMaxSize()
     ){
         Text(text="Finance/Balance Page")
+        Button(onClick = {navController.navigate(Screens.Groups.name)}) {
+            Text(text="Back to Groups")
+        }
     }
-    Button(onClick = {navController.navigate(Screens.Groups.name)}) {
-        Text(text="Back to Groups")
-    }
+
 
 }

@@ -69,6 +69,8 @@ class UserRepository {
                 .select{filter { eq("user_id", userId)}} // Select all columns (you can specify specific ones like .select("id", "name", "email"))
                 .decodeSingle<UserInformation>()
 
+            Log.d("ICH HABE ES GESCHAFFT", "user info $response")
+
             return response
         } catch (e: Exception) {
             // Log the error and throw an exception

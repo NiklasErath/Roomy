@@ -33,7 +33,7 @@ fun Item() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(
-            painterResource(R.drawable.letter_a),
+            painterResource(R.drawable.ic_launcher_background),
             contentDescription = "Letter",
             Modifier.weight(1f)
         )

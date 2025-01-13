@@ -3,6 +3,7 @@ package com.example.roomy.db.data
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+
 //serialize to JSN
 @Serializable
 data class UserInformation(

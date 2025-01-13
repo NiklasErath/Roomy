@@ -52,6 +52,16 @@ dependencies {
 
     implementation(libs.androidx.navigation.compose)
 
+    // Supabase BOM (Bill of Materials) for version alignment
+    implementation(platform("io.github.jan-tennert.supabase:bom:3.0.1"))
+
+    // Supabase modules
+    implementation("io.github.jan-tennert.supabase:auth-kt")
+    implementation("io.github.jan-tennert.supabase:postgrest-kt")
+    // Add other Supabase modules as needed
+
+    // Ktor client for Android
+    implementation("io.ktor:ktor-client-android:3.0.0")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

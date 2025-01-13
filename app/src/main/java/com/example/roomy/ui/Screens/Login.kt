@@ -1,7 +1,5 @@
 package com.example.roomy.ui
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,14 +27,24 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.roomy.db.UserRepository
+import com.example.roomy.ui.ViewModels.UserViewModel
+import com.example.roomy.ui.ViewModels.UserViewModelFactory
 
 @Composable
 fun Login(
+    modifier: Modifier = Modifier,
+    userRepository: UserRepository
     navController: NavController
 ){
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    val viewModel: UserViewModel = viewModel(
+        factory = UserViewModelFactory(userRepository)  // Correct way to provide the factory
+    )
 
 
     Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
@@ -72,7 +80,9 @@ fun Login(
 
         Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End){
             Button(onClick = {
-        navController.navigate(Screens.Groups.name)
+                viewModel.logInUser(email, password);
+                viewModel.getUserInformation()
+//        navController.navigate(Screens.Groups.name)
             }) {
                 Text(text="Log In  ", fontSize = 20.sp)
                 Icon(imageVector = Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Arrow Right", modifier = Modifier.size(20.dp))

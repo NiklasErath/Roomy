@@ -1,7 +1,12 @@
 package com.example.roomy.ui
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.EaseIn
+import androidx.compose.animation.core.EaseOut
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,6 +43,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.roomy.db.Supabase.supabase
+import com.example.roomy.db.UserRepository
 
 enum class Screens {
     Login, Register, Groups, Home, Balance, Profile
@@ -51,6 +58,8 @@ fun RoomyApp(
 
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val userRepository = UserRepository()
+
 
     val currentDestination = navBackStackEntry?.destination?.route
     val displayBottomBarAndHeader=when(currentDestination){
@@ -93,7 +102,9 @@ fun RoomyApp(
             ) {
                 Box {
                     Login(
-                        navController
+                        navController,
+//                        navController,
+                        userRepository
                     )
                 }
             }

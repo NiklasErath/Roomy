@@ -30,10 +30,16 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.roomy.db.UserRepository
+import com.example.roomy.ui.ViewModels.UserViewModel
+import com.example.roomy.ui.ViewModels.UserViewModelFactory
 
 @Composable
 fun Register(
+    userRepository: UserRepository,
+
     navController: NavController
 ){
     var email by remember { mutableStateOf("") }
@@ -42,6 +48,9 @@ fun Register(
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
 
+    val viewModel: UserViewModel = viewModel(
+        factory = UserViewModelFactory(userRepository)  // Correct way to provide the factory
+    )
 
 
     Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
@@ -95,7 +104,9 @@ fun Register(
 
         Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End){
             Button(onClick = {
-                navController.navigate(Screens.Groups.name)
+                viewModel.signUp(email, password)
+
+//                navController.navigate(Screens.Groups.name)
             }) {
                 Text(text="Sign Up  ", fontSize = 20.sp)
                 Icon(imageVector = Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Arrow Right", modifier = Modifier.size(20.dp))

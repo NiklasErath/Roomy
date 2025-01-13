@@ -26,7 +26,8 @@ class UserRepository {
 
             Log.d("TAG", "Sign-up successful: $result")
         } catch (e: Exception) {
-            Log.d("TAG", "Sign up failed")
+            Log.d("Tag","Sign up failed with exception:.................")
+            e.message?.let { Log.d("TAG", it) }
         }
     }
 
@@ -39,6 +40,7 @@ class UserRepository {
             Log.d("TAG", "Sign-in successful: $result")
         } catch (e: Exception) {
             Log.d("TAG", "Sign in failed")
+            e.message?.let { Log.d("TAG", it) }
             Log.d("DATA LOGIN", "$userEmail , $userPassword")
 
         }
@@ -64,9 +66,10 @@ class UserRepository {
             // Query to fetch user information by userId
             val response = supabase
                 .from("user_information") // Table name
-                .select(){filter { eq("user_id", "$userId")}} // Select all columns (you can specify specific ones like .select("id", "name", "email"))
+                .select{filter { eq("user_id", userId)}} // Select all columns (you can specify specific ones like .select("id", "name", "email"))
                 .decodeSingle<UserInformation>()
-return response
+
+            return response
         } catch (e: Exception) {
             // Log the error and throw an exception
             Log.d("TAG", "Could not get the User information: ${e.message}")

@@ -1,7 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-}
+    id ("org.jetbrains.kotlin.plugin.serialization") version "1.8.22"
+    }
 
 android {
     namespace = "com.example.roomy"
@@ -49,6 +50,9 @@ android {
 }
 
 dependencies {
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+
 
     implementation(libs.androidx.navigation.compose)
 

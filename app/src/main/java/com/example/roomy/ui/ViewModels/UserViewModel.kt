@@ -37,6 +37,9 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
 
     fun getUserInformation() {
         viewModelScope.launch {
+            Log.d("Tag", "geeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeet userId from currentUserSession")
+            Log.d("Tag", currentUserSession.value.userId)
+
             val user = userRepository.getUserById(currentUserSession.value.userId)
             _loggedInUser.update { oldState ->
                 oldState.copy(
@@ -45,6 +48,45 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
                     email = user.email
                 )
             }
+        }
+    }
+
+    fun logInAndFetchUserInformation(userEmail: String, userPassword: String){
+        viewModelScope.launch {
+            userRepository.signIn(userEmail, userPassword)
+
+            val currentSession = userRepository.getSession()
+            _session.update { oldState ->
+                oldState.copy(
+                    userId = currentSession
+                )
+
+            }
+
+            val user = userRepository.getUserById(currentUserSession.value.userId)
+            _loggedInUser.update { oldState ->
+                oldState.copy(
+                    userId = user.id,
+                    username = user.username,
+                    email = user.email
+                )
+            }
+
+        }
+    }
+
+    fun signUp(userEmail: String, userPassword: String) {
+        viewModelScope.launch {
+            userRepository.signUp(userEmail, userPassword)
+
+            val currentSession = userRepository.getSession()
+            _session.update { oldState ->
+                oldState.copy(
+                    userId = currentSession
+                )
+
+            }
+
         }
     }
 

@@ -1,5 +1,7 @@
 package com.example.roomy.ui
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -35,8 +37,7 @@ import com.example.roomy.ui.ViewModels.UserViewModelFactory
 
 @Composable
 fun Login(
-    modifier: Modifier = Modifier,
-    userRepository: UserRepository
+    userRepository: UserRepository,
     navController: NavController
 ){
     var email by remember { mutableStateOf("") }
@@ -80,8 +81,8 @@ fun Login(
 
         Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End){
             Button(onClick = {
-                viewModel.logInUser(email, password);
-                viewModel.getUserInformation()
+                viewModel.logInAndFetchUserInformation(email, password);
+//                viewModel.getUserInformation()
 //        navController.navigate(Screens.Groups.name)
             }) {
                 Text(text="Log In  ", fontSize = 20.sp)

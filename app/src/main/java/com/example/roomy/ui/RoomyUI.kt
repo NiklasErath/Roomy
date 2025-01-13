@@ -7,6 +7,7 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -62,7 +63,7 @@ fun RoomyApp(
 
 
     val currentDestination = navBackStackEntry?.destination?.route
-    val displayBottomBarAndHeader=when(currentDestination){
+    val displayBottomBarAndHeader = when (currentDestination) {
         Screens.Login.name, Screens.Register.name, Screens.Groups.name -> false
         else -> true
     }
@@ -70,31 +71,31 @@ fun RoomyApp(
 
     Scaffold(
 
-            bottomBar = {
-            if(displayBottomBarAndHeader){
-            BottomNavigationBar(navController,currentDestination) }},
+        bottomBar = {
+            if (displayBottomBarAndHeader) {
+                BottomNavigationBar(navController, currentDestination)
+            }
+        },
 
-            topBar = {
-                if(displayBottomBarAndHeader){
-                    Header(navController, currentDestination)
-                }
+        topBar = {
+            if (displayBottomBarAndHeader) {
+                Header(navController, currentDestination)
+            }
 
 
         },
 
 
-
-
         modifier = Modifier.fillMaxSize(),
 
-    ) { innerPadding ->
+        ) { innerPadding ->
         NavHost(
             navController, startDestination = Screens.Login.name,
             modifier = Modifier
                 .padding(innerPadding)
-                .padding(horizontal = if(currentDestination == Screens.Home.name) 0.dp else 20.dp),
+                .padding(horizontal = if (currentDestination == Screens.Home.name) 0.dp else 20.dp),
 
-        )
+            )
         {
 
             composable(
@@ -102,10 +103,10 @@ fun RoomyApp(
             ) {
                 Box {
                     Login(
+                        userRepository,
                         navController,
-//                        navController,
-                        userRepository
-                    )
+
+                        )
                 }
             }
 
@@ -114,7 +115,7 @@ fun RoomyApp(
             ) {
                 Box {
                     Register(
-
+                        userRepository,
                         navController
                     )
                 }
@@ -155,7 +156,7 @@ fun RoomyApp(
             composable(
                 Screens.Profile.name,
             ) {
-                Box{
+                Box {
                     Profile(
                         navController
                     )
@@ -178,20 +179,25 @@ fun BottomNavigationBar(
     NavigationBar {
         NavigationBarItem(
             selected = (currentDestination == Screens.Home.name),
-            onClick = { navController.navigate(Screens.Home.name)},
+            onClick = { navController.navigate(Screens.Home.name) },
             icon = { Icon(imageVector = Icons.Filled.CheckCircle, contentDescription = "Home") },
             label = { Text("Lists") }
         )
         NavigationBarItem(
             selected = (currentDestination == Screens.Balance.name),
-            onClick = { navController.navigate(Screens.Balance.name)},
+            onClick = { navController.navigate(Screens.Balance.name) },
             icon = { Icon(imageVector = Icons.Filled.Refresh, contentDescription = "Overview") },
             label = { Text("Balance") }
         )
         NavigationBarItem(
             selected = (currentDestination == Screens.Profile.name),
-            onClick = { navController.navigate(Screens.Profile.name)},
-            icon = { Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = "Overview") },
+            onClick = { navController.navigate(Screens.Profile.name) },
+            icon = {
+                Icon(
+                    imageVector = Icons.Filled.AccountCircle,
+                    contentDescription = "Overview"
+                )
+            },
             label = { Text("Profile") }
         )
     }
@@ -227,7 +233,7 @@ fun Header(
                 )
                 IconButton(onClick = {
 //                Add Members screen
-                                     }) {
+                }) {
                     Icon(
                         imageVector = Icons.Filled.AccountCircle,
                         contentDescription = "Profile",

@@ -1,12 +1,18 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id ("org.jetbrains.kotlin.plugin.serialization") version "1.8.22"
+    kotlin("plugin.serialization") version "1.9.0"
     }
 
 android {
     namespace = "com.example.roomy"
     compileSdk = 34
+
+    configurations.all {
+        resolutionStrategy {
+            force("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+        }
+    }
 
     defaultConfig {
         applicationId = "com.example.roomy"
@@ -32,6 +38,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
     kotlinOptions {
         jvmTarget = "1.8"
@@ -52,6 +59,11 @@ android {
 dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    // Force the version for any conflicting transitive dependency
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0") {
+        because("Fixing transitive dependency conflict")
+    }
+
 
 
     implementation(libs.androidx.navigation.compose)
@@ -63,6 +75,9 @@ dependencies {
     implementation("io.github.jan-tennert.supabase:auth-kt")
     implementation("io.github.jan-tennert.supabase:postgrest-kt")
     // Add other Supabase modules as needed
+    implementation ("io.github.jan-tennert.supabase:realtime-kt")
+
+
 
     // Ktor client for Android
     implementation("io.ktor:ktor-client-android:3.0.0")

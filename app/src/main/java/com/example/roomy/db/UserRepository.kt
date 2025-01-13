@@ -8,6 +8,9 @@ import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromJsonElement
 import java.util.UUID
 
 
@@ -64,12 +67,18 @@ class UserRepository {
 
         try {
             // Query to fetch user information by userId
-            val response = supabase
+            var response = supabase
                 .from("user_information") // Table name
                 .select{filter { eq("user_id", userId)}} // Select all columns (you can specify specific ones like .select("id", "name", "email"))
                 .decodeSingle<UserInformation>()
 
-            return response
+//            response = Json.decodeFromString(response.toString())
+            Log.d("TAG", "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
+
+            Log.d("TAG", response.id)
+
+
+            return UserInformation(id="af", username ="jkadfs", email = "klajfd")
         } catch (e: Exception) {
             // Log the error and throw an exception
             Log.d("TAG", "Could not get the User information: ${e.message}")
@@ -77,4 +86,22 @@ class UserRepository {
         }
 
     }
+
+
+//    suspend fun getUserById(userId: String): UserInformation {
+//        Log.d("TAG", "HEYXXXYYYXXXX")
+//
+//        try {
+//            // Query to fetch user information by userId
+//            val response = supabase
+//                .from("user_information") // Table name
+//                .select{filter { eq("user_id", userId)}} // Select all columns (you can specify specific ones like .select("id", "name", "email"))
+//                .decodeSingle<UserInformation>()
+//
+//            return response
+//        } catch (e: Exception) {
+//            // Log the error and throw an exception
+//            Log.d("TAG", "Could not get the User information: ${e.message}")
+//            throw IllegalStateException("No User information available")
+//        }
 }

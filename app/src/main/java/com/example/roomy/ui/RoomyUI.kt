@@ -1,26 +1,13 @@
 package com.example.roomy.ui
 
-import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.core.EaseIn
-import androidx.compose.animation.core.EaseOut
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
@@ -36,7 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -46,12 +32,17 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.roomy.db.GroupRepository
-import com.example.roomy.db.Supabase.supabase
+import com.example.roomy.db.ItemRepository
+import com.example.roomy.db.ShoppingListRepository
 import com.example.roomy.db.UserRepository
 import com.example.roomy.ui.ViewModels.GroupViewModel
-import com.example.roomy.ui.ViewModels.GroupViewModelFactory
+import com.example.roomy.ui.Factory.GroupViewModelFactory
+import com.example.roomy.ui.Factory.ItemViewModelFactory
+import com.example.roomy.ui.Factory.ShoppingListViewModelFactory
 import com.example.roomy.ui.ViewModels.UserViewModel
-import com.example.roomy.ui.ViewModels.UserViewModelFactory
+import com.example.roomy.ui.Factory.UserViewModelFactory
+import com.example.roomy.ui.ViewModels.ItemViewModel
+import com.example.roomy.ui.ViewModels.ShoppingListViewModel
 
 enum class Screens {
     Login, Register, Groups, Home, Balance, Profile
@@ -67,6 +58,8 @@ fun RoomyApp(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val userRepository = UserRepository()
     val groupRepository = GroupRepository()
+    val shoppingListRepository = ShoppingListRepository()
+    val itemRepository = ItemRepository()
 
 
     val currentDestination = navBackStackEntry?.destination?.route
@@ -81,6 +74,14 @@ fun RoomyApp(
 
     val userViewModel: UserViewModel = viewModel(
         factory = UserViewModelFactory(userRepository)
+    )
+
+    val shoppingListViewModel: ShoppingListViewModel = viewModel(
+        factory = ShoppingListViewModelFactory(shoppingListRepository)
+    )
+
+    val itemViewModel: ItemViewModel = viewModel(
+        factory = ItemViewModelFactory(itemRepository)
     )
 
 
@@ -144,7 +145,8 @@ fun RoomyApp(
 
                         navController,
                         groupViewModel,
-                        userViewModel
+                        userViewModel,
+                        shoppingListViewModel
                     )
                 }
             }

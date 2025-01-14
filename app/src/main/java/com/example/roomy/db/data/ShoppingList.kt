@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 data class ShoppingList (
     @SerialName("list_id") val id: Int,
     @SerialName("created_at") val created: String,
-    @SerialName("item_id") val itemId: Int,
+    @SerialName("item_id") val itemId: List<Int>,
     @SerialName("group_id") val groupId: Int,
     val quantity:Int
 )

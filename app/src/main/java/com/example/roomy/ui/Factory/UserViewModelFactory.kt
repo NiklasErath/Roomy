@@ -1,8 +1,9 @@
-package com.example.roomy.ui.ViewModels
+package com.example.roomy.ui.Factory
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.roomy.db.UserRepository
+import com.example.roomy.ui.ViewModels.UserViewModel
 
 class UserViewModelFactory(private val userRepository: UserRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

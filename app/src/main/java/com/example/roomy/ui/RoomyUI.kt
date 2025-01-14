@@ -130,7 +130,7 @@ fun RoomyApp(
             ) {
                 Box {
                     Register(
-                        userRepository,
+                        userViewModel,
                         navController
                     )
                 }

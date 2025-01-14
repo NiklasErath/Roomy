@@ -5,6 +5,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.roomy.db.UserRepository
 import com.example.roomy.ui.States.SessionState
 import com.example.roomy.ui.States.UserState
@@ -21,6 +22,13 @@ sealed class LoginState {
     data class Error(val message: String) : LoginState()
 }
 
+sealed class RegisterState {
+    object Idle : RegisterState()
+    object Loading : RegisterState()
+    object Success : RegisterState()
+    data class Error(val message: String) : RegisterState()
+}
+
 class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
 
     private val _session = MutableStateFlow(SessionState(""))
@@ -32,6 +40,9 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
     private val _loginState = mutableStateOf<LoginState>(LoginState.Idle)
     val loginState: State<LoginState> = _loginState
 
+    private val _registerState = mutableStateOf<RegisterState>(RegisterState.Idle)
+    val registerState: State<RegisterState> = _registerState
+
     suspend fun logInUser(userEmail: String, userPassword: String) {
         userRepository.signIn(userEmail, userPassword)
         val currentSession = userRepository.getSession()
@@ -41,7 +52,7 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
             )
         }
 
-        }
+    }
 
 
     suspend fun getUserInformation() {
@@ -58,6 +69,7 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
         }
 
     }
+
 
     fun logInAndFetchUserInformation(userEmail: String, userPassword: String) {
         viewModelScope.launch {
@@ -79,20 +91,73 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
         }
     }
 
+
     fun signUp(userEmail: String, userPassword: String, userName: String) {
         viewModelScope.launch {
-            userRepository.signUp(userEmail, userPassword)
 
-            val currentSession = userRepository.getSession()
-            _session.update { oldState ->
-                oldState.copy(
-                    userId = currentSession
-                )
+            try {
+
+
+                val emailExists = userRepository.checkExistingEmail(userEmail)
+                val userNameExists = userRepository.checkExistingUserName(userName)
+
+                if (emailExists) throw IllegalArgumentException("Email already exists")
+                else if (userNameExists) throw IllegalArgumentException("Username already exists")
+
+                userRepository.signUp(userEmail, userPassword)
+                userRepository.signIn(userEmail, userPassword)
+
+                val currentSession = userRepository.getSession()
+                _session.update { oldState ->
+                    oldState.copy(
+                        userId = currentSession
+                    )
+                }
+
+                userRepository.updateUserInformation(currentSession, userName)
+
+                _loggedInUser.update { oldState ->
+                    oldState.copy(
+                        userId = currentSession,
+                        username = userName,
+                        email = userEmail
+                    )
+                }
+
+                _registerState.value = RegisterState.Success
+
+
+            } catch (e: Exception) {
+                _registerState.value = RegisterState.Error(e.message ?: "Unknown Error")
+
 
             }
 
+
         }
     }
+
+//    fun signUp(userEmail: String, userPassword: String, userName: String) {
+//        viewModelScope.launch {
+//            try {
+//                userRepository.signUp(userEmail, userPassword)
+//
+//                val currentSession = userRepository.getSession()
+//                _session.update { oldState ->
+//                    oldState.copy(
+//                        userId = currentSession
+//                    )
+//
+//                }
+//            }catch (e:Exception){
+//                                _registerState.value = RegisterState.Error(e.message ?: "Unknown Error")
+//
+//
+//            }
+//
+//        }
+//    }
+
 
 
 }

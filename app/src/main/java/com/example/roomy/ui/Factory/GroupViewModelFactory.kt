@@ -1,9 +1,9 @@
-package com.example.roomy.ui.ViewModels
+package com.example.roomy.ui.Factory
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.roomy.db.GroupRepository
-import com.example.roomy.db.UserRepository
+import com.example.roomy.ui.ViewModels.GroupViewModel
 
 
 class GroupViewModelFactory(

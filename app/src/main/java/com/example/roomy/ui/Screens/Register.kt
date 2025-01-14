@@ -41,7 +41,7 @@ import com.example.roomy.db.UserRepository
 import com.example.roomy.ui.ViewModels.LoginState
 import com.example.roomy.ui.ViewModels.RegisterState
 import com.example.roomy.ui.ViewModels.UserViewModel
-import com.example.roomy.ui.ViewModels.UserViewModelFactory
+import com.example.roomy.ui.Factory.UserViewModelFactory
 
 @Composable
 fun Register(

@@ -5,7 +5,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Item(
-    @SerialName("item_id") val id: Int,
-    @SerialName("created_at") val created: String,
+    @SerialName("item_id") val id: Int? = null,
     @SerialName("item_name") val name: String,
-)
+    @SerialName("group_id") val groupId: Int,
+    @SerialName("status") val status: String,
+    @SerialName("quantity") val quantity: Int ? = null,
+    @SerialName("icon") val icon: String ? = null,
+
+    )

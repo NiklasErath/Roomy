@@ -44,7 +44,7 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
     val registerState: State<RegisterState> = _registerState
 
     suspend fun logInUser(userEmail: String, userPassword: String) {
-        userRepository.signIn(userEmail, userPassword)
+        userRepository.signIn("n@n.com", "1234")
         val currentSession = userRepository.getSession()
         _session.update { oldState ->
             oldState.copy(

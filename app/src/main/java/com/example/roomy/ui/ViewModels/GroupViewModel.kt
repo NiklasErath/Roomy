@@ -1,6 +1,9 @@
 package com.example.roomy.ui.ViewModels
 
 import android.util.Log
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.roomy.db.GroupRepository
 import androidx.lifecycle.ViewModel
@@ -9,19 +12,42 @@ import com.example.roomy.db.data.GroupInformation
 import com.example.roomy.db.data.Groups
 import com.example.roomy.ui.States.GroupState
 import com.example.roomy.ui.States.GroupsUiState
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 
+sealed class AddGroupState {
+    object Idle : AddGroupState()
+    object Success : AddGroupState()
+    data class Error(val message: String) : AddGroupState()
+}
+
+
 class GroupViewModel(private val groupRepository: GroupRepository) : ViewModel() {
+
+
+    private val _addGroupState = mutableStateOf<AddGroupState>(AddGroupState.Idle)
+    val addGroupState: State<AddGroupState> = _addGroupState
+    fun resetGroupState(){
+        _addGroupState.value = AddGroupState.Idle
+    }
 
     private val _groups = MutableStateFlow(GroupState(emptyList()))
     private val _groupsInformation = MutableStateFlow(GroupsUiState(emptyList()))
 
     val groups = _groups.asStateFlow()
     val groupsInformation = _groupsInformation.asStateFlow()
+
+    private val _currentGroup = MutableStateFlow(GroupInformation(id=-1, name="Placeholder", creatorId = "-1"))
+    val currentGroup: StateFlow<GroupInformation> get() = _currentGroup
+
+    fun setCurrentGroup(group: GroupInformation) {
+        _currentGroup.value = group
+    }
 
     fun getGroupsByUserId(userId: String) {
         viewModelScope.launch {
@@ -49,18 +75,26 @@ class GroupViewModel(private val groupRepository: GroupRepository) : ViewModel()
         }
     }
 
-    fun createNewGroup(groupName: String, userId: String){
+    fun createNewGroup(groupName: String, userId: String) {
         viewModelScope.launch {
-          val newGroup = groupRepository.createGroup(groupName, userId)
+            val newGroup = groupRepository.createGroup(groupName, userId)
             Log.d("HAHHAHAHAHAHA", "$newGroup")
             newGroup.id?.let {
                 addMemberToGroup(userId, it)
+
+                setCurrentGroup(newGroup)
+                _addGroupState.value = AddGroupState.Success
+
+
+
+
             } ?: run {
                 Log.d("TAG", "Group ID is null. Cannot add member.")
-            }        }
+            }
+        }
     }
 
-    fun addMemberToGroup(userId: String, groupId: Int){
+    fun addMemberToGroup(userId: String, groupId: Int) {
         viewModelScope.launch {
             groupRepository.addMemberToGroup(userId, groupId)
         }

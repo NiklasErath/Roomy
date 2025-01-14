@@ -20,9 +20,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import com.example.roomy.R
+import com.example.roomy.db.data.Item
 
 @Composable
-fun Item() {
+fun Item(item:Item) {
     Column(
         Modifier
             .fillMaxWidth()
@@ -33,10 +34,10 @@ fun Item() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(
-            painterResource(R.drawable.ic_launcher_background),
+            painterResource(R.drawable.letter_a),
             contentDescription = "Letter",
             Modifier.weight(1f)
         )
-        Text(text = "Apples", color = Color.White)
+        Text(text = item.name, color = Color.White)
     }
 }

@@ -33,16 +33,13 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.roomy.db.GroupRepository
 import com.example.roomy.db.ItemRepository
-import com.example.roomy.db.ShoppingListRepository
 import com.example.roomy.db.UserRepository
 import com.example.roomy.ui.ViewModels.GroupViewModel
 import com.example.roomy.ui.Factory.GroupViewModelFactory
 import com.example.roomy.ui.Factory.ItemViewModelFactory
-import com.example.roomy.ui.Factory.ShoppingListViewModelFactory
 import com.example.roomy.ui.ViewModels.UserViewModel
 import com.example.roomy.ui.Factory.UserViewModelFactory
 import com.example.roomy.ui.ViewModels.ItemViewModel
-import com.example.roomy.ui.ViewModels.ShoppingListViewModel
 
 enum class Screens {
     Login, Register, Groups, Home, Balance, Profile
@@ -58,7 +55,6 @@ fun RoomyApp(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val userRepository = UserRepository()
     val groupRepository = GroupRepository()
-    val shoppingListRepository = ShoppingListRepository()
     val itemRepository = ItemRepository()
 
 
@@ -74,10 +70,6 @@ fun RoomyApp(
 
     val userViewModel: UserViewModel = viewModel(
         factory = UserViewModelFactory(userRepository)
-    )
-
-    val shoppingListViewModel: ShoppingListViewModel = viewModel(
-        factory = ShoppingListViewModelFactory(shoppingListRepository)
     )
 
     val itemViewModel: ItemViewModel = viewModel(
@@ -146,7 +138,6 @@ fun RoomyApp(
                         navController,
                         groupViewModel,
                         userViewModel,
-                        shoppingListViewModel
                     )
                 }
             }

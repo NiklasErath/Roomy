@@ -39,7 +39,6 @@ import androidx.navigation.NavController
 import com.example.roomy.R
 import com.example.roomy.ui.States.GroupsUiState
 import com.example.roomy.ui.ViewModels.GroupViewModel
-import com.example.roomy.ui.ViewModels.ShoppingListViewModel
 import com.example.roomy.ui.ViewModels.UserViewModel
 
 @Composable
@@ -47,7 +46,6 @@ fun Groups(
     navController: NavController,
     groupViewModel: GroupViewModel,
     userViewModel: UserViewModel,
-    shoppingListViewModel: ShoppingListViewModel,
 ){
 
 

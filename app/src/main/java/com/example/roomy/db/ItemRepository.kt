@@ -9,17 +9,18 @@ import io.github.jan.supabase.postgrest.query.Columns
 
 class ItemRepository {
 
-    suspend fun getAllItems(): List<Item> {
+    suspend fun getItemsByGroupId(groupId: Int): List<Item>{
         try {
-            val response = supabase
-                .from("items").select(Columns.ALL)
+            val response = supabase.from("items")
+                .select { filter { eq("group_id", groupId) } }
                 .decodeList<Item>()
-
             return response
+
         } catch (e: Exception) {
             // Log the error and throw an exception
-            Log.d("TAG", "Could not get the ShoppingList: ${e.message}")
-            throw e
+            Log.d("TAG", "Could not get the groups: ${e.message}")
+            throw IllegalStateException("No groups available")
+
         }
     }
 }

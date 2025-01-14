@@ -15,9 +15,9 @@ class ItemViewModel(private val itemRepository: ItemRepository) : ViewModel() {
 
     val allItems = _allItems.asStateFlow()
 
-    suspend fun getAllItems() {
+    suspend fun getItemsByGroupId(groupId:Int) {
         viewModelScope.launch {
-            val fetchedItems = itemRepository.getAllItems()
+            val fetchedItems = itemRepository.getItemsByGroupId(groupId)
 
             _allItems.update {
                 it.copy(

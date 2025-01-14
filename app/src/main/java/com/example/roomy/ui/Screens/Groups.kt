@@ -63,12 +63,6 @@ fun Groups(
 
     val currentUserId = userViewModel.currentUserSession.collectAsState().value.userId
 
-    val groupState by groupViewModel.groups.collectAsState(
-        initial = GroupState(
-            emptyList()
-        )
-    )
-
     val groupInformationState by groupViewModel.groupsInformation.collectAsState(
         initial = GroupsUiState(
             emptyList()
@@ -157,7 +151,8 @@ fun Groups(
                 )
 
             Button(
-                onClick = {addGroupPopUp = false}
+                onClick = {addGroupPopUp = false
+                groupViewModel.createNewGroup(newGroupName,currentUserId)},
             ){
                 Text(text = "Add Group")
             }

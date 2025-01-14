@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.roomy.db.GroupRepository
 import androidx.lifecycle.ViewModel
+import com.example.roomy.db.Supabase.supabase
+import com.example.roomy.db.data.GroupInformation
 import com.example.roomy.db.data.Groups
 import com.example.roomy.ui.States.GroupState
 import com.example.roomy.ui.States.GroupsUiState
@@ -44,6 +46,23 @@ class GroupViewModel(private val groupRepository: GroupRepository) : ViewModel()
             _groupsInformation.update {
                 it.copy(groupsInformation = household)
             }
+        }
+    }
+
+    fun createNewGroup(groupName: String, userId: String){
+        viewModelScope.launch {
+          val newGroup = groupRepository.createGroup(groupName, userId)
+            Log.d("HAHHAHAHAHAHA", "$newGroup")
+            newGroup.id?.let {
+                addMemberToGroup(userId, it)
+            } ?: run {
+                Log.d("TAG", "Group ID is null. Cannot add member.")
+            }        }
+    }
+
+    fun addMemberToGroup(userId: String, groupId: Int){
+        viewModelScope.launch {
+            groupRepository.addMemberToGroup(userId, groupId)
         }
     }
 

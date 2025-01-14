@@ -49,7 +49,6 @@ import com.example.roomy.ui.States.GroupsUiState
 import com.example.roomy.ui.ViewModels.AddGroupState
 import com.example.roomy.ui.ViewModels.GroupViewModel
 import com.example.roomy.ui.ViewModels.RegisterState
-import com.example.roomy.ui.ViewModels.ShoppingListViewModel
 import com.example.roomy.ui.ViewModels.UserViewModel
 
 @Composable
@@ -57,7 +56,6 @@ fun Groups(
     navController: NavController,
     groupViewModel: GroupViewModel,
     userViewModel: UserViewModel,
-    shoppingListViewModel: ShoppingListViewModel,
 ) {
 
 

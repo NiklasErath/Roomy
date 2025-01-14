@@ -40,16 +40,13 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.roomy.db.GroupRepository
 import com.example.roomy.db.ItemRepository
-import com.example.roomy.db.ShoppingListRepository
 import com.example.roomy.db.UserRepository
 import com.example.roomy.ui.ViewModels.GroupViewModel
 import com.example.roomy.ui.Factory.GroupViewModelFactory
 import com.example.roomy.ui.Factory.ItemViewModelFactory
-import com.example.roomy.ui.Factory.ShoppingListViewModelFactory
 import com.example.roomy.ui.ViewModels.UserViewModel
 import com.example.roomy.ui.Factory.UserViewModelFactory
 import com.example.roomy.ui.ViewModels.ItemViewModel
-import com.example.roomy.ui.ViewModels.ShoppingListViewModel
 
 enum class Screens {
     Login, Register, Groups, Home, Balance, Profile
@@ -65,7 +62,6 @@ fun RoomyApp(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val userRepository = UserRepository()
     val groupRepository = GroupRepository()
-    val shoppingListRepository = ShoppingListRepository()
     val itemRepository = ItemRepository()
 
 
@@ -81,10 +77,6 @@ fun RoomyApp(
 
     val userViewModel: UserViewModel = viewModel(
         factory = UserViewModelFactory(userRepository)
-    )
-
-    val shoppingListViewModel: ShoppingListViewModel = viewModel(
-        factory = ShoppingListViewModelFactory(shoppingListRepository)
     )
 
     val itemViewModel: ItemViewModel = viewModel(
@@ -115,7 +107,7 @@ fun RoomyApp(
 
             ){
                 innerPadding ->
-            AppNavHost(navController, Modifier.padding(innerPadding), userViewModel, groupViewModel, shoppingListViewModel, itemViewModel)
+            AppNavHost(navController, Modifier.padding(innerPadding), userViewModel, groupViewModel, itemViewModel)
 
         }
 
@@ -128,7 +120,7 @@ fun RoomyApp(
 
             ){
                 innerPadding ->
-            AppNavHost(navController, Modifier.padding(innerPadding), userViewModel, groupViewModel, shoppingListViewModel, itemViewModel)
+            AppNavHost(navController, Modifier.padding(innerPadding), userViewModel, groupViewModel, itemViewModel)
 
         }
 
@@ -138,7 +130,7 @@ fun RoomyApp(
 
 
 @Composable
-fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier, userViewModel: UserViewModel, groupViewModel: GroupViewModel, shoppingListViewModel: ShoppingListViewModel, itemViewModel: ItemViewModel) {
+fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier, userViewModel: UserViewModel, groupViewModel: GroupViewModel, itemViewModel: ItemViewModel) {
     NavHost(
         navController = navController,
         startDestination = Screens.Login.name,
@@ -180,7 +172,6 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier, 
                         navController,
                         groupViewModel,
                         userViewModel,
-                        shoppingListViewModel
                     )
                 }
             }

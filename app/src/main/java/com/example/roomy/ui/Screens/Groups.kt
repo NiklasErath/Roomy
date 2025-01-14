@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -38,7 +39,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.roomy.R
 import com.example.roomy.ui.States.GroupsUiState
+import com.example.roomy.ui.ViewModels.AddGroupState
 import com.example.roomy.ui.ViewModels.GroupViewModel
+import com.example.roomy.ui.ViewModels.RegisterState
 import com.example.roomy.ui.ViewModels.UserViewModel
 
 @Composable
@@ -46,8 +49,12 @@ fun Groups(
     navController: NavController,
     groupViewModel: GroupViewModel,
     userViewModel: UserViewModel,
-){
+) {
 
+
+    val addGroupState by groupViewModel.addGroupState
+
+    val context = LocalContext.current
 
 
     val currentUserId = userViewModel.currentUserSession.collectAsState().value.userId
@@ -63,47 +70,92 @@ fun Groups(
         groupViewModel.getGroupsByUserId(currentUserId)
     }
 
+    LaunchedEffect(addGroupState) {
+        if (addGroupState is AddGroupState.Success) {
+            navController.navigate(Screens.Home.name)
+            groupViewModel.resetGroupState()
+
+        }
+    }
+
     var newGroupName by remember { mutableStateOf("Home") }
     var newMemberEmail by remember { mutableStateOf("") }
 
 
     var addGroupPopUp by remember { mutableStateOf(false) }
 
-    Column (
+    Column(
         Modifier.fillMaxSize()
-    ){
-        Text(text="Groups Page")
-        Button(onClick = {navController.navigate(Screens.Home.name)}) {
-            Text(text="Select and enter Group")
+    ) {
+        Text(text = "Groups Page")
+        Button(onClick = { navController.navigate(Screens.Home.name) }) {
+            Text(text = "Select and enter Group")
         }
 
         LazyColumn {
             if (groupInformationState.groupsInformation.isEmpty()) {
-                item{
-                    Text(text= "No groups")
+                item {
+                    Text(text = "No groups")
                 }
             } else {
-                itemsIndexed(groupInformationState.groupsInformation) {
-                    index, groupInformation ->
-            Text(text = "Group ID: ${groupInformation.name}")
+                itemsIndexed(groupInformationState.groupsInformation) { index, groupInformation ->
+
+
+                        OutlinedCard(
+                            Modifier.clickable {
+                                groupViewModel.setCurrentGroup(groupInformation)
+                                navController.navigate(Screens.Home.name)
+                            }.fillMaxWidth(),
+
+                        ) {
+                            Row(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp), horizontalArrangement = Arrangement.Center) {
+
+                            Text(text = " ${groupInformation.name}")
+                        }
+
+                    }
+
+
                 }
+
+
+            }
+            item {
+                Spacer(Modifier.height(100.dp))
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
+
+                    Button(onClick = {
+                        addGroupPopUp = true
+
+                    }) {
+                        Icon(imageVector = Icons.Filled.Add, contentDescription = "Add Group")
+                    }
+
+                }
+
             }
         }
 
-        Spacer(Modifier.height(100.dp))
-        Button(onClick = {
-            addGroupPopUp = true
 
-        }) {
-             Icon(imageVector = Icons.Filled.Add, contentDescription = "Add Group")
-        }
     }
 
-    if(addGroupPopUp){
-        Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceEvenly) {
+    if (addGroupPopUp) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceEvenly
+        ) {
 
-            Row (Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
-                Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Return", Modifier.clickable { addGroupPopUp = false })
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                    contentDescription = "Return",
+                    Modifier.clickable { addGroupPopUp = false })
 
                 Spacer(Modifier.width(20.dp))
                 Text(text = "Add Group", fontSize = integerResource(id = R.integer.heading1).sp)
@@ -111,9 +163,14 @@ fun Groups(
 
             OutlinedTextField(
                 value = newGroupName,
-                onValueChange = {newValue -> newGroupName = newValue},
+                onValueChange = { newValue -> newGroupName = newValue },
                 Modifier.fillMaxWidth(),
-                leadingIcon = {Icon(imageVector = Icons.Filled.Edit, contentDescription = "GroupName")},
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Filled.Edit,
+                        contentDescription = "GroupName"
+                    )
+                },
             )
 
             Row {
@@ -121,36 +178,37 @@ fun Groups(
             }
             OutlinedTextField(
                 value = newMemberEmail,
-                onValueChange = {newValue -> newMemberEmail = newValue},
+                onValueChange = { newValue -> newMemberEmail = newValue },
                 Modifier.fillMaxWidth(),
 //                leadingIcon = {Icon(imageVector = Icons.Filled.Edit, contentDescription = "AddUser")},
                 label = { Text("Invite someone New") },
                 placeholder = { Text("example@outlook.com") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
 
-                        trailingIcon = {Icon(imageVector = Icons.Filled.Add, contentDescription = "Add", Modifier.clickable {
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = "Add",
+                        Modifier.clickable {
 
 //                    Add new member, if successfull make a list with added users emails/usernames under this textfield - just save locally from input to display
 //                    If not succesfull, popup with error message ...
 //                    Ensure Users can only be added once
 
-                })},
+                        })
+                },
 
 
                 )
 
             Button(
-                onClick = {addGroupPopUp = false
-                groupViewModel.createNewGroup(newGroupName,currentUserId)},
-            ){
+                onClick = {
+                    groupViewModel.createNewGroup(newGroupName, currentUserId)
+                    addGroupPopUp = false
+                },
+            ) {
                 Text(text = "Add Group")
             }
         }
-
-
-
-
-
     }
-
 }

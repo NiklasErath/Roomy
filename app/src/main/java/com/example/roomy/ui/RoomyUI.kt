@@ -1,5 +1,10 @@
 package com.example.roomy.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +25,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -77,34 +84,61 @@ fun RoomyApp(
     )
 
 
-    Scaffold(
+    if (displayBottomBarAndHeader) {
 
-        bottomBar = {
-            if (displayBottomBarAndHeader) {
-                BottomNavigationBar(navController, currentDestination)
-            }
-        },
+        Scaffold(
 
-        topBar = {
-            if (displayBottomBarAndHeader) {
-                Header(navController, currentDestination)
-            }
+            bottomBar = {
 
+                    BottomNavigationBar(navController, currentDestination)
 
-        },
+            },
+
+            topBar = {
+
+                    Header(navController, currentDestination, groupViewModel)
 
 
-        modifier = Modifier.fillMaxSize(),
 
-        ) { innerPadding ->
-        NavHost(
-            navController, startDestination = Screens.Login.name,
-            modifier = Modifier
-                .padding(innerPadding)
-                .padding(horizontal = if (currentDestination == Screens.Home.name) 0.dp else 20.dp),
+            },
 
-            )
-        {
+
+            modifier = Modifier.fillMaxSize(),
+
+            ){
+                innerPadding ->
+            AppNavHost(navController, Modifier.padding(innerPadding), userViewModel, groupViewModel, itemViewModel)
+
+        }
+
+
+    } else {
+
+        Scaffold(
+
+            modifier = Modifier.fillMaxSize(),
+
+            ){
+                innerPadding ->
+            AppNavHost(navController, Modifier.padding(innerPadding), userViewModel, groupViewModel, itemViewModel)
+
+        }
+
+
+    }
+}
+
+
+@Composable
+fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier, userViewModel: UserViewModel, groupViewModel: GroupViewModel, itemViewModel: ItemViewModel) {
+    NavHost(
+        navController = navController,
+        startDestination = Screens.Login.name,
+        modifier = modifier
+//                .padding(horizontal = if (currentDestination == Screens.Home.name) 0.dp else 20.dp),
+                .padding(horizontal = 20.dp),
+    ) {
+
 
             composable(
                 Screens.Login.name,
@@ -147,7 +181,8 @@ fun RoomyApp(
             ) {
                 Box {
                     Home(
-
+                        groupViewModel,
+                        itemViewModel,
                         navController
                     )
                 }
@@ -172,13 +207,10 @@ fun RoomyApp(
                     )
                 }
             }
-        }
 
 
     }
-
 }
-
 
 @Composable
 fun BottomNavigationBar(
@@ -216,8 +248,13 @@ fun BottomNavigationBar(
 @Composable
 fun Header(
     navController: NavController,
-    currentDestination: String?
+    currentDestination: String?,
+    groupViewModel: GroupViewModel
 ) {
+
+    val currentGroup by groupViewModel.currentGroup.collectAsState()
+
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -238,7 +275,7 @@ fun Header(
                     )
                 }
                 Text(
-                    text = currentDestination ?: "No Destination",
+                    text = currentGroup.name,
                     fontSize = 20.sp,
                 )
                 IconButton(onClick = {

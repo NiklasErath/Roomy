@@ -86,8 +86,6 @@ class GroupViewModel(private val groupRepository: GroupRepository) : ViewModel()
                 _addGroupState.value = AddGroupState.Success
 
 
-
-
             } ?: run {
                 Log.d("TAG", "Group ID is null. Cannot add member.")
             }
@@ -99,6 +97,4 @@ class GroupViewModel(private val groupRepository: GroupRepository) : ViewModel()
             groupRepository.addMemberToGroup(userId, groupId)
         }
     }
-
-
 }

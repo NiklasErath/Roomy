@@ -25,6 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -32,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.roomy.R
 import com.example.roomy.db.UserRepository
 import com.example.roomy.ui.ViewModels.UserViewModel
 import com.example.roomy.ui.ViewModels.UserViewModelFactory
@@ -54,7 +56,7 @@ fun Register(
 
 
     Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
-        Text(text="Sign up", fontSize = 32.sp)
+        Text(text="Sign up", fontSize = integerResource(id = R.integer.heading1).sp)
         Spacer(Modifier.height(100.dp))
 
         OutlinedTextField(
@@ -63,8 +65,10 @@ fun Register(
             Modifier.fillMaxWidth(),
             label = { Text("Email") },
             leadingIcon = {Icon(imageVector = Icons.Filled.Email, contentDescription = "Email")},
-            placeholder = {Text(text="example@outlook.com")}
-        )
+            placeholder = {Text(text="example@outlook.com")},
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+
+            )
 
         Spacer(Modifier.height(10.dp))
 
@@ -104,7 +108,7 @@ fun Register(
 
         Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End){
             Button(onClick = {
-                viewModel.signUp(email, password)
+                viewModel.signUp(email, password, username)
 
 //                navController.navigate(Screens.Groups.name)
             }) {

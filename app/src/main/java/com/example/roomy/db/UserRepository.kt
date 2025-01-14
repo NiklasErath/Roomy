@@ -42,6 +42,8 @@ class UserRepository {
             e.message?.let { Log.d("TAG", it) }
             Log.d("DATA LOGIN", "$userEmail , $userPassword")
 
+            throw e
+
         }
     }
 
@@ -74,7 +76,7 @@ class UserRepository {
         } catch (e: Exception) {
             // Log the error and throw an exception
             Log.d("TAG", "Could not get the User information: ${e.message}")
-            throw IllegalStateException("No User information available")
+            throw e
         }
 
     }

@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -43,6 +45,8 @@ import com.example.roomy.R
 import com.example.roomy.db.GroupRepository
 import com.example.roomy.db.UserRepository
 import com.example.roomy.ui.Screens
+import com.example.roomy.ui.States.GroupState
+import com.example.roomy.ui.States.GroupsUiState
 import com.example.roomy.ui.ViewModels.GroupViewModel
 import com.example.roomy.ui.ViewModels.GroupViewModelFactory
 import com.example.roomy.ui.ViewModels.UserViewModel
@@ -58,6 +62,18 @@ fun Groups(
 
 
     val currentUserId = userViewModel.currentUserSession.collectAsState().value.userId
+
+    val groupState by groupViewModel.groups.collectAsState(
+        initial = GroupState(
+            emptyList()
+        )
+    )
+
+    val groupInformationState by groupViewModel.groupsInformation.collectAsState(
+        initial = GroupsUiState(
+            emptyList()
+        )
+    )
 
     LaunchedEffect(Unit) {
 
@@ -76,6 +92,19 @@ fun Groups(
         Text(text="Groups Page")
         Button(onClick = {navController.navigate(Screens.Home.name)}) {
             Text(text="Select and enter Group")
+        }
+
+        LazyColumn {
+            if (groupInformationState.groupsInformation.isEmpty()) {
+                item{
+                    Text(text= "No groups")
+                }
+            } else {
+                itemsIndexed(groupInformationState.groupsInformation) {
+                    index, groupInformation ->
+            Text(text = "Group ID: ${groupInformation.name}")
+                }
+            }
         }
 
         Spacer(Modifier.height(100.dp))

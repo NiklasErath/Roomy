@@ -15,4 +15,3 @@ class UserViewModelFactory(private val userRepository: UserRepository) : ViewMod
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
-

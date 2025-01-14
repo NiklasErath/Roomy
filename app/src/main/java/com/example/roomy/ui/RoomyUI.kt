@@ -44,6 +44,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.roomy.db.GroupRepository
 import com.example.roomy.db.Supabase.supabase
 import com.example.roomy.db.UserRepository
 
@@ -60,6 +61,7 @@ fun RoomyApp(
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val userRepository = UserRepository()
+    val groupRepository = GroupRepository()
 
 
     val currentDestination = navBackStackEntry?.destination?.route
@@ -127,7 +129,9 @@ fun RoomyApp(
                 Box {
                     Groups(
 
-                        navController
+                        navController,
+                        groupRepository,
+                        userRepository
                     )
                 }
             }

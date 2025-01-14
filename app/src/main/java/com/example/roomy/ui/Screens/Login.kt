@@ -44,7 +44,7 @@ fun Login(
     var password by remember { mutableStateOf("") }
 
     val viewModel: UserViewModel = viewModel(
-        factory = UserViewModelFactory(userRepository)  // Correct way to provide the factory
+        factory = UserViewModelFactory(userRepository)
     )
 
 

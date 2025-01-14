@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.roomy.db.UserRepository
 import com.example.roomy.ui.States.SessionState
 import com.example.roomy.ui.States.UserState
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -50,6 +49,8 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
             }
         }
     }
+
+
 
     fun logInAndFetchUserInformation(userEmail: String, userPassword: String){
         viewModelScope.launch {

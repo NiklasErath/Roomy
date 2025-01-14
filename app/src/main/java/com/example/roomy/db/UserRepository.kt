@@ -18,7 +18,6 @@ class UserRepository {
 
         try {
 
-
             val result = supabase.auth.signUpWith(Email) {
                 email = userEmail
                 password = userPassword

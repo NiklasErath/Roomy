@@ -39,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -47,6 +48,10 @@ import androidx.navigation.compose.rememberNavController
 import com.example.roomy.db.GroupRepository
 import com.example.roomy.db.Supabase.supabase
 import com.example.roomy.db.UserRepository
+import com.example.roomy.ui.ViewModels.GroupViewModel
+import com.example.roomy.ui.ViewModels.GroupViewModelFactory
+import com.example.roomy.ui.ViewModels.UserViewModel
+import com.example.roomy.ui.ViewModels.UserViewModelFactory
 
 enum class Screens {
     Login, Register, Groups, Home, Balance, Profile
@@ -69,6 +74,14 @@ fun RoomyApp(
         Screens.Login.name, Screens.Register.name, Screens.Groups.name -> false
         else -> true
     }
+
+    val groupViewModel: GroupViewModel = viewModel(
+        factory = GroupViewModelFactory(groupRepository)
+    )
+
+    val userViewModel: UserViewModel = viewModel(
+        factory = UserViewModelFactory(userRepository)
+    )
 
 
     Scaffold(
@@ -105,7 +118,7 @@ fun RoomyApp(
             ) {
                 Box {
                     Login(
-                        userRepository,
+                        userViewModel,
                         navController,
 
                         )
@@ -130,8 +143,8 @@ fun RoomyApp(
                     Groups(
 
                         navController,
-                        groupRepository,
-                        userRepository
+                        groupViewModel,
+                        userViewModel
                     )
                 }
             }

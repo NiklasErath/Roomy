@@ -45,17 +45,15 @@ import kotlin.math.log
 
 @Composable
 fun Login(
-    userRepository: UserRepository,
+    userViewModel: UserViewModel,
     navController: NavController
 ){
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    val viewModel: UserViewModel = viewModel(
-        factory = UserViewModelFactory(userRepository)
-    )
 
-    val loginState by viewModel.loginState
+
+    val loginState by userViewModel.loginState
     var context = LocalContext.current
 
     LaunchedEffect (loginState){
@@ -106,7 +104,7 @@ fun Login(
 
         Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End){
             Button(onClick = {
-                viewModel.logInAndFetchUserInformation(email, password);
+                userViewModel.logInAndFetchUserInformation(email, password);
 //                viewModel.getUserInformation()
 //        navController.navigate(Screens.Groups.name)
             }) {

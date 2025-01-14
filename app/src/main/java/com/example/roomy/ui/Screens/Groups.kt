@@ -51,22 +51,17 @@ import com.example.roomy.ui.ViewModels.UserViewModelFactory
 @Composable
 fun Groups(
     navController: NavController,
-    groupRepository: GroupRepository,
-    userRepository: UserRepository
+    groupViewModel: GroupViewModel,
+    userViewModel: UserViewModel
 ){
 
-    val viewModel: GroupViewModel = viewModel(
-        factory = GroupViewModelFactory(groupRepository)
-    )
 
-    val userViewModel: UserViewModel = viewModel(
-        factory = UserViewModelFactory(userRepository)
-    )
 
     val currentUserId = userViewModel.currentUserSession.collectAsState().value.userId
 
-    LaunchedEffect(currentUserId) {
-        viewModel.getGroupsByUserId(currentUserId)
+    LaunchedEffect(Unit) {
+
+        groupViewModel.getGroupsByUserId(currentUserId)
     }
 
     var newGroupName by remember { mutableStateOf("Home") }

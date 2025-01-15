@@ -34,10 +34,41 @@ class ItemRepository {
 
     suspend fun addItem(
         item: Item
-    ) {
+    ) :Item {
         try {
 
-            supabase.from("items").insert(item)
+            var newItem = supabase.from("items").insert(item){select()}.decodeSingle<Item>()
+            Log.d("TAG", "Could not Add Item: ${newItem}")
+
+
+
+            return newItem
+
+        } catch (e: Exception) {
+            // Log the error and throw an exception
+            Log.d("TAG", "Could not Add Item: ${e.message}")
+            throw e
+        }
+    }
+
+    suspend fun updateItem(
+        item: Item
+    ) {
+        try {
+            Log.d("TAG", "Item: ${item}")
+
+
+            item.id?.let {
+                supabase.from("items").update(
+                    {
+                        set("status", item.status)
+                    }
+                ) {
+                    filter {
+                        eq("item_id", it)
+                    }
+                }
+            }
 
         } catch (e: Exception) {
             // Log the error and throw an exception

@@ -2,6 +2,7 @@ package com.example.roomy.ui
 
 import android.content.res.Resources.Theme
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
@@ -23,13 +24,18 @@ import com.example.roomy.R
 import com.example.roomy.db.data.Item
 
 @Composable
-fun Item(item:Item) {
+fun Item(
+    item: Item,
+    updateItem: () -> Unit
+) {
+
     Column(
-        Modifier
+        modifier = Modifier
             .fillMaxWidth()
             .aspectRatio(1.1f)
             .background(MaterialTheme.colorScheme.primary)
-            .padding(bottom = 4.dp),
+            .padding(bottom = 4.dp)
+            .clickable { updateItem() },
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

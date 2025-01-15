@@ -130,6 +130,4 @@ class GroupViewModel(
             groupRepository.addMemberToGroup(userId, groupId)
         }
     }
-
-
 }

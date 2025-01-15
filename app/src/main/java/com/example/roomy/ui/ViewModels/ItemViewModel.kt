@@ -30,6 +30,51 @@ class ItemViewModel(private val itemRepository: ItemRepository) : ViewModel() {
     val allShoppingListItems = _allShoppingListItems.asStateFlow()
     val allInventoryItems = _allInventoryItems.asStateFlow()
 
+    fun moveToInventory(item:Item){
+
+        val newItem = Item(item.id, item.name, item.groupId, "inventory", item.quantity, item.icon)
+
+        viewModelScope.launch {
+
+            _allShoppingListItems.update { it ->
+                it.copy(
+                    items = it.items.filter { it.id != newItem.id}
+                )
+            }
+
+            _allInventoryItems.update {
+                it.copy(
+                    items = it.items + newItem
+                )
+            }
+            itemRepository.updateItem(newItem)
+
+        }
+    }
+
+
+    fun moveToShoppingList(item:Item){
+
+        val newItem = Item(item.id, item.name, item.groupId, "shoppingList", item.quantity, item.icon)
+
+        viewModelScope.launch {
+
+            _allInventoryItems.update { it ->
+                it.copy(
+                    items = it.items.filter { it.id != newItem.id}
+                )
+            }
+
+            _allShoppingListItems.update {
+                it.copy(
+                    items = it.items + newItem
+                )
+            }
+            itemRepository.updateItem(newItem)
+
+        }
+    }
+
 
     suspend fun getAllItems(groupId: Int) {
         viewModelScope.launch {
@@ -61,12 +106,23 @@ class ItemViewModel(private val itemRepository: ItemRepository) : ViewModel() {
         )
         viewModelScope.launch {
 
+
             _allShoppingListItems.update {
                 it.copy(
                     items = it.items + item
                 )
             }
-            itemRepository.addItem(item)
+
+            val newItem = itemRepository.addItem(item)
+
+            _allShoppingListItems.update {
+                it.copy(
+                    items = it.items.map { existingItem ->
+                        if (existingItem == item) newItem else existingItem
+                    }
+                )
+            }
+
 
         }
     }

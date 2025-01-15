@@ -117,6 +117,34 @@ class UserRepository {
 
     }
 
+    suspend fun getUserByName(name: String): UserInformation {
+        Log.d("TAG", "HEYXXXYYYXXXX")
+
+        try {
+            // Query to fetch user information by userId
+            val response = supabase
+                .from("user_information") // Table name
+                .select {
+                    filter {
+                        eq(
+                            "username",
+                            name
+                        )
+                    }
+                } // Select all columns (you can specify specific ones like .select("id", "name", "email"))
+                .decodeSingle<UserInformation>()
+
+            Log.d("USER TO ADD", "user info $response")
+
+            return response
+        } catch (e: Exception) {
+            // Log the error and throw an exception
+            Log.d("TAG", "No user found ${e.message}")
+            throw e
+        }
+
+    }
+
     suspend fun checkExistingEmail(userEmail: String): Boolean {
 
         try {

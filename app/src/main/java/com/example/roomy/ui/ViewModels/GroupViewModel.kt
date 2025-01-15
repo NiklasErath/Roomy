@@ -132,4 +132,14 @@ class GroupViewModel(
             groupRepository.addMemberToGroup(userId, groupId)
         }
     }
+
+    fun addMemberByNameToGroup(username: String, groupId: Int) {
+        viewModelScope.launch {
+
+            val user = userRepository.getUserByName(username)
+            addMemberToGroup(user.id, groupId)
+
+        }
+
+    }
 }

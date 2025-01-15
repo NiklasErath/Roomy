@@ -136,115 +136,224 @@ fun Home(
 //                .padding(horizontal = 20.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            Text(text = currentGroup.name)
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                groupMemberInformation.memberInformation.forEach { groupMembers ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        UserProfileCircle(groupMembers.username, 50.dp, Color.Blue)
-                        Text(
-                            text = groupMembers.username,
-                            modifier = Modifier.padding(start = 8.dp)
+            groupMemberInformation.memberInformation.forEach { groupMembers ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    UserProfileCircle(groupMembers.username, 50.dp, Color.Blue)
+                    Text(
+                        text = groupMembers.username,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+            }
+        }
+
+        Button(onClick = { navController.navigate(Screens.Groups.name) }) {
+            Text(text = "Back to Groups")
+        }
+
+        Button(onClick = { groupViewModel.deleteGroup(currentGroupIdInt) }) {
+            Text(text = "Delete Group")
+        }
+        Button(onClick = { navController.navigate(Screens.GroupMembers.route) }) {
+            Text(text = "GroupMembers")
+        }
+
+        if (shoppingListItems.items.isEmpty() && renderAfterFetching) {
+            Text(text = "Nothing here yet, add a new Item to your Shopping List")
+        } else if (renderAfterFetching) {
+
+            shoppingListItems.items.chunked(3).forEach { rowItems ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    rowItems.forEach { item ->
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                        ) {
+                            Item(
+                                item,
+                                updateItem = {
+                                    itemViewModel.moveToInventory(item)
+                                })
+                        }
+                    }
+
+                    repeat(3 - rowItems.size) {
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
+                }
+                Spacer(Modifier.height(8.dp))
+            }
+        }
+        Spacer(Modifier.height(50.dp))
+        Text(text = "Inventory")
+
+        if (inventoryItems.items.isEmpty() && renderAfterFetching) {
+            Text(text = "Nothing here yet, add a new Item to your Shopping List")
+        } else if (renderAfterFetching) {
+
+            inventoryItems.items.chunked(3).forEach { rowItems ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    rowItems.forEach { item ->
+
+
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                        ) {
+                            Item(
+                                item,
+                                updateItem = {
+                                    itemViewModel.moveToShoppingList(item)
+                                })
+
+                        }
+
+
+                    }
+
+                    repeat(3 - rowItems.size) {
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
+                }
+                Spacer(Modifier.height(8.dp))
+            }
+        }
+    }
+
+    Column(
+        Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Bottom
+    ) {
+        Row(Modifier.fillMaxWidth()) {
+            OutlinedTextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.background)
+                    .border(width = 1.dp, color = Color.White)
+                    .clip(
+                        shape = RoundedCornerShape(
+                            topStart = 10.dp,
+                            topEnd = 10.dp
                         )
-                    }
+                    ),
+                value = "", // Replace with actual value
+                onValueChange = { /* Handle value change */ },
+                label = { Text(text = "Label Text") } // Add a label for the text field
+            )
+        }
+
+        Text(text = currentGroup.name)
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            groupMemberInformation.memberInformation.forEach { groupMembers ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    UserProfileCircle(groupMembers.username, 50.dp, Color.Blue)
+                    Text(
+                        text = groupMembers.username,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
                 }
             }
+        }
 
-            Button(onClick = { navController.navigate(Screens.Groups.name) }) {
-                Text(text = "Back to Groups")
-            }
-            Button(onClick = {
-                groupViewModel.addMemberToGroup(
-                    "0f35ef14-7c8c-4dd8-9a63-2f14190eec8d",
-                    currentGroupIdInt
-                )
-            }) {
-                Text(text = "Add Member")
-            }
+        Button(onClick = { navController.navigate(Screens.Groups.name) }) {
+            Text(text = "Back to Groups")
+        }
+        Button(onClick = {
+            groupViewModel.addMemberToGroup(
+                "0f35ef14-7c8c-4dd8-9a63-2f14190eec8d",
+                currentGroupIdInt
+            )
+        }) {
+            Text(text = "Add Member")
+        }
 
-            Button(onClick = {
-                groupViewModel.kickUser(
-                    "0f35ef14-7c8c-4dd8-9a63-2f14190eec8d",
-                    currentGroupIdInt
-                )
-            }) {
-                Text(text = "Delete Member")
-            }
+        Button(onClick = {
+            groupViewModel.kickUser(
+                "0f35ef14-7c8c-4dd8-9a63-2f14190eec8d",
+                currentGroupIdInt
+            )
+        }) {
+            Text(text = "Delete Member")
+        }
 
-            Button(onClick = { groupViewModel.deleteGroup(currentGroupIdInt) }) {
-                Text(text = "Delete Group")
-            }
+        Button(onClick = { groupViewModel.deleteGroup(currentGroupIdInt) }) {
+            Text(text = "Delete Group")
+        }
 
-            if (shoppingListItems.items.isEmpty() && renderAfterFetching) {
-                Text(text = "Nothing here yet, add a new Item to your Shopping List")
-            } else if (renderAfterFetching) {
-
-                shoppingListItems.items.chunked(3).forEach { rowItems ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        rowItems.forEach { item ->
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                            ) {
-                                Item(
-                                    item,
-                                    updateItem = {
-                                        itemViewModel.moveToInventory(item)
-                                    })
-                            }
-                        }
-
-                        repeat(3 - rowItems.size) {
-                            Spacer(modifier = Modifier.weight(1f))
+        if (shoppingListItems.items.isEmpty() && renderAfterFetching) {
+            Text(text = "Nothing here yet, add a new Item to your Shopping List")
+        } else if (renderAfterFetching) {
+            shoppingListItems.items.chunked(3).forEach { rowItems ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    rowItems.forEach { item ->
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                        ) {
+                            Item(
+                                item,
+                                updateItem = {
+                                    itemViewModel.moveToInventory(item)
+                                })
                         }
                     }
-                    Spacer(Modifier.height(8.dp))
+
+                    repeat(3 - rowItems.size) {
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
                 }
+                Spacer(Modifier.height(8.dp))
             }
-            Spacer(Modifier.height(50.dp))
-            Text(text = "Inventory")
+        }
+        Spacer(Modifier.height(50.dp))
+        Text(text = "Inventory")
 
-            if (inventoryItems.items.isEmpty() && renderAfterFetching) {
-                Text(text = "Nothing here yet, add a new Item to your Shopping List")
-            } else if (renderAfterFetching) {
-
-                inventoryItems.items.chunked(3).forEach { rowItems ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        rowItems.forEach { item ->
-
-
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                            ) {
-                                Item(
-                                    item,
-                                    updateItem = {
-                                        itemViewModel.moveToShoppingList(item)
-                                    })
-
-                            }
-
-
-                        }
-
-                        repeat(3 - rowItems.size) {
-                            Spacer(modifier = Modifier.weight(1f))
+        if (inventoryItems.items.isEmpty() && renderAfterFetching) {
+            Text(text = "Nothing here yet, add a new Item to your Shopping List")
+        } else if (renderAfterFetching) {
+            inventoryItems.items.chunked(3).forEach { rowItems ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    rowItems.forEach { item ->
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                        ) {
+                            Item(
+                                item,
+                                updateItem = {
+                                    itemViewModel.moveToShoppingList(item)
+                                })
                         }
                     }
-                    Spacer(Modifier.height(8.dp))
+
+                    repeat(3 - rowItems.size) {
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
                 }
+                Spacer(Modifier.height(8.dp))
             }
         }
 
@@ -286,8 +395,6 @@ fun Home(
 
     }
 }
-
-
 
 
 //ExpandingItemELement no as composable but in Group/Home Composable - leave here for future testing

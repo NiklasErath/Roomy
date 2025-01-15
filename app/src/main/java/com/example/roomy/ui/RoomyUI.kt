@@ -54,7 +54,7 @@ enum class Screens (val route: String){
     Login("Login"),
     Register("Register"),
     Groups("Groups"),
-    Home("Home/{groupId}"),
+    Home("Home"),
     Balance("Balance"),
     Profile("Profile")
 }
@@ -185,18 +185,13 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier, 
 
             composable(
                 Screens.Home.route,
-                arguments = listOf(navArgument("groupId") {type = NavType.StringType})
-
             ) {
-
-                val groupId = it.arguments?.getString("groupId")
 
                 Box {
                     Home(
                         groupViewModel,
                         itemViewModel,
                         navController,
-                        currentGroupId = groupId
                     )
                 }
             }

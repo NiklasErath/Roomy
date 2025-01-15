@@ -34,10 +34,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.roomy.db.GroupRepository
 import com.example.roomy.db.ItemRepository
 import com.example.roomy.db.UserRepository
@@ -48,8 +50,13 @@ import com.example.roomy.ui.ViewModels.UserViewModel
 import com.example.roomy.ui.Factory.UserViewModelFactory
 import com.example.roomy.ui.ViewModels.ItemViewModel
 
-enum class Screens {
-    Login, Register, Groups, Home, Balance, Profile
+enum class Screens (val route: String){
+    Login("Login"),
+    Register("Register"),
+    Groups("Groups"),
+    Home("Home/{groupId}"),
+    Balance("Balance"),
+    Profile("Profile")
 }
 
 @Composable
@@ -133,7 +140,7 @@ fun RoomyApp(
 fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier, userViewModel: UserViewModel, groupViewModel: GroupViewModel, itemViewModel: ItemViewModel) {
     NavHost(
         navController = navController,
-        startDestination = Screens.Login.name,
+        startDestination = Screens.Login.route,
         modifier = modifier
 //                .padding(horizontal = if (currentDestination == Screens.Home.name) 0.dp else 20.dp),
                 .padding(horizontal = 20.dp),
@@ -141,7 +148,7 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier, 
 
 
             composable(
-                Screens.Login.name,
+                Screens.Login.route,
             ) {
                 Box {
                     Login(
@@ -153,7 +160,7 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier, 
             }
 
             composable(
-                Screens.Register.name,
+                Screens.Register.route,
             ) {
                 Box {
                     Register(
@@ -164,7 +171,7 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier, 
             }
 
             composable(
-                Screens.Groups.name,
+                Screens.Groups.route,
             ) {
                 Box {
                     Groups(
@@ -177,19 +184,25 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier, 
             }
 
             composable(
-                Screens.Home.name,
+                Screens.Home.route,
+                arguments = listOf(navArgument("groupId") {type = NavType.StringType})
+
             ) {
+
+                val groupId = it.arguments?.getString("groupId")
+
                 Box {
                     Home(
                         groupViewModel,
                         itemViewModel,
-                        navController
+                        navController,
+                        currentGroupId = groupId
                     )
                 }
             }
 
             composable(
-                Screens.Balance.name,
+                Screens.Balance.route,
             ) {
                 Box {
                     Balance(
@@ -199,7 +212,7 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier, 
             }
 
             composable(
-                Screens.Profile.name,
+                Screens.Profile.route,
             ) {
                 Box {
                     Profile(
@@ -220,20 +233,20 @@ fun BottomNavigationBar(
 
     NavigationBar {
         NavigationBarItem(
-            selected = (currentDestination == Screens.Home.name),
-            onClick = { navController.navigate(Screens.Home.name) },
+            selected = (currentDestination == Screens.Home.route),
+            onClick = { navController.navigate(Screens.Home.route) },
             icon = { Icon(imageVector = Icons.Filled.CheckCircle, contentDescription = "Home") },
             label = { Text("Lists") }
         )
         NavigationBarItem(
-            selected = (currentDestination == Screens.Balance.name),
-            onClick = { navController.navigate(Screens.Balance.name) },
+            selected = (currentDestination == Screens.Balance.route),
+            onClick = { navController.navigate(Screens.Balance.route) },
             icon = { Icon(imageVector = Icons.Filled.Refresh, contentDescription = "Overview") },
             label = { Text("Balance") }
         )
         NavigationBarItem(
-            selected = (currentDestination == Screens.Profile.name),
-            onClick = { navController.navigate(Screens.Profile.name) },
+            selected = (currentDestination == Screens.Profile.route),
+            onClick = { navController.navigate(Screens.Profile.route) },
             icon = {
                 Icon(
                     imageVector = Icons.Filled.AccountCircle,

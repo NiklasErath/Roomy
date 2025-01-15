@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -61,6 +62,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.roomy.R
+import com.example.roomy.ui.Composables.UserProfileCircle
+import com.example.roomy.ui.States.GroupMembersUiState
 import com.example.roomy.ui.States.GroupsUiState
 import com.example.roomy.ui.States.ItemsUiState
 import com.example.roomy.ui.ViewModels.GroupViewModel
@@ -77,8 +80,12 @@ import kotlinx.coroutines.launch
 fun Home(
     groupViewModel: GroupViewModel,
     itemViewModel: ItemViewModel,
-    navController: NavController
+    navController: NavController,
+    currentGroupId: String?
 ) {
+
+    val currentGroupIdInt = currentGroupId?.toIntOrNull() ?: 0
+
 
     var itemName by remember { mutableStateOf("") }
 
@@ -97,11 +104,19 @@ fun Home(
     val shoppingListItems by itemViewModel.allShoppingListItems.collectAsState(
         initial = ItemsUiState(emptyList())
     )
+    val groupMemberInformation by groupViewModel.groupMembers.collectAsState(
+        initial = GroupMembersUiState(
+            emptyList()
+        )
+    )
+
 
 
     LaunchedEffect(Unit) {
 
-        currentGroup.id?.let { itemViewModel.getAllItems(it) }
+         itemViewModel.getAllItems(currentGroupIdInt)
+         groupViewModel.getGroupMembers(currentGroupIdInt)
+
     }
 
     LaunchedEffect(finishedFetching){
@@ -120,9 +135,27 @@ fun Home(
             .verticalScroll(rememberScrollState())
     ) {
         Text(text = currentGroup.name)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            groupMemberInformation.memberInformation.forEach { groupMembers ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    UserProfileCircle(groupMembers.username, 50.dp, Color.Blue)
+                    Text(
+                        text = groupMembers.username,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+            }
+        }
 
         Button(onClick = { navController.navigate(Screens.Groups.name) }) {
             Text(text = "Back to Groups")
+        }
+        Button(onClick = {groupViewModel.addMemberToGroup("0f35ef14-7c8c-4dd8-9a63-2f14190eec8d", currentGroupIdInt)}) {
+            Text(text = "Add Member")
         }
 
         if(shoppingListItems.items.isEmpty() && renderAfterFetching){

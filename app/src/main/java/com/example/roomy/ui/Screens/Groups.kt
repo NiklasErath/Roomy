@@ -64,13 +64,7 @@ fun Groups(
 
     val currentUserId = userViewModel.currentUserSession.collectAsState().value.userId
 
-    val groupMembers = groupViewModel.groupMembers.collectAsState().value.memberInformation
 
-    val groupMemberInformation by groupViewModel.groupMembers.collectAsState(
-        initial = GroupMembersUiState(
-            emptyList()
-        )
-    )
 
     val groupInformationState by groupViewModel.groupsInformation.collectAsState(
         initial = GroupsUiState(
@@ -100,12 +94,6 @@ fun Groups(
     Column(
         Modifier.fillMaxSize()
     ) {
-        LazyColumn {
-            itemsIndexed(groupMemberInformation.memberInformation) { index, groupMembers ->
-                UserProfileCircle(groupMembers.username, 50.dp, Color.Blue)
-                Text(text = "${groupMembers.username}")
-            }
-        }
         Text(text = "Groups Page")
         Button(onClick = { navController.navigate(Screens.Home.name) }) {
             Text(text = "Select and enter Group")
@@ -123,7 +111,7 @@ fun Groups(
                         OutlinedCard(
                             Modifier.clickable {
                                 groupViewModel.setCurrentGroup(groupInformation)
-                                navController.navigate(Screens.Home.name)
+                                navController.navigate("Home/${groupInformation.id}")
                             }.fillMaxWidth(),
 
                         ) {

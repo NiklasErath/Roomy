@@ -142,6 +142,20 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
         }
     }
 
+    fun updateUserName(username: String, userId: String){
+        viewModelScope.launch{
+            userRepository.updateUserInformation(userId, username)
+            _loggedInUser.update { oldstate ->
+                oldstate.copy(
+                    userId = userId,
+                    username = username,
+                    email = loggedInUser.value.email
+                )
+            }
+
+        }
+    }
+
 //    fun signUp(userEmail: String, userPassword: String, userName: String) {
 //        viewModelScope.launch {
 //            try {

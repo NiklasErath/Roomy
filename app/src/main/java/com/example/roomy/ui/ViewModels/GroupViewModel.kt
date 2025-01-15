@@ -72,7 +72,6 @@ class GroupViewModel(
 
 
     fun getGroupInformationByGroupId(groups: List<Groups>) {
-        Log.d("IDS", "$groups")
         viewModelScope.launch {
             val household = groups.map { group ->
                 Log.d("IDS", "${group.groupId}")
@@ -87,9 +86,7 @@ class GroupViewModel(
     fun createNewGroup(groupName: String, userId: String, addedUsers: List<String>) {
         viewModelScope.launch {
             val newGroup = groupRepository.createGroup(groupName, userId)
-            Log.d("HAHHAHAHAHAHA", "$newGroup")
             newGroup.id?.let { groupId ->
-                Log.d("GROUP ID", "$groupId and $userId")
                 groupRepository.addMemberToGroup(userId, groupId)
                 try {
 

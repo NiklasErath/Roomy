@@ -229,6 +229,7 @@ fun AppNavHost(
         ) {
             Box {
                 Profile(
+                    userViewModel,
                     navController
                 )
             }

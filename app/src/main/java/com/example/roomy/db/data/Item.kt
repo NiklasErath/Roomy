@@ -10,6 +10,6 @@ data class Item(
     @SerialName("group_id") val groupId: Int,
     @SerialName("status") val status: String,
     @SerialName("quantity") val quantity: Int ? = null,
-    @SerialName("icon") val icon: String ? = null,
+    @SerialName("icon") val icon: Int ? = null,
 
     )

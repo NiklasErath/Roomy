@@ -40,7 +40,7 @@ fun Item(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(
-            painterResource(R.drawable.letter_a),
+            painterResource(item.icon?: R.drawable.placeholder),
             contentDescription = "Letter",
             Modifier.weight(1f)
         )

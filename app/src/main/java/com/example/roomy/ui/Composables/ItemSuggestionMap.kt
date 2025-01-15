@@ -2,7 +2,7 @@ package com.example.roomy.ui.Composables
 
 import com.example.roomy.R
 
-object IconMap {
+object ItemSuggestionMap {
 
     val nameToIconId: HashMap<String, Int> = hashMapOf(
         "placeholder" to R.drawable.letter_a,
@@ -16,3 +16,5 @@ object IconMap {
 
         )
 }
+
+val suggestedItems = listOf("banana", "cheese", "cola", "milk", "cherry", "eggs", "steak", "unknown")

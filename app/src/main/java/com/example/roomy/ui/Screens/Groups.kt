@@ -97,7 +97,7 @@ fun Home(
     var isExpanded by remember { mutableStateOf(false) }
 
     val animatedHeight by animateDpAsState(
-        targetValue = if (isExpanded) (0.5 * LocalConfiguration.current.screenHeightDp).dp else 56.dp
+        targetValue = if (isExpanded) (0.6 * LocalConfiguration.current.screenHeightDp).dp else 56.dp
     )
 
     val focusRequester = remember { FocusRequester() }
@@ -133,7 +133,7 @@ fun Home(
         Column(
             Modifier
                 .fillMaxSize()
-                .padding(horizontal = 20.dp)
+//                .padding(horizontal = 20.dp)
                 .verticalScroll(rememberScrollState())
         ) {
             Text(text = currentGroup.name)
@@ -277,7 +277,11 @@ fun Home(
             itemName,
             updateExpandState = { isExpanded = it },
             updateFocusState = { isFocused = it },
-            updtaeItemName = { itemName = it })
+            updtaeItemName = { itemName = it },
+            currentGroupId = currentGroupIdInt,
+            itemViewModel = itemViewModel
+        )
+
 
 
     }

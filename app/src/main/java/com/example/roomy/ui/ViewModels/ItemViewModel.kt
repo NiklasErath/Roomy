@@ -96,14 +96,14 @@ class ItemViewModel(private val itemRepository: ItemRepository) : ViewModel() {
         }
     }
 
-    fun addItem(itemName:String, groupId: Int, status:String, quantity:Int, icon:String) {
-        val item = Item(
-            groupId = groupId,
-            name = itemName,
-            status = status,
-//                quantity = quantity,
-//                icon = icon
-        )
+    fun addItem(item: Item) {
+//        val item = Item(
+//            groupId = groupId,
+//            name = itemName,
+//            status = status,
+////                quantity = quantity,
+////                icon = icon
+//        )
         viewModelScope.launch {
 
 

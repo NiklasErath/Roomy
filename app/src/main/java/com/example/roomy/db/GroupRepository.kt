@@ -1,11 +1,13 @@
 package com.example.roomy.db
 
 import android.util.Log
+import androidx.compose.foundation.layout.Column
 import com.example.roomy.db.Supabase.supabase
 import com.example.roomy.db.data.GroupInformation
 import com.example.roomy.db.data.Groups
 import com.example.roomy.db.data.UserInformation
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.query.Columns
 
 class GroupRepository {
 
@@ -77,8 +79,15 @@ class GroupRepository {
 
     suspend fun addMemberToGroup(userId: String, groupId: Int) {
         try {
-            val relation = Groups(userId = userId, groupId = groupId)
-            supabase.from("parent_group").insert(relation)
+            val existingRelation = supabase.from("parent_group").select {   filter {
+                eq("group_id", groupId)
+                eq("user_id", userId)
+            }}
+
+                if (existingRelation.data.isEmpty()){
+                    val relation = Groups(userId = userId, groupId = groupId)
+                    supabase.from("parent_group").insert(relation)
+                }
         } catch (e: Exception) {
             Log.d("TAG", "Could not insert relation ${e.message}")
         }

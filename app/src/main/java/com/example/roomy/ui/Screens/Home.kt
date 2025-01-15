@@ -158,6 +158,10 @@ fun Home(
             Text(text = "Add Member")
         }
 
+        Button(onClick = {groupViewModel.kickUser("0f35ef14-7c8c-4dd8-9a63-2f14190eec8d", currentGroupIdInt)}) {
+            Text(text = "Delete Member")
+        }
+
         if(shoppingListItems.items.isEmpty() && renderAfterFetching){
             Text(text = "Nothing here yet, add a new Item to your Shopping List")
         }else if(renderAfterFetching) {

@@ -1,5 +1,6 @@
 package com.example.roomy.ui
 
+import android.widget.Toast
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -34,6 +35,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.roomy.ui.Composables.ExpandingAddItemElement
 import com.example.roomy.ui.Composables.UserProfileCircle
 import com.example.roomy.ui.States.GroupMembersUiState
@@ -47,13 +49,12 @@ fun Group(
     groupViewModel: GroupViewModel,
     itemViewModel: ItemViewModel,
     navController: NavController,
+    previousScreen: String
 ) {
 
     val context = LocalContext.current
 
-
     var itemName by remember { mutableStateOf("") }
-
 
     val finishedFetching by itemViewModel.finishedFetching
 
@@ -90,12 +91,26 @@ fun Group(
     var isFocused by remember { mutableStateOf(false) }
 
 
+    var triggerNavCheck by remember { mutableStateOf(true) }
+
+
+    LaunchedEffect(previousScreen) {
+        if(triggerNavCheck) {
+            when (previousScreen) {
+                Screens.Groups.name, Screens.Balance.name, Screens.Profile.name -> renderAfterFetching =
+                    true
+
+                else -> renderAfterFetching = false
+            }
+            triggerNavCheck = false
+        }
+    }
 
 
     LaunchedEffect(Unit) {
 
-        currentGroup.id?.let { itemViewModel.getAllItems(it) }
-        currentGroup.id?.let { groupViewModel.getGroupMembers(it) }
+        itemViewModel.getAllItems(currentGroupIdInt)
+     groupViewModel.getGroupMembers(currentGroupIdInt)
 
     }
 

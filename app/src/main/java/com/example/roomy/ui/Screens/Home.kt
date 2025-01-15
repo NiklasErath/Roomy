@@ -1,6 +1,7 @@
 package com.example.roomy.ui
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -41,6 +42,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.roomy.R
 import com.example.roomy.ui.States.GroupsUiState
 import com.example.roomy.ui.ViewModels.AddGroupState
@@ -54,10 +56,10 @@ fun Home(
     userViewModel: UserViewModel,
 ) {
 
+    val context = LocalContext.current
 
     val addGroupState by groupViewModel.addGroupState
 
-    val context = LocalContext.current
 
     val currentUserId = userViewModel.currentUserSession.collectAsState().value.userId
 

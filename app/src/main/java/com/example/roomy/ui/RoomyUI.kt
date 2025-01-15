@@ -201,11 +201,15 @@ fun AppNavHost(
             Screens.Groups.route,
         ) {
 
+            val previousBackSTackEntry = navController.previousBackStackEntry
+            val previousScreen = previousBackSTackEntry?.destination?.route ?: "No previous entry"
+
             Box {
                 Group(
                     groupViewModel,
                     itemViewModel,
                     navController,
+                    previousScreen
                 )
             }
         }

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -46,7 +47,7 @@ fun Item(
         Icon(
             painterResource(item.icon ?: R.drawable.placeholder),
             contentDescription = "Letter",
-            Modifier.weight(1f)
+            Modifier.weight(1f).size(64.dp)
         )
         Text(text = item.name, color = Color.White)
     }

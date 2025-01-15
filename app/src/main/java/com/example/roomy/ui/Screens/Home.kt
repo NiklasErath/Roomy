@@ -48,7 +48,7 @@ import com.example.roomy.ui.ViewModels.GroupViewModel
 import com.example.roomy.ui.ViewModels.UserViewModel
 
 @Composable
-fun Groups(
+fun Home(
     navController: NavController,
     groupViewModel: GroupViewModel,
     userViewModel: UserViewModel,
@@ -92,7 +92,7 @@ fun Groups(
         Modifier.fillMaxSize()
     ) {
         Text(text = "Groups Page")
-        Button(onClick = { navController.navigate(Screens.Home.name) }) {
+        Button(onClick = { navController.navigate(Screens.Groups.name) }) {
             Text(text = "Select and enter Group")
         }
 
@@ -108,7 +108,7 @@ fun Groups(
                         OutlinedCard(
                             Modifier.clickable {
                                 groupViewModel.setCurrentGroup(groupInformation)
-                                navController.navigate("Home")
+                                navController.navigate(Screens.Groups.name)
                             }.fillMaxWidth(),
 
                         ) {

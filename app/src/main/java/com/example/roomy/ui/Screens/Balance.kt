@@ -19,7 +19,7 @@ fun Balance(
         Modifier.fillMaxSize().padding(horizontal = 20.dp)
     ){
         Text(text="Finance/Balance Page")
-        Button(onClick = {navController.navigate(Screens.Groups.name)}) {
+        Button(onClick = {navController.navigate(Screens.Home.name)}) {
             Text(text="Back to Groups")
         }
     }

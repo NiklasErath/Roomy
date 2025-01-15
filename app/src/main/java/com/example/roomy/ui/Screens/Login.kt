@@ -53,7 +53,7 @@ fun Login(
 
     LaunchedEffect (loginState){
         if(loginState is LoginState.Success){
-            navController.navigate(Screens.Groups.name)
+            navController.navigate(Screens.Home.name)
         }
         if(loginState is LoginState.Error ){
 

@@ -34,14 +34,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.roomy.R
-import com.example.roomy.db.UserRepository
-import com.example.roomy.ui.ViewModels.LoginState
 import com.example.roomy.ui.ViewModels.RegisterState
 import com.example.roomy.ui.ViewModels.UserViewModel
-import com.example.roomy.ui.Factory.UserViewModelFactory
 
 @Composable
 fun Register(
@@ -60,7 +56,7 @@ fun Register(
 
     LaunchedEffect(registerState) {
         if (registerState is RegisterState.Success) {
-            navController.navigate(Screens.Groups.name)
+            navController.navigate(Screens.Home.name)
         }
         if (registerState is RegisterState.Error) {
             val errorMessage = (registerState as RegisterState.Error).message

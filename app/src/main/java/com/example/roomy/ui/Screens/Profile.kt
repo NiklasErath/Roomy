@@ -19,7 +19,7 @@ fun Profile(
         Modifier.fillMaxSize().padding(horizontal = 20.dp)
     ){
         Text(text="Profile/Settings Page")
-        Button(onClick = {navController.navigate(Screens.Groups.name)}) {
+        Button(onClick = {navController.navigate(Screens.Home.name)}) {
             Text(text="Back to Groups")
         }
     }

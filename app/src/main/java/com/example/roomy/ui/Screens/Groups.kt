@@ -43,7 +43,7 @@ import com.example.roomy.ui.ViewModels.ItemViewModel
 
 
 @Composable
-fun Home(
+fun Group(
     groupViewModel: GroupViewModel,
     itemViewModel: ItemViewModel,
     navController: NavController,
@@ -137,7 +137,7 @@ fun Home(
                 }
             }
 
-            Button(onClick = { navController.navigate(Screens.Groups.name) }) {
+            Button(onClick = { navController.navigate(Screens.Home.name) }) {
                 Text(text = "Back to Groups")
             }
             Button(onClick = { navController.navigate(Screens.GroupMembers.route) }) {

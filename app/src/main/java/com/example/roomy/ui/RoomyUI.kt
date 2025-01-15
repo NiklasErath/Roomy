@@ -1,10 +1,5 @@
 package com.example.roomy.ui
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,12 +29,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.example.roomy.db.GroupRepository
 import com.example.roomy.db.ItemRepository
 import com.example.roomy.db.UserRepository
@@ -54,8 +47,8 @@ import com.example.roomy.ui.ViewModels.ItemViewModel
 enum class Screens(val route: String) {
     Login("Login"),
     Register("Register"),
-    Groups("Groups"),
     Home("Home"),
+    Groups("Groups"),
     Balance("Balance"),
     Profile("Profile"),
     GroupMembers("GroupMembers")
@@ -76,7 +69,7 @@ fun RoomyApp(
 
     val currentDestination = navBackStackEntry?.destination?.route
     val displayBottomBarAndHeader = when (currentDestination) {
-        Screens.Login.name, Screens.Register.name, Screens.Groups.name -> false
+        Screens.Login.name, Screens.Register.name, Screens.Home.name -> false
         else -> true
     }
 
@@ -192,10 +185,10 @@ fun AppNavHost(
         }
 
         composable(
-            Screens.Groups.route,
+            Screens.Home.route,
         ) {
             Box {
-                Groups(
+                Home(
 
                     navController,
                     groupViewModel,
@@ -205,11 +198,11 @@ fun AppNavHost(
         }
 
         composable(
-            Screens.Home.route,
+            Screens.Groups.route,
         ) {
 
             Box {
-                Home(
+                Group(
                     groupViewModel,
                     itemViewModel,
                     navController,
@@ -259,8 +252,8 @@ fun BottomNavigationBar(
 
     NavigationBar {
         NavigationBarItem(
-            selected = (currentDestination == Screens.Home.route),
-            onClick = { navController.navigate(Screens.Home.route) },
+            selected = (currentDestination == Screens.Groups.route),
+            onClick = { navController.navigate(Screens.Groups.route) },
             icon = { Icon(imageVector = Icons.Filled.CheckCircle, contentDescription = "Home") },
             label = { Text("Lists") }
         )
@@ -307,7 +300,7 @@ fun Header(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                IconButton(onClick = { navController.navigate(Screens.Groups.name) }) {
+                IconButton(onClick = { navController.navigate(Screens.Home.name) }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Group",

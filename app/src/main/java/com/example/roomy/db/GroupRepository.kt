@@ -8,6 +8,7 @@ import com.example.roomy.db.data.Groups
 import com.example.roomy.db.data.UserInformation
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
+import io.ktor.util.escapeHTML
 
 class GroupRepository {
 
@@ -82,11 +83,15 @@ class GroupRepository {
             val existingRelation = supabase.from("parent_group").select {   filter {
                 eq("group_id", groupId)
                 eq("user_id", userId)
-            }}
+            }}.decodeList<Groups>()
+            Log.d("EXIST", "$existingRelation")
 
-                if (existingRelation.data.isEmpty()){
+                if (existingRelation.isEmpty()){
                     val relation = Groups(userId = userId, groupId = groupId)
                     supabase.from("parent_group").insert(relation)
+                    Log.d("MMM", "Add member success")
+                } else {
+                    Log.d("ERROR", "ERROR")
                 }
         } catch (e: Exception) {
             Log.d("TAG", "Could not insert relation ${e.message}")

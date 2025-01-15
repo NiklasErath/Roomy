@@ -1,4 +1,4 @@
-package com.example.roomy.ui
+package com.example.roomy.ui.Composables
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -8,11 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -21,7 +17,6 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,126 +25,28 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
+import androidx.compose.ui.window.Dialog
 import com.example.roomy.R
-import com.example.roomy.ui.Composables.UserProfileCircle
-import com.example.roomy.ui.States.GroupMembersUiState
-import com.example.roomy.ui.States.GroupsUiState
-import com.example.roomy.ui.ViewModels.AddGroupState
 import com.example.roomy.ui.ViewModels.GroupViewModel
-import com.example.roomy.ui.ViewModels.RegisterState
-import com.example.roomy.ui.ViewModels.UserViewModel
+
 
 @Composable
-fun Groups(
-    navController: NavController,
+fun AddGroupPopUp(
+    onDismissRequest: ()-> Unit,
     groupViewModel: GroupViewModel,
-    userViewModel: UserViewModel,
+    currentUserId: String,
 ) {
-
-
-    val addGroupState by groupViewModel.addGroupState
-
-    val context = LocalContext.current
-
-
-    val currentUserId = userViewModel.currentUserSession.collectAsState().value.userId
-
-
-
-    val groupInformationState by groupViewModel.groupsInformation.collectAsState(
-        initial = GroupsUiState(
-            emptyList()
-        )
-    )
-
-    LaunchedEffect(Unit) {
-        groupViewModel.getGroupsByUserId(currentUserId)
-        groupViewModel.getGroupMembers(2)
-    }
-
-    LaunchedEffect(addGroupState) {
-        if (addGroupState is AddGroupState.Success) {
-            navController.navigate(Screens.Groups.name)
-            groupViewModel.resetGroupState()
-
-        }
-    }
 
     var newGroupName by remember { mutableStateOf("Home") }
     var newMemberEmail by remember { mutableStateOf("") }
 
+    Dialog(onDismissRequest = { onDismissRequest() }) {
 
-    var addGroupPopUp by remember { mutableStateOf(false) }
-
-    Column(
-        Modifier.fillMaxSize()
-    ) {
-        Text(text = "Groups Page")
-        Button(onClick = { navController.navigate(Screens.Home.name) }) {
-            Text(text = "Select and enter Group")
-        }
-
-        LazyColumn {
-            if (groupInformationState.groupsInformation.isEmpty()) {
-                item {
-                    Text(text = "No groups")
-                }
-            } else {
-                itemsIndexed(groupInformationState.groupsInformation) { index, groupInformation ->
-
-
-                        OutlinedCard(
-                            Modifier.clickable {
-                                groupViewModel.setCurrentGroup(groupInformation)
-                                navController.navigate("Home/${groupInformation.id}")
-                            }.fillMaxWidth(),
-
-                        ) {
-                            Row(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp), horizontalArrangement = Arrangement.Center) {
-
-                            Text(text = " ${groupInformation.name}")
-                        }
-
-                    }
-
-
-                }
-
-
-            }
-            item {
-                Spacer(Modifier.height(100.dp))
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
-
-                    Button(onClick = {
-                        addGroupPopUp = true
-
-                    }) {
-                        Icon(imageVector = Icons.Filled.Add, contentDescription = "Add Group")
-                    }
-
-                }
-
-            }
-        }
-
-
-    }
-
-    if (addGroupPopUp) {
         Column(
             Modifier
                 .fillMaxSize()
@@ -162,7 +59,7 @@ fun Groups(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                     contentDescription = "Return",
-                    Modifier.clickable { addGroupPopUp = false })
+                    Modifier.clickable { onDismissRequest() })
 
                 Spacer(Modifier.width(20.dp))
                 Text(text = "Add Group", fontSize = integerResource(id = R.integer.heading1).sp)
@@ -209,13 +106,23 @@ fun Groups(
                 )
 
             Button(
-                onClick = {
+                onClick = { onDismissRequest()
                     groupViewModel.createNewGroup(newGroupName, currentUserId)
-                    addGroupPopUp = false
-                },
+                    onDismissRequest()                },
             ) {
                 Text(text = "Add Group")
             }
+/*
+            if (addGroupPopUp) {
+                AddGroupPopUp(
+                    onDismissRequest = {addGroupPopUp = false},
+                    groupViewModel = groupViewModel,
+                    currentUserId = currentUserId
+                )
+
+            }
+
+ */
         }
     }
 }

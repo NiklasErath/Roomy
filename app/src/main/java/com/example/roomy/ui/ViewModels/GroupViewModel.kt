@@ -14,6 +14,7 @@ import com.example.roomy.db.data.Groups
 import com.example.roomy.ui.States.GroupMembersUiState
 import com.example.roomy.ui.States.GroupState
 import com.example.roomy.ui.States.GroupsUiState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -87,8 +88,9 @@ class GroupViewModel(
         viewModelScope.launch {
             val newGroup = groupRepository.createGroup(groupName, userId)
             Log.d("HAHHAHAHAHAHA", "$newGroup")
-            newGroup.id?.let {
-                addMemberToGroup(userId, it)
+            newGroup.id?.let { groupId ->
+                Log.d("GROUP ID", "$groupId and $userId")
+                groupRepository.addMemberToGroup(userId, groupId)
 
                 setCurrentGroup(newGroup)
                 _addGroupState.value = AddGroupState.Success

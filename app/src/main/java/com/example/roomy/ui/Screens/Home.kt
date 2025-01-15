@@ -162,6 +162,10 @@ fun Home(
             Text(text = "Delete Member")
         }
 
+        Button(onClick = {groupViewModel.deleteGroup(currentGroupIdInt)}) {
+            Text(text = "Delete Group")
+        }
+
         if(shoppingListItems.items.isEmpty() && renderAfterFetching){
             Text(text = "Nothing here yet, add a new Item to your Shopping List")
         }else if(renderAfterFetching) {

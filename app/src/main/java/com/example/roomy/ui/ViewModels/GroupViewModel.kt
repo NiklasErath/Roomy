@@ -84,13 +84,22 @@ class GroupViewModel(
         }
     }
 
-    fun createNewGroup(groupName: String, userId: String) {
+    fun createNewGroup(groupName: String, userId: String, addedUsers: List<String>) {
         viewModelScope.launch {
             val newGroup = groupRepository.createGroup(groupName, userId)
             Log.d("HAHHAHAHAHAHA", "$newGroup")
             newGroup.id?.let { groupId ->
                 Log.d("GROUP ID", "$groupId and $userId")
                 groupRepository.addMemberToGroup(userId, groupId)
+                try {
+
+
+                    addedUsers.forEach { item ->
+                        addMemberByNameToGroup(item, groupId)
+                    }
+                } catch (e: Exception){
+                    println("Failed to add users")
+                }
 
                 setCurrentGroup(newGroup)
                 _addGroupState.value = AddGroupState.Success
@@ -138,6 +147,11 @@ class GroupViewModel(
 
             val user = userRepository.getUserByName(username)
             addMemberToGroup(user.id, groupId)
+            _groupMembers.update { oldState ->
+                val updatedMembers = oldState.memberInformation.toMutableList()
+                updatedMembers.add(user)
+                oldState.copy(memberInformation = updatedMembers)
+            }
 
         }
 

@@ -118,8 +118,6 @@ class UserRepository {
     }
 
     suspend fun getUserByName(name: String): UserInformation {
-        Log.d("TAG", "HEYXXXYYYXXXX")
-
         try {
             // Query to fetch user information by userId
             val response = supabase

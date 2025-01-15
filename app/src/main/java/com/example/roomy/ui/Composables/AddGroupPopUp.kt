@@ -107,7 +107,7 @@ fun AddGroupPopUp(
 
             Button(
                 onClick = { onDismissRequest()
-                    groupViewModel.createNewGroup(newGroupName, currentUserId)
+                    //groupViewModel.createNewGroup(newGroupName, currentUserId, a)
                     onDismissRequest()                },
             ) {
                 Text(text = "Add Group")

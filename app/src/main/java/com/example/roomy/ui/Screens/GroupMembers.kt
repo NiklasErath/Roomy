@@ -85,16 +85,13 @@ fun GroupMembers(
                         //groupViewModel.showErrorMessage("Please enter a username.")
                     }else {
                     groupViewModel.addMemberByNameToGroup(usernameAdd, currentGroupIdInt)
+                        usernameAdd = ""
                         }
                 },
                 modifier = Modifier.padding(top = 8.dp)
             ) {
                 Text(text = "Add")
             }
-        }
-
-        Button(onClick = {groupViewModel.addMemberToGroup("0f35ef14-7c8c-4dd8-9a63-2f14190eec8d", currentGroupIdInt)}) {
-            Text(text = "Add Member")
         }
 
     }

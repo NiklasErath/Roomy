@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -40,6 +41,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.roomy.R
+import com.example.roomy.ui.Composables.UserProfileCircle
+import com.example.roomy.ui.States.GroupMembersUiState
 import com.example.roomy.ui.States.GroupsUiState
 import com.example.roomy.ui.ViewModels.AddGroupState
 import com.example.roomy.ui.ViewModels.GroupViewModel
@@ -61,6 +64,14 @@ fun Groups(
 
     val currentUserId = userViewModel.currentUserSession.collectAsState().value.userId
 
+    val groupMembers = groupViewModel.groupMembers.collectAsState().value.memberInformation
+
+    val groupMemberInformation by groupViewModel.groupMembers.collectAsState(
+        initial = GroupMembersUiState(
+            emptyList()
+        )
+    )
+
     val groupInformationState by groupViewModel.groupsInformation.collectAsState(
         initial = GroupsUiState(
             emptyList()
@@ -68,8 +79,8 @@ fun Groups(
     )
 
     LaunchedEffect(Unit) {
-
         groupViewModel.getGroupsByUserId(currentUserId)
+        groupViewModel.getGroupMembers(2)
     }
 
     LaunchedEffect(addGroupState) {
@@ -89,6 +100,12 @@ fun Groups(
     Column(
         Modifier.fillMaxSize()
     ) {
+        LazyColumn {
+            itemsIndexed(groupMemberInformation.memberInformation) { index, groupMembers ->
+                UserProfileCircle(groupMembers.username, 50.dp, Color.Blue)
+                Text(text = "${groupMembers.username}")
+            }
+        }
         Text(text = "Groups Page")
         Button(onClick = { navController.navigate(Screens.Home.name) }) {
             Text(text = "Select and enter Group")

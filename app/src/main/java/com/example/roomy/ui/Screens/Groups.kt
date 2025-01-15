@@ -116,16 +116,12 @@ fun Home(
         Button(onClick = { navController.navigate(Screens.Groups.name) }) {
             Text(text = "Back to Groups")
         }
-        Button(onClick = {groupViewModel.addMemberToGroup("0f35ef14-7c8c-4dd8-9a63-2f14190eec8d", currentGroupIdInt)}) {
-            Text(text = "Add Member")
-        }
-
-        Button(onClick = {groupViewModel.kickUser("0f35ef14-7c8c-4dd8-9a63-2f14190eec8d", currentGroupIdInt)}) {
-            Text(text = "Delete Member")
-        }
 
         Button(onClick = {groupViewModel.deleteGroup(currentGroupIdInt)}) {
             Text(text = "Delete Group")
+        }
+        Button(onClick = { navController.navigate(Screens.GroupMembers.route) }) {
+            Text(text = "GroupMembers")
         }
 
         if(shoppingListItems.items.isEmpty() && renderAfterFetching){

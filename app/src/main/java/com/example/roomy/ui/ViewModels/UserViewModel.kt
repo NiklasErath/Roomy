@@ -54,7 +54,6 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
 
     }
 
-
     suspend fun getUserInformation() {
         Log.d("Tag", "geeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeet userId from currentUserSession")
         Log.d("Tag", currentUserSession.value.userId)

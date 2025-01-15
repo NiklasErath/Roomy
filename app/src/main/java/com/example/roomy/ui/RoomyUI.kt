@@ -50,13 +50,15 @@ import com.example.roomy.ui.ViewModels.UserViewModel
 import com.example.roomy.ui.Factory.UserViewModelFactory
 import com.example.roomy.ui.ViewModels.ItemViewModel
 
-enum class Screens (val route: String){
+
+enum class Screens(val route: String) {
     Login("Login"),
     Register("Register"),
     Groups("Groups"),
     Home("Home"),
     Balance("Balance"),
-    Profile("Profile")
+    Profile("Profile"),
+    GroupMembers("GroupMembers")
 }
 
 @Composable
@@ -97,14 +99,13 @@ fun RoomyApp(
 
             bottomBar = {
 
-                    BottomNavigationBar(navController, currentDestination)
+                BottomNavigationBar(navController, currentDestination)
 
             },
 
             topBar = {
 
-                    Header(navController, currentDestination, groupViewModel)
-
+                Header(navController, currentDestination, groupViewModel)
 
 
             },
@@ -112,9 +113,14 @@ fun RoomyApp(
 
             modifier = Modifier.fillMaxSize(),
 
-            ){
-                innerPadding ->
-            AppNavHost(navController, Modifier.padding(innerPadding), userViewModel, groupViewModel, itemViewModel)
+            ) { innerPadding ->
+            AppNavHost(
+                navController,
+                Modifier.padding(innerPadding),
+                userViewModel,
+                groupViewModel,
+                itemViewModel
+            )
 
         }
 
@@ -125,9 +131,14 @@ fun RoomyApp(
 
             modifier = Modifier.fillMaxSize(),
 
-            ){
-                innerPadding ->
-            AppNavHost(navController, Modifier.padding(innerPadding), userViewModel, groupViewModel, itemViewModel)
+            ) { innerPadding ->
+            AppNavHost(
+                navController,
+                Modifier.padding(innerPadding),
+                userViewModel,
+                groupViewModel,
+                itemViewModel
+            )
 
         }
 
@@ -137,84 +148,100 @@ fun RoomyApp(
 
 
 @Composable
-fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier, userViewModel: UserViewModel, groupViewModel: GroupViewModel, itemViewModel: ItemViewModel) {
+fun AppNavHost(
+    navController: NavHostController,
+    modifier: Modifier = Modifier,
+    userViewModel: UserViewModel,
+    groupViewModel: GroupViewModel,
+    itemViewModel: ItemViewModel
+) {
     NavHost(
         navController = navController,
         startDestination = Screens.Login.route,
         modifier = modifier
 //                .padding(horizontal = if (currentDestination == Screens.Home.name) 0.dp else 20.dp),
-                .padding(horizontal = 20.dp),
+            .padding(horizontal = 20.dp),
     ) {
 
 
-            composable(
-                Screens.Login.route,
-            ) {
-                Box {
-                    Login(
-                        userViewModel,
-                        navController,
+        composable(
+            Screens.Login.route,
+        ) {
+            Box {
+                Login(
+                    userViewModel,
+                    navController,
 
-                        )
-                }
-            }
-
-            composable(
-                Screens.Register.route,
-            ) {
-                Box {
-                    Register(
-                        userViewModel,
-                        navController
                     )
-                }
             }
+        }
 
-            composable(
-                Screens.Groups.route,
-            ) {
-                Box {
-                    Groups(
-
-                        navController,
-                        groupViewModel,
-                        userViewModel,
-                    )
-                }
+        composable(
+            Screens.Register.route,
+        ) {
+            Box {
+                Register(
+                    userViewModel,
+                    navController
+                )
             }
+        }
 
-            composable(
-                Screens.Home.route,
-            ) {
+        composable(
+            Screens.Groups.route,
+        ) {
+            Box {
+                Groups(
 
-                Box {
-                    Home(
-                        groupViewModel,
-                        itemViewModel,
-                        navController,
-                    )
-                }
+                    navController,
+                    groupViewModel,
+                    userViewModel,
+                )
             }
+        }
 
-            composable(
-                Screens.Balance.route,
-            ) {
-                Box {
-                    Balance(
-                        navController
-                    )
-                }
-            }
+        composable(
+            Screens.Home.route,
+        ) {
 
-            composable(
-                Screens.Profile.route,
-            ) {
-                Box {
-                    Profile(
-                        navController
-                    )
-                }
+            Box {
+                Home(
+                    groupViewModel,
+                    itemViewModel,
+                    navController,
+                )
             }
+        }
+
+        composable(
+            Screens.Balance.route,
+        ) {
+            Box {
+                Balance(
+                    navController
+                )
+            }
+        }
+
+        composable(
+            Screens.Profile.route,
+        ) {
+            Box {
+                Profile(
+                    navController
+                )
+            }
+        }
+        composable(
+            Screens.GroupMembers.route
+        ) {
+            Box {
+                GroupMembers(
+                    navController,
+                    groupViewModel
+                )
+            }
+        }
 
 
     }

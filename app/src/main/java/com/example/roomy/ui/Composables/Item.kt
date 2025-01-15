@@ -1,16 +1,13 @@
 package com.example.roomy.ui
 
-import android.content.res.Resources.Theme
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -23,10 +20,13 @@ import androidx.compose.ui.res.painterResource
 import com.example.roomy.R
 import com.example.roomy.db.data.Item
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Item(
     item: Item,
-    updateItem: () -> Unit
+    onClick: () -> Unit,
+    onLongClick: () -> Unit
+
 ) {
 
     Column(
@@ -35,12 +35,16 @@ fun Item(
             .aspectRatio(1.1f)
             .background(MaterialTheme.colorScheme.primary)
             .padding(bottom = 4.dp)
-            .clickable { updateItem() },
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick
+            )
+        ,
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(
-            painterResource(item.icon?: R.drawable.placeholder),
+            painterResource(item.icon ?: R.drawable.placeholder),
             contentDescription = "Letter",
             Modifier.weight(1f)
         )

@@ -77,4 +77,25 @@ class ItemRepository {
         }
     }
 
+
+    suspend fun deleteItem(
+        item: Item
+    ) {
+        try {
+
+            item.id?.let {
+                supabase.from("items").delete{
+                    filter{
+                        eq("item_id", item.id)
+                    }
+                }
+            }
+
+        } catch (e: Exception) {
+            // Log the error and throw an exception
+            Log.d("TAG", "Could not Delete Item: ${e.message}")
+            throw e
+        }
+    }
+
 }

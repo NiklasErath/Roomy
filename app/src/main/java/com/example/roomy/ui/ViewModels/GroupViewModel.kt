@@ -133,6 +133,10 @@ class GroupViewModel(
     fun kickUser(userId: String, groupId: Int) {
         viewModelScope.launch {
             groupRepository.kickMemberFromGroup(userId, groupId)
+            _groupMembers.update { oldState ->
+                val updatedMembers = oldState.memberInformation.filter { it.id != userId }
+                oldState.copy(memberInformation = updatedMembers)
+            }
         }
     }
 

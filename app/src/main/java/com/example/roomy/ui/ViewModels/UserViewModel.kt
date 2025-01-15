@@ -136,6 +136,12 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
         }
     }
 
+    fun getUserByUsername(username: String){
+        viewModelScope.launch {
+            userRepository.getUserByName(username)
+        }
+    }
+
 //    fun signUp(userEmail: String, userPassword: String, userName: String) {
 //        viewModelScope.launch {
 //            try {

@@ -1,5 +1,6 @@
 package com.example.roomy.ui
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.integerResource
@@ -79,7 +81,9 @@ fun Groups(
     }
 
     var newGroupName by remember { mutableStateOf("Home") }
-    var newMemberEmail by remember { mutableStateOf("") }
+    var usernameAdd by remember { mutableStateOf("") }
+
+    val addedUsers = remember { mutableStateListOf<String>() }
 
 
     var addGroupPopUp by remember { mutableStateOf(false) }
@@ -177,8 +181,8 @@ fun Groups(
 
             }
             OutlinedTextField(
-                value = newMemberEmail,
-                onValueChange = { newValue -> newMemberEmail = newValue },
+                value = usernameAdd,
+                onValueChange = { newValue -> usernameAdd = newValue },
                 Modifier.fillMaxWidth(),
 //                leadingIcon = {Icon(imageVector = Icons.Filled.Edit, contentDescription = "AddUser")},
                 label = { Text("Invite someone New") },
@@ -191,6 +195,15 @@ fun Groups(
                         contentDescription = "Add",
                         Modifier.clickable {
 
+
+                            if (addedUsers.contains(usernameAdd) || usernameAdd.isEmpty()) {
+                                return@clickable
+                            }
+
+                            userViewModel.getUserByUsername(usernameAdd)
+                            addedUsers.add(usernameAdd)
+                            Log.d("Users", "$addedUsers")
+                            usernameAdd = ""
 //                    Add new member, if successfull make a list with added users emails/usernames under this textfield - just save locally from input to display
 //                    If not succesfull, popup with error message ...
 //                    Ensure Users can only be added once
@@ -201,10 +214,24 @@ fun Groups(
 
 
                 )
-
+            if (addedUsers.isNotEmpty()) {
+              LazyColumn (){
+                  itemsIndexed(addedUsers) {index, item ->
+                      OutlinedCard(modifier = Modifier
+                          .fillMaxWidth()) {
+                          Row(modifier = Modifier.padding(12.dp)) {
+                              Text(text = item)
+                              Button(onClick = {addedUsers.remove(item)}) {
+                                  Text(text = "remove")
+                              }
+                          }
+                      }
+                  }
+              }
+            }
             Button(
                 onClick = {
-                    groupViewModel.createNewGroup(newGroupName, currentUserId)
+                    groupViewModel.createNewGroup(newGroupName, currentUserId,addedUsers)
                     addGroupPopUp = false
                 },
             ) {

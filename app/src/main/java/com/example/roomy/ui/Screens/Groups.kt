@@ -1,12 +1,8 @@
 package com.example.roomy.ui
 
-import android.widget.Toast
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,19 +13,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,17 +25,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
@@ -133,7 +116,8 @@ fun Home(
         Column(
             Modifier
                 .fillMaxSize()
-//                .padding(horizontal = 20.dp)
+                .padding(horizontal = 20.dp)
+                .padding(bottom = 50.dp)
                 .verticalScroll(rememberScrollState())
         ) {
             Text(text = currentGroup.name)
@@ -195,8 +179,11 @@ fun Home(
                             ) {
                                 Item(
                                     item,
-                                    updateItem = {
+                                    onClick = {
                                         itemViewModel.moveToInventory(item)
+                                    },
+                                    onLongClick = {
+                                        itemViewModel.deleteItem(item)
                                     })
                             }
                         }
@@ -230,8 +217,12 @@ fun Home(
                             ) {
                                 Item(
                                     item,
-                                    updateItem = {
+                                    onClick = {
                                         itemViewModel.moveToShoppingList(item)
+                                    },
+                                    onLongClick = {
+                                        itemViewModel.deleteItem(item)
+
                                     })
 
                             }
@@ -251,14 +242,10 @@ fun Home(
 
         // Overlay
         if (isExpanded) {
-            Toast.makeText(context, "clickeeed", Toast.LENGTH_SHORT).show()
             Box(
                 Modifier
                     .fillMaxSize()
                     .clickable {
-                        Toast
-                            .makeText(context, "clicked the box to close", Toast.LENGTH_SHORT)
-                            .show()
                         isExpanded = false
                         focusManager.clearFocus()
                         keyboardController?.hide()
@@ -269,6 +256,15 @@ fun Home(
             )
         }
 
+        fun resetAfterItemAdded(){
+            isExpanded = false
+            isFocused = false
+            itemName = ""
+            focusManager.clearFocus()
+            keyboardController?.hide()
+
+        }
+
         ExpandingAddItemElement(
             animatedHeight,
             isExpanded,
@@ -277,9 +273,10 @@ fun Home(
             itemName,
             updateExpandState = { isExpanded = it },
             updateFocusState = { isFocused = it },
-            updtaeItemName = { itemName = it },
+            updateItemName = { itemName = it },
             currentGroupId = currentGroupIdInt,
-            itemViewModel = itemViewModel
+            itemViewModel = itemViewModel,
+            resetAfterItemAdded = { resetAfterItemAdded() }
         )
 
 

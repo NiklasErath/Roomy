@@ -116,10 +116,12 @@ fun RoomyApp(
             ) { innerPadding ->
             AppNavHost(
                 navController,
-                Modifier.padding(innerPadding),
+                Modifier.padding(innerPadding).padding(horizontal = 0.dp),
                 userViewModel,
                 groupViewModel,
-                itemViewModel
+                itemViewModel,
+
+
             )
 
         }
@@ -134,10 +136,12 @@ fun RoomyApp(
             ) { innerPadding ->
             AppNavHost(
                 navController,
-                Modifier.padding(innerPadding),
+                Modifier.padding(innerPadding).padding(horizontal = 20.dp),
                 userViewModel,
                 groupViewModel,
-                itemViewModel
+                itemViewModel,
+
+
             )
 
         }
@@ -153,14 +157,14 @@ fun AppNavHost(
     modifier: Modifier = Modifier,
     userViewModel: UserViewModel,
     groupViewModel: GroupViewModel,
-    itemViewModel: ItemViewModel
+    itemViewModel: ItemViewModel,
 ) {
     NavHost(
         navController = navController,
         startDestination = Screens.Login.route,
         modifier = modifier
-//                .padding(horizontal = if (currentDestination == Screens.Home.name) 0.dp else 20.dp),
-            .padding(horizontal = 20.dp),
+//                .padding(horizontal = if (currentDestination != Screens.Login.name) 0.dp else 20.dp),
+//            .padding(horizontal = 20.dp),
     ) {
 
 

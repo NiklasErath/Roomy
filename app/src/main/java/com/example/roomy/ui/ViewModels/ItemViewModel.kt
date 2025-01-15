@@ -97,13 +97,6 @@ class ItemViewModel(private val itemRepository: ItemRepository) : ViewModel() {
     }
 
     fun addItem(item: Item) {
-//        val item = Item(
-//            groupId = groupId,
-//            name = itemName,
-//            status = status,
-////                quantity = quantity,
-////                icon = icon
-//        )
         viewModelScope.launch {
 
 
@@ -122,6 +115,31 @@ class ItemViewModel(private val itemRepository: ItemRepository) : ViewModel() {
                     }
                 )
             }
+
+
+        }
+    }
+
+    fun deleteItem(item: Item) {
+        viewModelScope.launch {
+
+            if(item.status == "shoppingList"){
+                _allShoppingListItems.update {
+                    it.copy(
+                        items = it.items - item
+                    )
+                }
+            }else if(item.status == "inventory"){
+                _allInventoryItems.update {
+                    it.copy(
+                        items = it.items - item
+                    )
+                }
+            }
+
+            itemRepository.deleteItem(item)
+
+
 
 
         }

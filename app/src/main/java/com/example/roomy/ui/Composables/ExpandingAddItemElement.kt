@@ -7,12 +7,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,9 +23,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
@@ -48,9 +48,10 @@ fun ExpandingAddItemElement(
     itemName: String,
     updateFocusState: (Boolean) -> Unit,
     updateExpandState: (Boolean) -> Unit,
-    updtaeItemName: (String) -> Unit,
+    updateItemName: (String) -> Unit,
     currentGroupId: Int,
-    itemViewModel: ItemViewModel
+    itemViewModel: ItemViewModel,
+    resetAfterItemAdded: () -> Unit
 ) {
 
 
@@ -62,19 +63,31 @@ fun ExpandingAddItemElement(
         }
     }
 
+    val placeHolderItem = com.example.roomy.db.data.Item(
+        name = itemName,
+        groupId = currentGroupId,
+        status = "shoppingList",
+        icon = R.drawable.placeholder
+    )
+    val dragOffset = remember { mutableStateOf(0f) }
+
+
     Box(
         Modifier
             .fillMaxSize()
+            .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+
             .height(animatedHeight)
             .zIndex(3f)
+
     ) {
         Column(
             Modifier
                 .fillMaxWidth()
+                .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
                 .height(animatedHeight)
                 .align(Alignment.BottomCenter)
                 .background(MaterialTheme.colorScheme.background)
-                .border(1.dp, Color.White)
                 .zIndex(3f)
                 .clickable { }, // Ensure this column is rendered above other elements
             verticalArrangement = if (isExpanded || isFocused) Arrangement.SpaceBetween else Arrangement.Bottom
@@ -87,17 +100,23 @@ fun ExpandingAddItemElement(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f, false) // Let the content grow but limit to max available space
+                        .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+
+                        .weight(1f, false)
+                        .padding(horizontal = 20.dp)
+
+// Let the content grow but limit to max available space
 //                        .padding(horizontal = 16.dp)
                 ) {
 
-                    if(filteredItems.isEmpty()){
-                        Text(text = "Type something to get some suggestions",
-                        modifier = Modifier.align(Alignment.Center),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f))
-                    }
-                    else {
+                    if (itemName == "") {
+                        Text(
+                            text = "Type something to get some suggestions",
+                            modifier = Modifier.align(Alignment.Center),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                        )
+                    } else {
 
                         LazyVerticalGrid(
                             columns = GridCells.Fixed(3), // Three columns
@@ -117,13 +136,31 @@ fun ExpandingAddItemElement(
                                     icon = iconResId
                                 )
                                 Item(item = suggestedItem,
-                                    updateItem = {
+                                    onClick = {
                                         itemViewModel.addItem(
                                             suggestedItem
                                         )
-                                    }
+                                        resetAfterItemAdded()
+
+                                    },
+                                    onLongClick = {}
 
                                 )
+                            }
+                            item {
+                                Item(item = placeHolderItem,
+                                    onClick = {
+                                        itemViewModel.addItem(
+                                            placeHolderItem
+                                        )
+                                        resetAfterItemAdded()
+
+                                    },
+                                    onLongClick = {}
+
+
+                                )
+
                             }
                         }
                     }
@@ -140,19 +177,37 @@ fun ExpandingAddItemElement(
             Box(
                 Modifier
                     .fillMaxWidth()
+                    .clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
+
+                    .border(width = 0.dp, color = Color.Transparent)
                     .zIndex(4f)
-                    .clickable { }// Ensure the TextField appears above the overlay
+                    .clickable { }
+                    .background(MaterialTheme.colorScheme.primary)
+                    .padding(horizontal = 20.dp)
+// Ensure the TextField appears above the overlay
             ) {
                 OutlinedTextField(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .border(
+                            width = 0.dp, // Thicker border
+                            color = Color.Transparent,
+                        )
+                        .clip(RoundedCornerShape(16.dp))
+
+                        .background(MaterialTheme.colorScheme.background)
                         .focusRequester(focusRequester)
                         .onFocusChanged { focusState ->
                             updateFocusState(focusState.isFocused)
                             if (focusState.isFocused) updateExpandState(true)
-                        },
+                        }
+
+
+//                        .padding(horizontal = 10.dp)
+                    ,
+
                     value = itemName,
-                    onValueChange = { newValue -> updtaeItemName(newValue) },
+                    onValueChange = { newValue -> updateItemName(newValue) },
                     placeholder = { Text(text = "We could use ...") },
                     trailingIcon = {
                         Icon(

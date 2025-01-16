@@ -134,33 +134,8 @@ fun Group(
                 .padding(bottom = 50.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            Text(text = currentGroup.name)
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                groupMemberInformation.memberInformation.forEach { groupMembers ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        UserProfileCircle(groupMembers.username, 50.dp, Color.Blue)
-                        Text(
-                            text = groupMembers.username,
-                            modifier = Modifier.padding(start = 8.dp)
-                        )
-                    }
-                }
-            }
 
-            Button(onClick = { navController.navigate(Screens.Home.name) }) {
-                Text(text = "Back to Groups")
-            }
-            Button(onClick = { navController.navigate(Screens.GroupMembers.route) }) {
-                Text(text = "Group Members")
-            }
-
-            Button(onClick = { groupViewModel.deleteGroup(currentGroupIdInt) }) {
-                Text(text = "Delete Group")
-            }
+            Text(text="ShoppingList")
 
             if (shoppingListItems.items.isEmpty() && renderAfterFetching) {
                 Text(text = "Nothing here yet, add a new Item to your Shopping List")

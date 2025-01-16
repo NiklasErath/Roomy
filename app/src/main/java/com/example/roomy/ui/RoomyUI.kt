@@ -1,13 +1,20 @@
 package com.example.roomy.ui
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
@@ -15,6 +22,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -24,8 +32,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -37,11 +47,14 @@ import com.example.roomy.db.GroupRepository
 import com.example.roomy.db.ItemRepository
 import com.example.roomy.db.NetworkConnection
 import com.example.roomy.db.UserRepository
+import com.example.roomy.ui.Composables.UserProfileCircle
+import com.example.roomy.ui.Composables.UserProfileCirclesStacked
 import com.example.roomy.ui.ViewModels.GroupViewModel
 import com.example.roomy.ui.Factory.GroupViewModelFactory
 import com.example.roomy.ui.Factory.ItemViewModelFactory
 import com.example.roomy.ui.ViewModels.UserViewModel
 import com.example.roomy.ui.Factory.UserViewModelFactory
+import com.example.roomy.ui.States.GroupMembersUiState
 import com.example.roomy.ui.ViewModels.ItemViewModel
 
 
@@ -112,14 +125,16 @@ fun RoomyApp(
             ) { innerPadding ->
             AppNavHost(
                 navController,
-                Modifier.padding(innerPadding).padding(horizontal = 0.dp),
+                Modifier
+                    .padding(innerPadding)
+                    .padding(horizontal = 0.dp),
                 userViewModel,
                 groupViewModel,
                 itemViewModel,
                 networkConnection
 
 
-            )
+                )
 
         }
 
@@ -133,14 +148,16 @@ fun RoomyApp(
             ) { innerPadding ->
             AppNavHost(
                 navController,
-                Modifier.padding(innerPadding).padding(horizontal = 20.dp),
+                Modifier
+                    .padding(innerPadding)
+                    .padding(horizontal = 20.dp),
                 userViewModel,
                 groupViewModel,
                 itemViewModel,
                 networkConnection
 
 
-            )
+                )
 
         }
 
@@ -298,6 +315,13 @@ fun Header(
 
     val currentGroup by groupViewModel.currentGroup.collectAsState()
 
+    val groupMemberInformation by groupViewModel.groupMembers.collectAsState(
+        initial = GroupMembersUiState(
+            emptyList()
+        )
+    )
+
+
 
     Column(
         modifier = Modifier
@@ -312,26 +336,44 @@ fun Header(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                IconButton(onClick = { navController.navigate(Screens.Home.name) }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Group",
+                Column(
+                    Modifier.weight(1f),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    IconButton(
+                        onClick = { navController.navigate(Screens.Home.name) },
+
+                        ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Group",
+                        )
+                    }
+
+                }
+
+
+                Column(
+                    Modifier.weight(2f),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = currentGroup.name,
+                        fontSize = 20.sp,
                     )
                 }
-                Text(
-                    text = currentGroup.name,
-                    fontSize = 20.sp,
-                )
-                IconButton(onClick = {
-//                Add Members screen
-                }) {
-                    Icon(
-                        imageVector = Icons.Filled.AccountCircle,
-                        contentDescription = "Profile",
-                        modifier = Modifier.size(30.dp)
-                    )
+
+                Row (Modifier.weight(1f).clickable { navController.navigate(Screens.GroupMembers.route) }, verticalAlignment = Alignment.CenterVertically){
+
+                    UserProfileCirclesStacked(groupMemberInformation)
+
+
                 }
-            }
+
+
+
+                }
+
         }
     }
 }

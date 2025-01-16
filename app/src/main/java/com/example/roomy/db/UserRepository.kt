@@ -93,6 +93,7 @@ class UserRepository {
     suspend fun getUserById(userId: String): UserInformation? {
 
         try {
+            // Query to fetch user information by userId
             val response = supabase
                 .from("user_information") // Table name
                 .select {
@@ -129,8 +130,12 @@ class UserRepository {
                     }
                 }
                 .decodeSingle<UserInformation>()
+
+            Log.d("USER TO ADD", "user info $response")
+
             return response
         } catch (e: Exception) {
+            // Log the error and throw an exception
             Log.d("TAG", "No user found ${e.message}")
             return null
         }

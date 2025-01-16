@@ -2,7 +2,9 @@ package com.example.roomy.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Button
@@ -13,6 +15,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.roomy.db.BalanceRepository
@@ -55,7 +58,10 @@ fun Balance(
             .fillMaxSize()
             .padding(horizontal = 20.dp)
     ) {
-        Text(text = "Finance/Balance Page")
+
+        Text(text = "BALANCE LOADING .... ",
+            modifier = Modifier.fillMaxWidth(), fontWeight = FontWeight.Bold)
+        Text(text = "Coming soon ... ")
         LazyColumn {
             itemsIndexed(balanceViewModel.balance.value.userBalanceLent) { index: Int, Balance ->
                 OutlinedCard(modifier = Modifier.padding(12.dp)) {

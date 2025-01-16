@@ -36,7 +36,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -59,12 +58,10 @@ fun Home(
     networkConnection: NetworkConnection
 ) {
 
-    val context = LocalContext.current
 
     val addGroupState by groupViewModel.addGroupState
 
     val groupItemsCount by itemViewModel.allGroupsItemsCount.collectAsState()
-
 
     val currentUserId = userViewModel.currentUserSession.collectAsState().value.userId
 
@@ -73,6 +70,9 @@ fun Home(
             emptyList()
         )
     )
+
+    val userErrorMessage by userViewModel.userError.collectAsState()
+
 
     val allGroupsMembers by groupViewModel.allGroupsMembers.collectAsState(
         initial = emptyList()
@@ -105,10 +105,6 @@ fun Home(
 
     var addGroupPopUp by remember { mutableStateOf(false) }
 
-    if (!networkConnection.isNetworkAvailable(context)) {
-        Toast.makeText(context, "No internet connection. Please try again.", Toast.LENGTH_LONG)
-            .show()
-    }
 
     Column(
         Modifier.fillMaxSize().padding(top = 12.dp)
@@ -234,9 +230,13 @@ fun Home(
                             }
 
                             userViewModel.getUserByUsername(usernameAdd)
-                            addedUsers.add(usernameAdd)
-                            Log.d("Users", "$addedUsers")
-                            usernameAdd = ""
+                            if(userErrorMessage.message == "No users found") {
+                                addedUsers.add(usernameAdd)
+                                Log.d("Users", "$addedUsers")
+                                usernameAdd = ""
+                            } else {
+                                usernameAdd = ""
+                            }
 //                    Add new member, if successfull make a list with added users emails/usernames under this textfield - just save locally from input to display
 //                    If not succesfull, popup with error message ...
 //                    Ensure Users can only be added once

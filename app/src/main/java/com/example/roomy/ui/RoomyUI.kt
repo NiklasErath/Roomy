@@ -1,5 +1,6 @@
 package com.example.roomy.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -56,6 +57,8 @@ import com.example.roomy.ui.ViewModels.UserViewModel
 import com.example.roomy.ui.Factory.UserViewModelFactory
 import com.example.roomy.ui.States.GroupMembersUiState
 import com.example.roomy.ui.ViewModels.ItemViewModel
+import androidx.compose.ui.platform.LocalContext
+
 
 
 enum class Screens(val route: String) {
@@ -81,12 +84,18 @@ fun RoomyApp(
     val itemRepository = ItemRepository()
 
     val networkConnection = NetworkConnection()
+    val context = LocalContext.current
 
 
     val currentDestination = navBackStackEntry?.destination?.route
     val displayBottomBarAndHeader = when (currentDestination) {
         Screens.Login.name, Screens.Register.name, Screens.Home.name -> false
         else -> true
+    }
+
+    if (!networkConnection.isNetworkAvailable(context)) {
+        Toast.makeText(context, "No internet connection. Please try again.", Toast.LENGTH_LONG)
+            .show()
     }
 
 
@@ -102,6 +111,28 @@ fun RoomyApp(
     val groupViewModel: GroupViewModel = viewModel(
         factory = GroupViewModelFactory(groupRepository, userRepository, itemViewModel )
     )
+
+    val userErrorMessage by userViewModel.userError.collectAsState()
+    val itemErrorMessage by itemViewModel.itemError.collectAsState()
+    val groupErrorMessage by groupViewModel.error.collectAsState()
+
+    if (userErrorMessage.message.isNotEmpty()) {
+        Toast.makeText(context, userErrorMessage.message, Toast.LENGTH_LONG)
+            .show()
+            userViewModel.clearUserError()
+    }
+
+    if (itemErrorMessage.message.isNotEmpty()) {
+        Toast.makeText(context, itemErrorMessage.message, Toast.LENGTH_LONG)
+            .show()
+        itemViewModel.clearItemError()
+    }
+
+    if (groupErrorMessage.message.isNotEmpty()) {
+        Toast.makeText(context, groupErrorMessage.message, Toast.LENGTH_LONG)
+            .show()
+        groupViewModel.clearGroupError()
+    }
 
 
     if (displayBottomBarAndHeader) {

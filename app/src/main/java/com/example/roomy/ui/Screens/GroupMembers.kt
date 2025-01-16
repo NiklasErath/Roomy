@@ -30,7 +30,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 
 
-
 @SuppressLint("SuspiciousIndentation")
 @Composable
 fun GroupMembers(
@@ -42,8 +41,6 @@ fun GroupMembers(
 
     val currentGroupIdInt: Int = currentGroup.id?.let { it } ?: 0
 
-    val errorMessage by groupViewModel.error.collectAsState()
-
     val groupMemberInformation by groupViewModel.groupMembers.collectAsState(
         initial = GroupMembersUiState(
             emptyList()
@@ -54,24 +51,26 @@ fun GroupMembers(
 
     var usernameAdd by remember { mutableStateOf("") }
 
-    if(errorMessage.message.isNotEmpty())
-    Toast.makeText(context, errorMessage.message, Toast.LENGTH_LONG)
-        .show()
-
     LaunchedEffect(Unit) {
 
         currentGroup.id?.let { groupViewModel.getGroupMembers(it) }
 
     }
- // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Column {
         LazyColumn {
             itemsIndexed(groupMemberInformation.memberInformation) { index: Int, memberInformation ->
-                OutlinedCard(modifier = Modifier
-                    .padding(12.dp)) {
+                OutlinedCard(
+                    modifier = Modifier
+                        .padding(12.dp)
+                ) {
                     Row() {
                         Text(text = "${memberInformation.username}")
-                        Button(onClick = {groupViewModel.kickUser("${memberInformation.id}", currentGroupIdInt)}) {
+                        Button(onClick = {
+                            groupViewModel.kickUser(
+                                "${memberInformation.id}",
+                                currentGroupIdInt
+                            )
+                        }) {
                             Text(text = "Kick Member")
                         }
                     }
@@ -93,19 +92,18 @@ fun GroupMembers(
             )
             Button(
                 onClick = {
-                    if (usernameAdd.isBlank()){
-                        //groupViewModel.showErrorMessage("Please enter a username.")
-                    }else {
-                    groupViewModel.addMemberByNameToGroup(usernameAdd, currentGroupIdInt)
+                    if (usernameAdd.isBlank()) {
+                        Toast.makeText(context, "Please enter a username", Toast.LENGTH_LONG).show()
+                    } else{
+                        groupViewModel.addMemberByNameToGroup(usernameAdd, currentGroupIdInt)
                         usernameAdd = ""
-                        }
+                    }
                 },
                 modifier = Modifier.padding(top = 8.dp)
             ) {
                 Text(text = "Add")
             }
         }
-        // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     }
 
 }

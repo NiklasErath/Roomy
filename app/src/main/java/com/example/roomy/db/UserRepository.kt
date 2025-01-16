@@ -13,6 +13,7 @@ import java.util.UUID
 
 class UserRepository {
 
+    // create a new account
     suspend fun signUp(userEmail: String, userPassword: String) {
         Log.d("DATA LOGIN", "$userEmail , $userPassword")
 
@@ -33,6 +34,7 @@ class UserRepository {
         }
     }
 
+    // login to your account
     suspend fun signIn(userEmail: String, userPassword: String) {
         try {
             val result = supabase.auth.signInWith(Email) {
@@ -50,7 +52,8 @@ class UserRepository {
         }
     }
 
-    suspend fun updateUserInformation(userId: String, userName: String) {
+    // update user Information
+    suspend fun updateUserInformation(userId: String, userName: String): Boolean {
 
         try {
             supabase.from("user_information").update(
@@ -58,23 +61,20 @@ class UserRepository {
             ) {
                 filter { eq("user_id", userId) }
             }
-            Log.d("TAG", userId)
-            Log.d("TAG", userName)
-
-
 
             Log.d("TAG", "Updating UserName Success")
 
-
+        return true
         } catch (e: Exception) {
             Log.d("TAG", "Updating UserName failed")
-            e.message?.let { Log.d("TAG", it) }
+        return false
 
         }
 
 
     }
 
+    // get the current session
     fun getSession(): String {
         val session = supabase.auth.currentSessionOrNull()
 
@@ -89,11 +89,10 @@ class UserRepository {
         return currentUserId
     }
 
-    suspend fun getUserById(userId: String): UserInformation {
-        Log.d("TAG", "HEYXXXYYYXXXX")
+    // get the user Information by the userId
+    suspend fun getUserById(userId: String): UserInformation? {
 
         try {
-            // Query to fetch user information by userId
             val response = supabase
                 .from("user_information") // Table name
                 .select {
@@ -103,25 +102,24 @@ class UserRepository {
                             userId
                         )
                     }
-                } // Select all columns (you can specify specific ones like .select("id", "name", "email"))
+                }
                 .decodeSingle<UserInformation>()
 
             Log.d("ICH HABE ES GESCHAFFT", "user info $response")
 
             return response
         } catch (e: Exception) {
-            // Log the error and throw an exception
             Log.d("TAG", "Could not get the User information: ${e.message}")
-            throw e
+             return null
         }
 
     }
 
-    suspend fun getUserByName(name: String): UserInformation {
+// get the user information by name
+    suspend fun getUserByName(name: String): UserInformation? {
         try {
-            // Query to fetch user information by userId
             val response = supabase
-                .from("user_information") // Table name
+                .from("user_information")
                 .select {
                     filter {
                         eq(
@@ -129,20 +127,17 @@ class UserRepository {
                             name
                         )
                     }
-                } // Select all columns (you can specify specific ones like .select("id", "name", "email"))
+                }
                 .decodeSingle<UserInformation>()
-
-            Log.d("USER TO ADD", "user info $response")
-
             return response
         } catch (e: Exception) {
-            // Log the error and throw an exception
             Log.d("TAG", "No user found ${e.message}")
-            throw e
+            return null
         }
 
     }
 
+    // check if the Email exists toi make sure the email is unique
     suspend fun checkExistingEmail(userEmail: String): Boolean {
 
         try {
@@ -170,6 +165,7 @@ class UserRepository {
 
     }
 
+    // check if the username already exists to make sure the username is unique
     suspend fun checkExistingUserName(userName: String): Boolean {
 
         try {

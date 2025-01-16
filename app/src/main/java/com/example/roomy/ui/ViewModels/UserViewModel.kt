@@ -5,11 +5,9 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.roomy.db.UserRepository
 import com.example.roomy.ui.States.SessionState
 import com.example.roomy.ui.States.UserState
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -29,6 +27,10 @@ sealed class RegisterState {
     data class Error(val message: String) : RegisterState()
 }
 
+sealed class UserError {
+    data class Error(val message: String)
+}
+
 class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
 
     private val _session = MutableStateFlow(SessionState(""))
@@ -37,12 +39,17 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
     val currentUserSession = _session.asStateFlow()
     val loggedInUser = _loggedInUser.asStateFlow()
 
+    // error Message
+    private val _userError = MutableStateFlow(UserError.Error(""))
+    val userError = _userError.asStateFlow()
+
     private val _loginState = mutableStateOf<LoginState>(LoginState.Idle)
     val loginState: State<LoginState> = _loginState
 
     private val _registerState = mutableStateOf<RegisterState>(RegisterState.Idle)
     val registerState: State<RegisterState> = _registerState
 
+    // Login user
     suspend fun logInUser(userEmail: String, userPassword: String) {
         userRepository.signIn("n@n.com", "1234")
         val currentSession = userRepository.getSession()
@@ -54,22 +61,29 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
 
     }
 
+    // get the Information of the user by ID
     suspend fun getUserInformation() {
         Log.d("Tag", "geeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeet userId from currentUserSession")
         Log.d("Tag", currentUserSession.value.userId)
 
         val user = userRepository.getUserById(currentUserSession.value.userId)
-        _loggedInUser.update { oldState ->
-            oldState.copy(
-                userId = user.id,
-                username = user.username,
-                email = user.email
-            )
+        if (user == null) {
+            _userError.update { oldState ->
+                oldState.copy("Failed to get user information")
+            }
+        } else {
+            _loggedInUser.update { oldState ->
+                oldState.copy(
+                    userId = user.id,
+                    username = user.username,
+                    email = user.email
+                )
+            }
         }
 
     }
 
-
+    // login the user and get all his information
     fun logInAndFetchUserInformation(userEmail: String, userPassword: String) {
         viewModelScope.launch {
             _loginState.value = LoginState.Loading
@@ -90,7 +104,7 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
         }
     }
 
-
+    // register
     fun signUp(userEmail: String, userPassword: String, userName: String) {
         viewModelScope.launch {
 
@@ -136,24 +150,51 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
         }
     }
 
-    fun getUserByUsername(username: String){
+    // get a user by his username
+    fun getUserByUsername(username: String) {
         viewModelScope.launch {
-            userRepository.getUserByName(username)
+            val user = userRepository.getUserByName(username)
+            if (user == null) {
+                _userError.update { oldState ->
+                    oldState.copy("No user found")
+                }
+            }
         }
     }
 
-    fun updateUserName(username: String, userId: String){
-        viewModelScope.launch{
-            userRepository.updateUserInformation(userId, username)
-            _loggedInUser.update { oldstate ->
-                oldstate.copy(
-                    userId = userId,
-                    username = username,
-                    email = loggedInUser.value.email
-                )
+    // update the username and check if he already exists
+    fun updateUserName(username: String, userId: String) {
+        viewModelScope.launch {
+            val newUsername = userRepository.checkExistingUserName(username)
+            if (newUsername) {
+                _userError.update { oldState ->
+                    oldState.copy("Username already exists")
+                }
+            } else {
+                val user = userRepository.updateUserInformation(userId, username)
+                if (!user) {
+                    _userError.update { oldState ->
+                        oldState.copy("username could not be updated")
+                    }
+                } else {
+                    _loggedInUser.update { oldstate ->
+                        oldstate.copy(
+                            userId = userId,
+                            username = username,
+                            email = loggedInUser.value.email
+                        )
+                    }
+                }
             }
 
         }
+    }
+
+    // clear the user error state
+    fun clearUserError(){
+    _userError.update { oldState->
+        oldState.copy("")
+    }
     }
 
 //    fun signUp(userEmail: String, userPassword: String, userName: String) {
@@ -176,7 +217,6 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
 //
 //        }
 //    }
-
 
 
 }

@@ -12,23 +12,23 @@ import io.ktor.util.escapeHTML
 
 class GroupRepository {
 
-    suspend fun getGroupsByUserId(userId: String): List<Groups> {
+    // get the groups of the loggedIn user
+    suspend fun getGroupsByUserId(userId: String): List<Groups>? {
         try {
             val response = supabase
                 .from("parent_group")
                 .select { filter { eq("user_id", userId) } }
                 .decodeList<Groups>()
-
-            Log.d("TAG", "Got the group Ids: $response")
             return response
         } catch (e: Exception) {
             // Log the error and throw an exception
             Log.d("TAG", "Could not get the groups: ${e.message}")
-            throw IllegalStateException("No groups available")
+            return null
         }
     }
 
-    suspend fun getGroupInformationById(groupId: Int): GroupInformation {
+    // get the group information of a group by groupId
+    suspend fun getGroupInformationById(groupId: Int): GroupInformation? {
         try {
             val response = supabase
                 .from("group_information")
@@ -37,11 +37,12 @@ class GroupRepository {
             return response
         } catch (e: Exception) {
             Log.d("TAG", "Could not get the groups: ${e.message}")
-            throw IllegalStateException("No groups available")
+            return null
         }
     }
 
-    suspend fun createGroup(groupName: String, userId: String): GroupInformation {
+    // create a new group
+    suspend fun createGroup(groupName: String, userId: String): GroupInformation? {
         try {
             val group = GroupInformation(name = groupName, creatorId = userId)
             val response = supabase.from("group_information").insert(group) { select() }
@@ -50,11 +51,12 @@ class GroupRepository {
             return response
         } catch (e: Exception) {
             Log.d("TAG", "Could not create group: ${e.message}")
-            throw IllegalStateException("No groups available")
+            return null
         }
     }
 
-    suspend fun getGroupMembers(groupId: Int): List<Groups> {
+    // get all the group members of a group by ID
+    suspend fun getGroupMembers(groupId: Int): List<Groups>? {
         try {
             val response =
                 supabase.from("parent_group").select { filter { eq("group_id", groupId) } }
@@ -63,43 +65,50 @@ class GroupRepository {
             return response
         } catch (e: Exception) {
             Log.d("TAG", "Could not create group: ${e.message}")
-            throw IllegalStateException("No groups available")
-
+            return null
         }
     }
 
-    suspend fun deleteGroup(groupId: Int) {
+    // delete a group in the group information table and kick all members
+    suspend fun deleteGroup(groupId: Int): Boolean {
         try {
             supabase.from("group_information").delete { filter { eq("group_id", groupId) } }
             supabase.from("parent_group").delete { filter { eq("group_id", groupId) } }
+            return true
         } catch (e: Exception) {
             Log.d("TAG", "Could not delete group: ${e.message}")
-            throw IllegalStateException("Failed to delete group")
+            return false
         }
     }
 
-    suspend fun addMemberToGroup(userId: String, groupId: Int) {
+    // add a member to a group by user id ande groupId
+    suspend fun addMemberToGroup(userId: String, groupId: Int): Boolean {
         try {
-            val existingRelation = supabase.from("parent_group").select {   filter {
-                eq("group_id", groupId)
-                eq("user_id", userId)
-            }}.decodeList<Groups>()
+            val existingRelation = supabase.from("parent_group").select {
+                filter {
+                    eq("group_id", groupId)
+                    eq("user_id", userId)
+                }
+            }.decodeList<Groups>()
             Log.d("EXIST", "$existingRelation")
 
-                if (existingRelation.isEmpty()){
-                    val relation = Groups(userId = userId, groupId = groupId)
-                    supabase.from("parent_group").insert(relation)
-                    Log.d("MMM", "Add member success")
-                } else {
-                    Log.d("ERROR", "ERROR")
-                }
+            if (existingRelation.isEmpty()) {
+                val relation = Groups(userId = userId, groupId = groupId)
+                supabase.from("parent_group").insert(relation)
+                Log.d("MMM", "Add member success")
+            } else {
+                Log.d("ERROR", "ERROR")
+            }
+            return true
         } catch (e: Exception) {
             Log.d("TAG", "Could not insert relation ${e.message}")
+            return false
         }
 
     }
 
-    suspend fun kickMemberFromGroup(userId: String, groupId: Int) {
+    // kick a member of the group by userId and groupId
+    suspend fun kickMemberFromGroup(userId: String, groupId: Int): Boolean {
         try {
             supabase.from("parent_group").delete {
                 filter {
@@ -107,9 +116,10 @@ class GroupRepository {
                     eq("user_id", userId)
                 }
             }
+            return true
         } catch (e: Exception) {
             Log.d("TAG", "Could not kick user ${e.message}")
-            throw IllegalStateException("Failed to kick user from group")
+            return false
         }
     }
 

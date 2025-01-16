@@ -35,6 +35,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
+import com.example.roomy.db.api.getSuggestedRecipe
 import com.example.roomy.ui.Composables.ExpandingAddItemElement
 import com.example.roomy.ui.Composables.UserProfileCircle
 import com.example.roomy.ui.States.GroupMembersUiState
@@ -134,6 +135,8 @@ fun Group(
                 .padding(bottom = 50.dp)
                 .verticalScroll(rememberScrollState())
         ) {
+
+            Button(onClick = { navController.navigate(Screens.RecipeSuggestion.name)}) { }
 
             Text(text="ShoppingList")
 

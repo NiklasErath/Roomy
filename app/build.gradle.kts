@@ -22,6 +22,22 @@ android {
     namespace = "com.example.roomy"
     compileSdk = 34
 
+    buildFeatures {
+
+        buildConfig = true
+    }
+    buildTypes {
+        release {
+            // Use the OPENAI_API_KEY from gradle.properties
+            buildConfigField("String", "OPENAI_API_KEY", "\"${findProperty("OPENAI_API_KEY")}\"")
+        }
+        debug {
+            // Optionally, you can also add a debug API key or a different value
+            buildConfigField("String", "OPENAI_API_KEY", "\"${findProperty("OPENAI_API_KEY")}\"")
+        }
+    }
+
+
     defaultConfig {
         applicationId = "com.example.roomy"
         minSdk = 26
@@ -77,6 +93,11 @@ dependencies {
     // ----- Kotlin Serialization -----
     // (Only need ONE line for the JSON library)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation ("com.squareup.okhttp3:okhttp:4.9.3")
+    implementation ("com.squareup.okhttp3:logging-interceptor:4.9.3")
+
 
     // ----- Jetpack Compose -----
     // Use the Compose BOM for version alignment

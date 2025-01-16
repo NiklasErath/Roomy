@@ -70,7 +70,8 @@ enum class Screens(val route: String) {
     Groups("Groups"),
     Balance("Balance"),
     Profile("Profile"),
-    GroupMembers("GroupMembers")
+    GroupMembers("GroupMembers"),
+    RecipeSuggestion("RecipeSuggestion")
 }
 
 @Composable
@@ -318,6 +319,17 @@ fun AppNavHost(
                     navController,
                     groupViewModel,
                     userViewModel
+                )
+            }
+        }
+
+        composable(
+            Screens.RecipeSuggestion.route
+        ) {
+            Box {
+                RecipeSuggestion(
+                    navController,
+                    itemViewModel
                 )
             }
         }

@@ -35,6 +35,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
+import com.example.roomy.db.api.getSuggestedRecipe
 import com.example.roomy.ui.Composables.ExpandingAddItemElement
 import com.example.roomy.ui.Composables.UserProfileCircle
 import com.example.roomy.ui.States.GroupMembersUiState
@@ -134,6 +135,15 @@ fun Group(
                 .padding(bottom = 50.dp)
                 .verticalScroll(rememberScrollState())
         ) {
+
+//            Note change this to our errorhandling process later on
+            Button(onClick = { if(inventoryItems.items.isEmpty()){
+                Toast.makeText(context, "Add some Items to your Inventory first", Toast.LENGTH_SHORT).show()
+
+            }else {navController.navigate(Screens.RecipeSuggestion.name)}
+            }) {
+                Text(text = "Recipe Suggestion with Items")
+            }
 
             Text(text="ShoppingList")
 

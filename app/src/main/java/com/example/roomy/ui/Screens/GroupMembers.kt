@@ -110,12 +110,14 @@ fun GroupMembers(
             if (currentUser.userId == currentGroup.creatorId) {
                 Button(onClick = {
                     groupViewModel.deleteGroup(currentGroupIdInt)
+                    navController.navigate("Home")
                 }) {
                     Text(text = "Delete group")
                 }
             } else {
                 Button(onClick = {
                     groupViewModel.kickUser(currentUser.userId, currentGroupIdInt)
+                    navController.navigate("Home")
 
                 }) {
                     Text(text = "Leave group")

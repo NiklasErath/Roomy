@@ -62,7 +62,7 @@ class BalanceRepository {
                 created = "",
                 groupId = groupId,
                 userOwes = userId,
-                userDebts = groupMemberId,
+                userLent = groupMemberId,
                 amount = 0,
             )
 
@@ -71,7 +71,7 @@ class BalanceRepository {
                 created = "",
                 groupId = groupId,
                 userOwes = groupMemberId,
-                userDebts = userId,
+                userLent = userId,
                 amount = 0,
             )
 

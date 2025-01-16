@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import com.example.roomy.db.GroupRepository
 import androidx.lifecycle.ViewModel
+import com.example.roomy.db.BalanceRepository
 import com.example.roomy.db.UserRepository
 import com.example.roomy.db.data.GroupInformation
 import com.example.roomy.db.data.Groups
@@ -33,7 +34,8 @@ sealed class GroupError {
 class GroupViewModel(
     private val groupRepository: GroupRepository,
     private val userRepository: UserRepository,
-    private val itemViewModel: ItemViewModel
+    private val itemViewModel: ItemViewModel,
+    private val balanceRepository: BalanceRepository
 ) : ViewModel() {
 
 
@@ -237,16 +239,19 @@ class GroupViewModel(
 
 
     // add a new member to a group by userID
+    /*
     fun addMemberToGroup(userId: String, groupId: Int) {
         viewModelScope.launch {
             val added = groupRepository.addMemberToGroup(userId, groupId)
             if (!added) {
                 _groupError.update { oldState ->
-                    oldState.copy("Add Member failed")
+                    oldState.copy("User already in the group")
                 }
             }
         }
     }
+
+     */
 
 
     //add a member to a group by his username
@@ -259,11 +264,17 @@ class GroupViewModel(
                     oldState.copy("No user found")
                 }
             } else {
-                addMemberToGroup(user.id, groupId)
-                _groupMembers.update { oldState ->
-                    val updatedMembers = oldState.memberInformation.toMutableList()
-                    updatedMembers.add(user)
-                    oldState.copy(memberInformation = updatedMembers)
+                val adduser = groupRepository.addMemberToGroup(user.id, groupId)
+                if (!adduser) {
+                    _groupError.update { oldState ->
+                        oldState.copy("User already in the group")
+                    }
+                } else {
+                    _groupMembers.update { oldState ->
+                        val updatedMembers = oldState.memberInformation.toMutableList()
+                        updatedMembers.add(user)
+                        oldState.copy(memberInformation = updatedMembers)
+                    }
                 }
             }
 

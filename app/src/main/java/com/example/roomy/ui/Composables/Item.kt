@@ -1,5 +1,6 @@
 package com.example.roomy.ui
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -21,6 +22,7 @@ import androidx.compose.ui.res.painterResource
 import com.example.roomy.R
 import com.example.roomy.db.data.Item
 
+@SuppressLint("ResourceType")
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Item(
@@ -39,16 +41,21 @@ fun Item(
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = onLongClick
-            )
-        ,
+            ),
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+       // val iconId = item.icon ?: R.drawable.placeholder
+        val iconId = R.drawable.placeholder
+
+
         Icon(
-            painterResource(item.icon ?: R.drawable.placeholder),
+            painter = painterResource(iconId),
             contentDescription = "Letter",
-            Modifier.weight(1f).size(64.dp)
+            modifier = Modifier
+                .weight(1f)
+                .size(64.dp)
         )
-        Text(text = item.name, color = Color.White)
     }
+
 }

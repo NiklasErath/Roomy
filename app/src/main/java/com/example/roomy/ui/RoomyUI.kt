@@ -112,7 +112,7 @@ fun RoomyApp(
 
 
     val groupViewModel: GroupViewModel = viewModel(
-        factory = GroupViewModelFactory(groupRepository, userRepository, itemViewModel )
+        factory = GroupViewModelFactory(groupRepository, userRepository, itemViewModel, balanceRepository )
     )
 
     val balanceViewModel: BalanceViewModel = viewModel(

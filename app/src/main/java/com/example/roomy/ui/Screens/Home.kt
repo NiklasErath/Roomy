@@ -48,6 +48,7 @@ import com.example.roomy.ui.ViewModels.AddGroupState
 import com.example.roomy.ui.ViewModels.GroupViewModel
 import com.example.roomy.ui.ViewModels.ItemViewModel
 import com.example.roomy.ui.ViewModels.UserViewModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun Home(
@@ -100,7 +101,7 @@ fun Home(
     var newGroupName by remember { mutableStateOf("Home") }
     var usernameAdd by remember { mutableStateOf("") }
 
-    val addedUsers = remember { mutableStateListOf<String>() }
+    val addedUsers = remember { mutableStateListOf<String>()}
 
 
     var addGroupPopUp by remember { mutableStateOf(false) }
@@ -228,13 +229,13 @@ fun Home(
                             if (addedUsers.contains(usernameAdd) || usernameAdd.isEmpty()) {
                                 return@clickable
                             }
-
                             userViewModel.getUserByUsername(usernameAdd)
-                            if(userErrorMessage.message == "No users found") {
+                            if(userErrorMessage.message == "No user found") {
+                                usernameAdd = ""
+                                groupViewModel.clearGroupError()
+                            } else {
                                 addedUsers.add(usernameAdd)
                                 Log.d("Users", "$addedUsers")
-                                usernameAdd = ""
-                            } else {
                                 usernameAdd = ""
                             }
 //                    Add new member, if successfull make a list with added users emails/usernames under this textfield - just save locally from input to display

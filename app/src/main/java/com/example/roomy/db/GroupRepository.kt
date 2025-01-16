@@ -97,7 +97,7 @@ class GroupRepository {
                 supabase.from("parent_group").insert(relation)
                 Log.d("MMM", "Add member success")
             } else {
-                Log.d("ERROR", "ERROR")
+                return false
             }
             return true
         } catch (e: Exception) {

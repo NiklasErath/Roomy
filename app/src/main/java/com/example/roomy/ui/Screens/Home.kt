@@ -132,27 +132,6 @@ fun Home(
 
                     GroupCard(groupViewModel, groupInformation, navController, allGroupsMembers[index], itemCount)
 
-//                    OutlinedCard(
-//                        Modifier
-//                            .clickable {
-//                                groupViewModel.setCurrentGroup(groupInformation)
-//                                navController.navigate(Screens.Groups.name)
-//                            }
-//                            .fillMaxWidth(),
-//
-//                        ) {
-//                        Row(
-//                            Modifier
-//                                .fillMaxWidth()
-//                                .padding(8.dp), horizontalArrangement = Arrangement.Center
-//                        ) {
-//
-//                            Text(text = " ${groupInformation.name}")
-//                        }
-//
-//                    }
-
-
                 }
 
 

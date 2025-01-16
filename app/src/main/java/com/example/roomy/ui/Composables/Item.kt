@@ -50,12 +50,11 @@ fun Item(
 
 
         Icon(
-            painter = painterResource(iconId),
+            painterResource(item.icon ?: R.drawable.placeholder),
             contentDescription = "Letter",
-            modifier = Modifier
-                .weight(1f)
-                .size(64.dp)
+            Modifier.weight(1f).size(64.dp)
         )
+        Text(text = item.name, color = Color.White)
     }
 
 }

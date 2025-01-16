@@ -275,6 +275,11 @@ class GroupViewModel(
                         updatedMembers.add(user)
                         oldState.copy(memberInformation = updatedMembers)
                     }
+
+//                    Also update the current AllGroupMembers here if a new group is created
+                    _allGroupsMembers.update { oldGroups ->
+                        oldGroups + _groupMembers.value
+                    }
                 }
             }
 

@@ -136,7 +136,14 @@ fun Group(
                 .verticalScroll(rememberScrollState())
         ) {
 
-            Button(onClick = { navController.navigate(Screens.RecipeSuggestion.name)}) { }
+//            Note change this to our errorhandling process later on
+            Button(onClick = { if(inventoryItems.items.isEmpty()){
+                Toast.makeText(context, "Add some Items to your Inventory first", Toast.LENGTH_SHORT).show()
+
+            }else {navController.navigate(Screens.RecipeSuggestion.name)}
+            }) {
+                Text(text = "Recipe Suggestion with Items")
+            }
 
             Text(text="ShoppingList")
 

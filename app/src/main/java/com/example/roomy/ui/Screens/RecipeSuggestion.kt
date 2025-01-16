@@ -27,11 +27,9 @@ fun RecipeSuggestion(
     itemViewModel: ItemViewModel
 ) {
 
-//    getSuggestedRecipe(listOf("eggs", "cheese", "bread", "pickles", "noodles"))
+    var recipe by remember { mutableStateOf("Fetching Recipe ...") }
 
-    var recipe by remember { mutableStateOf("") }
-
-    val shoppingListItems by itemViewModel.allShoppingListItems.collectAsState(
+    val shoppingListItems by itemViewModel.allInventoryItems.collectAsState(
         initial = ItemsUiState(emptyList())
     )
     val shoppingListItemsNames = shoppingListItems.items.map { it.name }

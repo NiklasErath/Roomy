@@ -58,7 +58,9 @@ import com.example.roomy.ui.Factory.UserViewModelFactory
 import com.example.roomy.ui.States.GroupMembersUiState
 import com.example.roomy.ui.ViewModels.ItemViewModel
 import androidx.compose.ui.platform.LocalContext
-
+import com.example.roomy.db.BalanceRepository
+import com.example.roomy.ui.Factory.BalanceViewModelFactory
+import com.example.roomy.ui.ViewModels.BalanceViewModel
 
 
 enum class Screens(val route: String) {
@@ -82,6 +84,7 @@ fun RoomyApp(
     val userRepository = UserRepository()
     val groupRepository = GroupRepository()
     val itemRepository = ItemRepository()
+    val balanceRepository = BalanceRepository()
 
     val networkConnection = NetworkConnection()
     val context = LocalContext.current
@@ -110,6 +113,10 @@ fun RoomyApp(
 
     val groupViewModel: GroupViewModel = viewModel(
         factory = GroupViewModelFactory(groupRepository, userRepository, itemViewModel )
+    )
+
+    val balanceViewModel: BalanceViewModel = viewModel(
+        factory = BalanceViewModelFactory(balanceRepository)
     )
 
     val userErrorMessage by userViewModel.userError.collectAsState()
@@ -164,7 +171,9 @@ fun RoomyApp(
                 userViewModel,
                 groupViewModel,
                 itemViewModel,
-                networkConnection
+                networkConnection,
+                balanceRepository,
+                balanceViewModel
 
 
                 )
@@ -187,7 +196,9 @@ fun RoomyApp(
                 userViewModel,
                 groupViewModel,
                 itemViewModel,
-                networkConnection
+                networkConnection,
+                balanceRepository,
+                balanceViewModel
 
 
                 )
@@ -206,7 +217,9 @@ fun AppNavHost(
     userViewModel: UserViewModel,
     groupViewModel: GroupViewModel,
     itemViewModel: ItemViewModel,
-    networkConnection: NetworkConnection
+    networkConnection: NetworkConnection,
+    balanceRepository: BalanceRepository,
+    balanceViewModel: BalanceViewModel
 ) {
     NavHost(
         navController = navController,
@@ -278,7 +291,11 @@ fun AppNavHost(
         ) {
             Box {
                 Balance(
-                    navController
+                    navController,
+                    balanceRepository,
+                    balanceViewModel,
+                    groupViewModel,
+                    userViewModel
                 )
             }
         }
@@ -299,7 +316,8 @@ fun AppNavHost(
             Box {
                 GroupMembers(
                     navController,
-                    groupViewModel
+                    groupViewModel,
+                    userViewModel
                 )
             }
         }

@@ -28,13 +28,15 @@ import com.example.roomy.ui.States.GroupMembersUiState
 import com.example.roomy.ui.ViewModels.GroupViewModel
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import com.example.roomy.ui.ViewModels.UserViewModel
 
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
 fun GroupMembers(
     navController: NavController,
-    groupViewModel: GroupViewModel
+    groupViewModel: GroupViewModel,
+    userViewModel: UserViewModel
 
 ) {
     val currentGroup by groupViewModel.currentGroup.collectAsState()
@@ -46,8 +48,10 @@ fun GroupMembers(
             emptyList()
         )
     )
+
     val context = LocalContext.current
 
+    val currentUser by userViewModel.loggedInUser.collectAsState()
 
     var usernameAdd by remember { mutableStateOf("") }
 
@@ -94,7 +98,7 @@ fun GroupMembers(
                 onClick = {
                     if (usernameAdd.isBlank()) {
                         Toast.makeText(context, "Please enter a username", Toast.LENGTH_LONG).show()
-                    } else{
+                    } else {
                         groupViewModel.addMemberByNameToGroup(usernameAdd, currentGroupIdInt)
                         usernameAdd = ""
                     }
@@ -103,7 +107,22 @@ fun GroupMembers(
             ) {
                 Text(text = "Add")
             }
-        }
-    }
+            if (currentUser.userId == currentGroup.creatorId) {
+                Button(onClick = {
+                    groupViewModel.deleteGroup(currentGroupIdInt)
+                }) {
+                    Text(text = "Delete group")
+                }
+            } else {
+                Button(onClick = {
+                    groupViewModel.kickUser(currentUser.userId, currentGroupIdInt)
 
+                }) {
+                    Text(text = "Leave group")
+                }
+            }
+        }
+
+    }
 }
+

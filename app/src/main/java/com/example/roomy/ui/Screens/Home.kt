@@ -42,12 +42,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.roomy.R
 import com.example.roomy.db.NetworkConnection
 import com.example.roomy.ui.States.GroupsUiState
 import com.example.roomy.ui.ViewModels.AddGroupState
 import com.example.roomy.ui.ViewModels.GroupViewModel
+import com.example.roomy.ui.ViewModels.ItemViewModel
 import com.example.roomy.ui.ViewModels.UserViewModel
 
 @Composable
@@ -55,12 +55,15 @@ fun Home(
     navController: NavController,
     groupViewModel: GroupViewModel,
     userViewModel: UserViewModel,
+    itemViewModel: ItemViewModel,
     networkConnection: NetworkConnection
 ) {
 
     val context = LocalContext.current
 
     val addGroupState by groupViewModel.addGroupState
+
+    val groupItemsCount by itemViewModel.allGroupsItemsCount.collectAsState()
 
 
     val currentUserId = userViewModel.currentUserSession.collectAsState().value.userId
@@ -71,9 +74,19 @@ fun Home(
         )
     )
 
+    val allGroupsMembers by groupViewModel.allGroupsMembers.collectAsState(
+        initial = emptyList()
+    )
+
     LaunchedEffect(Unit) {
         groupViewModel.getGroupsByUserId(currentUserId)
-        groupViewModel.getGroupMembers(2)
+
+//        if (groupInformationState.groupsInformation.isNotEmpty()) {
+//            val groupIds = groupInformationState.groupsInformation.mapNotNull { it.id }
+//
+//            itemViewModel.getAllItemCountsForGroups(groupIds)
+//        }
+    //        groupViewModel.getGroupMembers(2)
     }
 
     LaunchedEffect(addGroupState) {
@@ -98,41 +111,49 @@ fun Home(
     }
 
     Column(
-        Modifier.fillMaxSize()
-    ) {
-        Text(text = "Groups Page")
-        Button(onClick = { navController.navigate(Screens.Groups.name) }) {
-            Text(text = "Select and enter Group")
-        }
+        Modifier.fillMaxSize().padding(top = 12.dp)
 
-        LazyColumn {
-            if (groupInformationState.groupsInformation.isEmpty()) {
+    ) {
+        Text(text = "My Groups", fontSize = integerResource(id = R.integer.heading1).sp)
+        Spacer(Modifier.height(40.dp))
+
+
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            if (groupInformationState.groupsInformation.isEmpty() || allGroupsMembers.isEmpty()) {
                 item {
                     Text(text = "No groups")
                 }
             } else {
                 itemsIndexed(groupInformationState.groupsInformation) { index, groupInformation ->
 
+                    val itemCount = groupItemsCount[groupInformation.id] ?: -1
 
-                    OutlinedCard(
-                        Modifier
-                            .clickable {
-                                groupViewModel.setCurrentGroup(groupInformation)
-                                navController.navigate(Screens.Groups.name)
-                            }
-                            .fillMaxWidth(),
 
-                        ) {
-                        Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp), horizontalArrangement = Arrangement.Center
-                        ) {
 
-                            Text(text = " ${groupInformation.name}")
-                        }
 
-                    }
+                    GroupCard(groupViewModel, groupInformation, navController, allGroupsMembers[index], itemCount)
+
+//                    OutlinedCard(
+//                        Modifier
+//                            .clickable {
+//                                groupViewModel.setCurrentGroup(groupInformation)
+//                                navController.navigate(Screens.Groups.name)
+//                            }
+//                            .fillMaxWidth(),
+//
+//                        ) {
+//                        Row(
+//                            Modifier
+//                                .fillMaxWidth()
+//                                .padding(8.dp), horizontalArrangement = Arrangement.Center
+//                        ) {
+//
+//                            Text(text = " ${groupInformation.name}")
+//                        }
+//
+//                    }
 
 
                 }

@@ -89,9 +89,6 @@ fun RoomyApp(
         else -> true
     }
 
-    val groupViewModel: GroupViewModel = viewModel(
-        factory = GroupViewModelFactory(groupRepository, userRepository)
-    )
 
     val userViewModel: UserViewModel = viewModel(
         factory = UserViewModelFactory(userRepository)
@@ -99,6 +96,11 @@ fun RoomyApp(
 
     val itemViewModel: ItemViewModel = viewModel(
         factory = ItemViewModelFactory(itemRepository)
+    )
+
+
+    val groupViewModel: GroupViewModel = viewModel(
+        factory = GroupViewModelFactory(groupRepository, userRepository, itemViewModel )
     )
 
 
@@ -216,7 +218,9 @@ fun AppNavHost(
                     navController,
                     groupViewModel,
                     userViewModel,
-                    networkConnection
+                    itemViewModel,
+
+                    networkConnection,
                 )
             }
         }

@@ -2,21 +2,16 @@ package com.example.roomy.ui.ViewModels
 
 import android.util.Log
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.roomy.db.GroupRepository
 import androidx.lifecycle.ViewModel
-import com.example.roomy.db.Supabase.supabase
 import com.example.roomy.db.UserRepository
 import com.example.roomy.db.data.GroupInformation
 import com.example.roomy.db.data.Groups
 import com.example.roomy.ui.States.GroupMembersUiState
 import com.example.roomy.ui.States.GroupState
 import com.example.roomy.ui.States.GroupsUiState
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -37,7 +32,8 @@ sealed class GroupError {
 
 class GroupViewModel(
     private val groupRepository: GroupRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val itemViewModel: ItemViewModel
 ) : ViewModel() {
 
 
@@ -49,6 +45,7 @@ class GroupViewModel(
 
     private val _groups = MutableStateFlow(GroupState(emptyList()))
     private val _groupsInformation = MutableStateFlow(GroupsUiState(emptyList()))
+    private val _allGroupsMembers = MutableStateFlow<List<GroupMembersUiState>>(emptyList())
     private val _groupMembers = MutableStateFlow(GroupMembersUiState(emptyList()))
 
     // error State
@@ -57,6 +54,8 @@ class GroupViewModel(
 
     val groups = _groups.asStateFlow()
     val groupsInformation = _groupsInformation.asStateFlow()
+    val allGroupsMembers = _allGroupsMembers.asStateFlow()
+
     val groupMembers = _groupMembers.asStateFlow()
 
     private val _currentGroup =
@@ -68,6 +67,7 @@ class GroupViewModel(
     }
 
     // get the Groups for the user to display them
+    //Updated: this now also fetches the group members for each group and the number of shoppingListItems in each group to display in the Home UI
     fun getGroupsByUserId(userId: String) {
         viewModelScope.launch {
             val groups = groupRepository.getGroupsByUserId(userId)
@@ -82,6 +82,43 @@ class GroupViewModel(
                     )
                 }
                 getGroupInformationByGroupId(groups)
+
+//              Addition by Jakob - getALlGroupMembers for Home Page to display them and all itemcounts
+                getAllGroupsMembers(groups)
+
+                val groupIds = groups.map { it.groupId }
+                itemViewModel.getAllItemCountsForGroups(groupIds)
+            }
+        }
+    }
+
+
+    // Function to get all members for all groups
+    fun getAllGroupsMembers(groups: List<Groups>) {
+        viewModelScope.launch {
+//               For each group, fetch its members
+            val allMembers = mutableListOf<GroupMembersUiState>()
+            for (group in groups) {
+                // Step 3: Fetch members for each group
+                val groupMembers = groupRepository.getGroupMembers(group.groupId)
+
+                if (groupMembers != null) {
+                    val groupMemberInfo = groupMembers.map { member ->
+                        // Assuming userRepository.getUserById returns a UserInformation object
+                        userRepository.getUserById(member.userId)
+                    }.filterNotNull()
+
+                    // Step 4: Add the group members to the list
+                    allMembers.add(GroupMembersUiState(groupMemberInfo))
+                } else {
+                    _groupError.update { oldState ->
+                        oldState.copy("Could not get All Group Members")
+                    }
+                }
+            }
+            // Step 5: Update _allGroupsMembers with the fetched members
+            _allGroupsMembers.update {
+                allMembers
             }
         }
     }
@@ -94,6 +131,10 @@ class GroupViewModel(
                 Log.d("IDS", "${group.groupId}")
                 groupRepository.getGroupInformationById(group.groupId)
             }
+//            val houseHoldMembers = groups.map{group ->
+//                val groups = groupRepository.getGroupMembers(group.groupId)
+//            }
+
             if (household == null) {
                 _groupError.update { oldState ->
                     oldState.copy("No group Information found")
@@ -102,6 +143,7 @@ class GroupViewModel(
                 _groupsInformation.update {
                     it.copy(groupsInformation = household.filterNotNull())
                 }
+
             }
         }
     }
@@ -197,8 +239,8 @@ class GroupViewModel(
     // add a new member to a group by userID
     fun addMemberToGroup(userId: String, groupId: Int) {
         viewModelScope.launch {
-            val added =groupRepository.addMemberToGroup(userId, groupId)
-            if(!added){
+            val added = groupRepository.addMemberToGroup(userId, groupId)
+            if (!added) {
                 _groupError.update { oldState ->
                     oldState.copy("Add Member failed")
                 }
@@ -207,7 +249,7 @@ class GroupViewModel(
     }
 
 
-//add a member to a group by his username
+    //add a member to a group by his username
     fun addMemberByNameToGroup(username: String, groupId: Int) {
         viewModelScope.launch {
 

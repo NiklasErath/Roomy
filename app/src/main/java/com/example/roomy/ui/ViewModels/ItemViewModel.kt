@@ -19,6 +19,9 @@ class ItemViewModel(private val itemRepository: ItemRepository) : ViewModel() {
         data class Error(val message: String)
     }
 
+    private val _allGroupsItemsCount = MutableStateFlow<Map<Int, Int>>(emptyMap())
+    val allGroupsItemsCount = _allGroupsItemsCount.asStateFlow()
+
 
     private val _finishedFetching = mutableStateOf<Boolean>(false)
     val finishedFetching: State<Boolean> = _finishedFetching
@@ -57,12 +60,13 @@ class ItemViewModel(private val itemRepository: ItemRepository) : ViewModel() {
                     items = it.items + newItem
                 )
             }
+
             itemRepository.updateItem(newItem)
 
         }
     }
 
-// move Item to the shopping list
+    // move Item to the shopping list
     fun moveToShoppingList(item: Item) {
 
         val newItem =
@@ -86,7 +90,7 @@ class ItemViewModel(private val itemRepository: ItemRepository) : ViewModel() {
         }
     }
 
-// get All Items of a group
+    // get All Items of a group
     suspend fun getAllItems(groupId: Int) {
         viewModelScope.launch {
             val result = itemRepository.getAllItems(groupId)
@@ -128,7 +132,40 @@ class ItemViewModel(private val itemRepository: ItemRepository) : ViewModel() {
         }
     }
 
-// add an Item to your List
+
+    // Function to get itemCounts for each group
+    fun getAllItemCountsForGroups(groupIds: List<Int>) {
+        viewModelScope.launch {
+            val groupItemsCountMap = mutableMapOf<Int, Int>()
+
+            // Iterate through each groupId and fetch the items for that group
+            groupIds.forEach { groupId ->
+                try {
+                    // Fetch items for the group
+                    val result = itemRepository.getAllItems(groupId)
+                    if (result != null) {
+                        val (shoppingListItems, inventoryItems) = result
+
+                        //Only Shoppinglist items for now
+                        val totalItemsForGroup = shoppingListItems.size
+//                        + inventoryItems.size
+
+                        groupItemsCountMap[groupId] = totalItemsForGroup
+                    }
+                } catch (e: Exception) {
+                    groupItemsCountMap[groupId] = -1
+                    _itemError.update { oldState ->
+                        oldState.copy("Failed to get ItemCounts")
+                    }
+                }
+            }
+
+            // Update the state with the new item counts
+            _allGroupsItemsCount.update { groupItemsCountMap }
+        }
+    }
+
+    // add an Item to your List
     fun addItem(item: Item) {
         viewModelScope.launch {
 
@@ -176,7 +213,7 @@ class ItemViewModel(private val itemRepository: ItemRepository) : ViewModel() {
             }
 
             val delete = itemRepository.deleteItem(item)
-            if (!delete){
+            if (!delete) {
                 _itemError.update { oldState ->
                     oldState.copy("Failed to delete Item")
                 }

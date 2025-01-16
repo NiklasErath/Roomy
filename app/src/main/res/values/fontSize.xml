@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="heading1">32</integer>
+    <integer name="heading2">24</integer>
+
 </resources>

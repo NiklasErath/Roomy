@@ -84,6 +84,10 @@ fun Profile(
                         Text(text= "Change to Dark mode")
                     }
                 }
+
+                Button(onClick = { navController.navigate(Screens.GroupMembers.route)}) {
+                    Text(text = "Manage Members")
+                }
             }
         }
     }

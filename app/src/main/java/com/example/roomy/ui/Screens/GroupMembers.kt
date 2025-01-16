@@ -1,5 +1,7 @@
 package com.example.roomy.ui
 
+import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,8 +27,11 @@ import androidx.navigation.NavController
 import com.example.roomy.ui.States.GroupMembersUiState
 import com.example.roomy.ui.ViewModels.GroupViewModel
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 
 
+
+@SuppressLint("SuspiciousIndentation")
 @Composable
 fun GroupMembers(
     navController: NavController,
@@ -44,8 +49,14 @@ fun GroupMembers(
             emptyList()
         )
     )
+    val context = LocalContext.current
+
 
     var usernameAdd by remember { mutableStateOf("") }
+
+    if(errorMessage.message.isNotEmpty())
+    Toast.makeText(context, errorMessage.message, Toast.LENGTH_LONG)
+        .show()
 
     LaunchedEffect(Unit) {
 
@@ -80,9 +91,6 @@ fun GroupMembers(
                     )
                 }
             )
-            if (errorMessage.message.isNotEmpty()){
-            Text("User not found")
-            }
             Button(
                 onClick = {
                     if (usernameAdd.isBlank()){

@@ -35,6 +35,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.roomy.db.GroupRepository
 import com.example.roomy.db.ItemRepository
+import com.example.roomy.db.NetworkConnection
 import com.example.roomy.db.UserRepository
 import com.example.roomy.ui.ViewModels.GroupViewModel
 import com.example.roomy.ui.Factory.GroupViewModelFactory
@@ -65,6 +66,8 @@ fun RoomyApp(
     val userRepository = UserRepository()
     val groupRepository = GroupRepository()
     val itemRepository = ItemRepository()
+
+    val networkConnection = NetworkConnection()
 
 
     val currentDestination = navBackStackEntry?.destination?.route
@@ -113,6 +116,7 @@ fun RoomyApp(
                 userViewModel,
                 groupViewModel,
                 itemViewModel,
+                networkConnection
 
 
             )
@@ -133,6 +137,7 @@ fun RoomyApp(
                 userViewModel,
                 groupViewModel,
                 itemViewModel,
+                networkConnection
 
 
             )
@@ -151,6 +156,7 @@ fun AppNavHost(
     userViewModel: UserViewModel,
     groupViewModel: GroupViewModel,
     itemViewModel: ItemViewModel,
+    networkConnection: NetworkConnection
 ) {
     NavHost(
         navController = navController,
@@ -193,6 +199,7 @@ fun AppNavHost(
                     navController,
                     groupViewModel,
                     userViewModel,
+                    networkConnection
                 )
             }
         }

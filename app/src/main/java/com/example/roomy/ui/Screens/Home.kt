@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.roomy.R
+import com.example.roomy.db.NetworkConnection
 import com.example.roomy.ui.States.GroupsUiState
 import com.example.roomy.ui.ViewModels.AddGroupState
 import com.example.roomy.ui.ViewModels.GroupViewModel
@@ -54,6 +55,7 @@ fun Home(
     navController: NavController,
     groupViewModel: GroupViewModel,
     userViewModel: UserViewModel,
+    networkConnection: NetworkConnection
 ) {
 
     val context = LocalContext.current
@@ -90,6 +92,11 @@ fun Home(
 
     var addGroupPopUp by remember { mutableStateOf(false) }
 
+    if (!networkConnection.isNetworkAvailable(context)) {
+        Toast.makeText(context, "No internet connection. Please try again.", Toast.LENGTH_LONG)
+            .show()
+    }
+
     Column(
         Modifier.fillMaxSize()
     ) {
@@ -107,17 +114,20 @@ fun Home(
                 itemsIndexed(groupInformationState.groupsInformation) { index, groupInformation ->
 
 
-                        OutlinedCard(
-                            Modifier.clickable {
+                    OutlinedCard(
+                        Modifier
+                            .clickable {
                                 groupViewModel.setCurrentGroup(groupInformation)
                                 navController.navigate(Screens.Groups.name)
-                            }.fillMaxWidth(),
+                            }
+                            .fillMaxWidth(),
 
                         ) {
-                            Row(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp), horizontalArrangement = Arrangement.Center) {
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp), horizontalArrangement = Arrangement.Center
+                        ) {
 
                             Text(text = " ${groupInformation.name}")
                         }
@@ -131,7 +141,7 @@ fun Home(
             }
             item {
                 Spacer(Modifier.height(100.dp))
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
 
                     Button(onClick = {
                         addGroupPopUp = true
@@ -214,26 +224,27 @@ fun Home(
                 },
 
 
-
                 )
             if (addedUsers.isNotEmpty()) {
-              LazyColumn (){
-                  itemsIndexed(addedUsers) {index, item ->
-                      OutlinedCard(modifier = Modifier
-                          .fillMaxWidth()) {
-                          Row(modifier = Modifier.padding(12.dp)) {
-                              Text(text = item)
-                              Button(onClick = {addedUsers.remove(item)}) {
-                                  Text(text = "remove")
-                              }
-                          }
-                      }
-                  }
-              }
+                LazyColumn() {
+                    itemsIndexed(addedUsers) { index, item ->
+                        OutlinedCard(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        ) {
+                            Row(modifier = Modifier.padding(12.dp)) {
+                                Text(text = item)
+                                Button(onClick = { addedUsers.remove(item) }) {
+                                    Text(text = "remove")
+                                }
+                            }
+                        }
+                    }
+                }
             }
             Button(
                 onClick = {
-                    groupViewModel.createNewGroup(newGroupName, currentUserId,addedUsers)
+                    groupViewModel.createNewGroup(newGroupName, currentUserId, addedUsers)
                     addGroupPopUp = false
                 },
             ) {

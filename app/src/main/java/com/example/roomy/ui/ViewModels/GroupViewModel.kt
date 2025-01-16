@@ -2,6 +2,7 @@ package com.example.roomy.ui.ViewModels
 
 import android.util.Log
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -29,6 +30,10 @@ sealed class AddGroupState {
     data class Error(val message: String) : AddGroupState()
 }
 
+sealed class GroupError {
+    data class Error(val message: String)
+}
+
 
 class GroupViewModel(
     private val groupRepository: GroupRepository,
@@ -46,6 +51,10 @@ class GroupViewModel(
     private val _groupsInformation = MutableStateFlow(GroupsUiState(emptyList()))
     private val _groupMembers = MutableStateFlow(GroupMembersUiState(emptyList()))
 
+    // error State
+    private val _groupError = MutableStateFlow(GroupError.Error(""))
+    val error = _groupError.asStateFlow()
+
     val groups = _groups.asStateFlow()
     val groupsInformation = _groupsInformation.asStateFlow()
     val groupMembers = _groupMembers.asStateFlow()
@@ -58,103 +67,174 @@ class GroupViewModel(
         _currentGroup.value = group
     }
 
+    // get the Groups for the user to display them
     fun getGroupsByUserId(userId: String) {
         viewModelScope.launch {
             val groups = groupRepository.getGroupsByUserId(userId)
-            _groups.update { oldState ->
-                oldState.copy(
-                    groups = groups
-                )
+            if (groups == null) {
+                _groupError.update { oldState ->
+                    oldState.copy("No groups found")
+                }
+            } else {
+                _groups.update { oldState ->
+                    oldState.copy(
+                        groups = groups
+                    )
+                }
+                getGroupInformationByGroupId(groups)
             }
-            getGroupInformationByGroupId(groups)
         }
     }
 
 
+    // get the Group information by the group Id
     fun getGroupInformationByGroupId(groups: List<Groups>) {
         viewModelScope.launch {
             val household = groups.map { group ->
                 Log.d("IDS", "${group.groupId}")
                 groupRepository.getGroupInformationById(group.groupId)
             }
-            _groupsInformation.update {
-                it.copy(groupsInformation = household)
+            if (household == null) {
+                _groupError.update { oldState ->
+                    oldState.copy("No group Information found")
+                }
+            } else {
+                _groupsInformation.update {
+                    it.copy(groupsInformation = household.filterNotNull())
+                }
             }
         }
     }
 
+    // create a new group with information needed
     fun createNewGroup(groupName: String, userId: String, addedUsers: List<String>) {
         viewModelScope.launch {
             val newGroup = groupRepository.createGroup(groupName, userId)
-            newGroup.id?.let { groupId ->
-                groupRepository.addMemberToGroup(userId, groupId)
-                try {
-
-
-                    addedUsers.forEach { item ->
-                        addMemberByNameToGroup(item, groupId)
-                    }
-                } catch (e: Exception){
-                    println("Failed to add users")
+            if (newGroup == null) {
+                _groupError.update { oldState ->
+                    oldState.copy("Could not create the group")
                 }
+            } else {
+                newGroup.id?.let { groupId ->
+                    val addMember = groupRepository.addMemberToGroup(userId, groupId)
+                    if (!addMember) {
+                        _groupError.update { oldState ->
+                            oldState.copy("Failed to add Member")
+                        }
+                    }
+                    try {
 
-                setCurrentGroup(newGroup)
-                _addGroupState.value = AddGroupState.Success
+                        addedUsers.forEach { item ->
+                            addMemberByNameToGroup(item, groupId)
+                        }
+                    } catch (e: Exception) {
+                        _groupError.update { oldState ->
+                            oldState.copy("Failed to add Members")
+                        }
+                    }
+
+                    setCurrentGroup(newGroup)
+                    _addGroupState.value = AddGroupState.Success
 
 
-            } ?: run {
-                Log.d("TAG", "Group ID is null. Cannot add member.")
+                } ?: run {
+                    Log.d("TAG", "Group ID is null. Cannot add member.")
+                }
             }
         }
     }
 
+    // get all the group members and their information for a group by groupid
     fun getGroupMembers(groupId: Int) {
         viewModelScope.launch {
             val users = groupRepository.getGroupMembers(groupId)
-            val usersInformation = users.map { users ->
-                Log.d("IDS FOR INFO", "${users.userId}")
-                userRepository.getUserById(users.userId)
+            if (users == null) {
+                _groupError.update { oldState ->
+                    oldState.copy("Could not fetch group Members")
+                }
+            } else {
+                val usersInformation = users.map { users ->
+                    Log.d("IDS FOR INFO", "${users.userId}")
+                    userRepository.getUserById(users.userId)
 
+                }
+                _groupMembers.update { it.copy(memberInformation = usersInformation.filterNotNull()) }
+                Log.d("User INFO", "$usersInformation")
             }
-            _groupMembers.update { it.copy(memberInformation = usersInformation) }
-            Log.d("User INFO", "$usersInformation")
         }
     }
 
+    // delete a group by groupId
     fun deleteGroup(groupId: Int) {
         viewModelScope.launch {
-            groupRepository.deleteGroup(groupId)
-        }
-    }
-
-    fun kickUser(userId: String, groupId: Int) {
-        viewModelScope.launch {
-            groupRepository.kickMemberFromGroup(userId, groupId)
-            _groupMembers.update { oldState ->
-                val updatedMembers = oldState.memberInformation.filter { it.id != userId }
-                oldState.copy(memberInformation = updatedMembers)
+            val delete = groupRepository.deleteGroup(groupId)
+            if (!delete) {
+                _groupError.update { oldState ->
+                    oldState.copy("Group could not be deleted")
+                }
             }
         }
     }
 
-    fun addMemberToGroup(userId: String, groupId: Int) {
+    // kick a user
+    fun kickUser(userId: String, groupId: Int) {
         viewModelScope.launch {
-            groupRepository.addMemberToGroup(userId, groupId)
+            val kicked = groupRepository.kickMemberFromGroup(userId, groupId)
+            if (!kicked) {
+                _groupError.update { oldState ->
+                    oldState.copy("Kick user failed")
+                }
+            } else {
+                _groupMembers.update { oldState ->
+                    val updatedMembers = oldState.memberInformation.filter { it.id != userId }
+                    oldState.copy(memberInformation = updatedMembers)
+                }
+            }
         }
     }
 
+
+    // add a new member to a group by userID
+    fun addMemberToGroup(userId: String, groupId: Int) {
+        viewModelScope.launch {
+            val added =groupRepository.addMemberToGroup(userId, groupId)
+            if(!added){
+                _groupError.update { oldState ->
+                    oldState.copy("Add Member failed")
+                }
+            }
+        }
+    }
+
+
+//add a member to a group by his username
     fun addMemberByNameToGroup(username: String, groupId: Int) {
         viewModelScope.launch {
 
             val user = userRepository.getUserByName(username)
-            addMemberToGroup(user.id, groupId)
-            _groupMembers.update { oldState ->
-                val updatedMembers = oldState.memberInformation.toMutableList()
-                updatedMembers.add(user)
-                oldState.copy(memberInformation = updatedMembers)
+            if (user == null) {
+                _groupError.update { oldState ->
+                    oldState.copy("No user found")
+                }
+            } else {
+                addMemberToGroup(user.id, groupId)
+                _groupMembers.update { oldState ->
+                    val updatedMembers = oldState.memberInformation.toMutableList()
+                    updatedMembers.add(user)
+                    oldState.copy(memberInformation = updatedMembers)
+                }
             }
 
         }
 
     }
+
+    // clear the group error state
+    fun clearGroupError() {
+        _groupError.update { oldState ->
+            oldState.copy("")
+        }
+    }
+
+
 }

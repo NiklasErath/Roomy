@@ -14,10 +14,15 @@ import kotlinx.coroutines.launch
 
 class ItemViewModel(private val itemRepository: ItemRepository) : ViewModel() {
 
+    // item error
+    sealed class ItemErrorState {
+        data class Error(val message: String)
+    }
+
 
     private val _finishedFetching = mutableStateOf<Boolean>(false)
     val finishedFetching: State<Boolean> = _finishedFetching
-    fun resetFinishedFetching(){
+    fun resetFinishedFetching() {
         _finishedFetching.value = false
     }
 
@@ -25,12 +30,17 @@ class ItemViewModel(private val itemRepository: ItemRepository) : ViewModel() {
     private val _allShoppingListItems = MutableStateFlow(ItemsUiState(emptyList()))
     private val _allInventoryItems = MutableStateFlow(ItemsUiState(emptyList()))
 
+    // item error handling
+    private val _itemError = MutableStateFlow(ItemErrorState.Error(""))
+    val itemError = _itemError.asStateFlow()
 
 
     val allShoppingListItems = _allShoppingListItems.asStateFlow()
     val allInventoryItems = _allInventoryItems.asStateFlow()
 
-    fun moveToInventory(item:Item){
+
+    // move item to the inventroy
+    fun moveToInventory(item: Item) {
 
         val newItem = Item(item.id, item.name, item.groupId, "inventory", item.quantity, item.icon)
 
@@ -38,7 +48,7 @@ class ItemViewModel(private val itemRepository: ItemRepository) : ViewModel() {
 
             _allShoppingListItems.update { it ->
                 it.copy(
-                    items = it.items.filter { it.id != newItem.id}
+                    items = it.items.filter { it.id != newItem.id }
                 )
             }
 
@@ -52,16 +62,17 @@ class ItemViewModel(private val itemRepository: ItemRepository) : ViewModel() {
         }
     }
 
+// move Item to the shopping list
+    fun moveToShoppingList(item: Item) {
 
-    fun moveToShoppingList(item:Item){
-
-        val newItem = Item(item.id, item.name, item.groupId, "shoppingList", item.quantity, item.icon)
+        val newItem =
+            Item(item.id, item.name, item.groupId, "shoppingList", item.quantity, item.icon)
 
         viewModelScope.launch {
 
             _allInventoryItems.update { it ->
                 it.copy(
-                    items = it.items.filter { it.id != newItem.id}
+                    items = it.items.filter { it.id != newItem.id }
                 )
             }
 
@@ -75,27 +86,49 @@ class ItemViewModel(private val itemRepository: ItemRepository) : ViewModel() {
         }
     }
 
-
+// get All Items of a group
     suspend fun getAllItems(groupId: Int) {
         viewModelScope.launch {
-            val (shoppingListItems:List<Item>, inventoryItems: List<Item>) = itemRepository.getAllItems(groupId)
+            val result = itemRepository.getAllItems(groupId)
 
-            _allShoppingListItems.update {
-                it.copy(
-                    items = shoppingListItems
-                )
-            }
+            if (result != null) {
+                val (shoppingListItems, inventoryItems) = result
 
-            _allInventoryItems.update {
-                it.copy(
-                    items = inventoryItems
-                )
+                _allShoppingListItems.update {
+                    it.copy(
+                        items = shoppingListItems
+                    )
+                }
+
+                _allInventoryItems.update {
+                    it.copy(
+                        items = inventoryItems
+                    )
+                }
+            } else {
+
+                _itemError.update { oldState ->
+                    oldState.copy("Could not get Items")
+                }
+
+                _allShoppingListItems.update {
+                    it.copy(
+                        items = emptyList()
+                    )
+                }
+
+                _allInventoryItems.update {
+                    it.copy(
+                        items = emptyList()
+                    )
+                }
             }
 
             _finishedFetching.value = true
         }
     }
 
+// add an Item to your List
     fun addItem(item: Item) {
         viewModelScope.launch {
 
@@ -108,28 +141,33 @@ class ItemViewModel(private val itemRepository: ItemRepository) : ViewModel() {
 
             val newItem = itemRepository.addItem(item)
 
-            _allShoppingListItems.update {
-                it.copy(
-                    items = it.items.map { existingItem ->
-                        if (existingItem == item) newItem else existingItem
-                    }
-                )
+            if (newItem == null) {
+                _itemError.update { oldState ->
+                    oldState.copy("Failed to add new Item")
+                }
+            } else {
+                _allShoppingListItems.update {
+                    it.copy(
+                        items = it.items.map { existingItem ->
+                            if (existingItem == item) newItem else existingItem
+                        }
+                    )
+                }
+
             }
-
-
         }
     }
 
+    // delete an item
     fun deleteItem(item: Item) {
         viewModelScope.launch {
-
-            if(item.status == "shoppingList"){
+            if (item.status == "shoppingList") {
                 _allShoppingListItems.update {
                     it.copy(
                         items = it.items - item
                     )
                 }
-            }else if(item.status == "inventory"){
+            } else if (item.status == "inventory") {
                 _allInventoryItems.update {
                     it.copy(
                         items = it.items - item
@@ -137,11 +175,19 @@ class ItemViewModel(private val itemRepository: ItemRepository) : ViewModel() {
                 }
             }
 
-            itemRepository.deleteItem(item)
+            val delete = itemRepository.deleteItem(item)
+            if (!delete){
+                _itemError.update { oldState ->
+                    oldState.copy("Failed to delete Item")
+                }
+            }
+        }
+    }
 
-
-
-
+    // clear the item error state
+    fun clearItemError() {
+        _itemError.update { oldState ->
+            oldState.copy("")
         }
     }
 }

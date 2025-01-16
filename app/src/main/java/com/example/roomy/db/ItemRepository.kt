@@ -11,7 +11,8 @@ import io.github.jan.supabase.postgrest.query.Columns
 
 class ItemRepository {
 
-    suspend fun getAllItems(groupId:Int): Pair<List<Item>, List<Item>> {
+    // get all Items of a group
+    suspend fun getAllItems(groupId: Int): Pair<List<Item>, List<Item>> ? {
         try {
             val shoppingListItems = supabase
                 .from("items")
@@ -27,17 +28,17 @@ class ItemRepository {
         } catch (e: Exception) {
             // Log the error and throw an exception
             Log.d("TAG", "Could not get the ShoppingLists: ${e.message}")
-            throw e
+            return null
         }
     }
 
-
+    // add Item to a List
     suspend fun addItem(
         item: Item
-    ) :Item {
+    ): Item? {
         try {
 
-            var newItem = supabase.from("items").insert(item){select()}.decodeSingle<Item>()
+            var newItem = supabase.from("items").insert(item) { select() }.decodeSingle<Item>()
             Log.d("TAG", "Could not Add Item: ${newItem}")
 
 
@@ -47,13 +48,13 @@ class ItemRepository {
         } catch (e: Exception) {
             // Log the error and throw an exception
             Log.d("TAG", "Could not Add Item: ${e.message}")
-            throw e
+            return null
         }
     }
 
     suspend fun updateItem(
         item: Item
-    ) {
+    ): Boolean {
         try {
             Log.d("TAG", "Item: ${item}")
 
@@ -69,32 +70,32 @@ class ItemRepository {
                     }
                 }
             }
-
+            return true
         } catch (e: Exception) {
             // Log the error and throw an exception
             Log.d("TAG", "Could not Add Item: ${e.message}")
-            throw e
+            return false
         }
     }
 
 
     suspend fun deleteItem(
         item: Item
-    ) {
+    ): Boolean {
         try {
 
             item.id?.let {
-                supabase.from("items").delete{
-                    filter{
+                supabase.from("items").delete {
+                    filter {
                         eq("item_id", item.id)
                     }
                 }
             }
-
+            return true
         } catch (e: Exception) {
             // Log the error and throw an exception
             Log.d("TAG", "Could not Delete Item: ${e.message}")
-            throw e
+            return false
         }
     }
 

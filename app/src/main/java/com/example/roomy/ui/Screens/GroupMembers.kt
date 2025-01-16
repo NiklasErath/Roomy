@@ -37,6 +37,7 @@ fun GroupMembers(
 
     val currentGroupIdInt: Int = currentGroup.id?.let { it } ?: 0
 
+    val errorMessage by groupViewModel.error.collectAsState()
 
     val groupMemberInformation by groupViewModel.groupMembers.collectAsState(
         initial = GroupMembersUiState(
@@ -51,7 +52,7 @@ fun GroupMembers(
         currentGroup.id?.let { groupViewModel.getGroupMembers(it) }
 
     }
-
+ // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Column {
         LazyColumn {
             itemsIndexed(groupMemberInformation.memberInformation) { index: Int, memberInformation ->
@@ -79,6 +80,9 @@ fun GroupMembers(
                     )
                 }
             )
+            if (errorMessage.message.isNotEmpty()){
+            Text("User not found")
+            }
             Button(
                 onClick = {
                     if (usernameAdd.isBlank()){
@@ -93,7 +97,7 @@ fun GroupMembers(
                 Text(text = "Add")
             }
         }
-
+        // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     }
 
 }

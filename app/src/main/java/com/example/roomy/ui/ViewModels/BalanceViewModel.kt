@@ -1,5 +1,6 @@
 package com.example.roomy.ui.ViewModels
 
+import android.util.Log
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.roomy.db.BalanceRepository
 import androidx.lifecycle.viewModelScope
@@ -26,22 +27,24 @@ class BalanceViewModel(private val balanceRepository: BalanceRepository) : ViewM
 
     suspend fun getUserBalance(groupId: Int, userId: String) {
         viewModelScope.launch {
+            Log.d("BALANCEIIII", "Fetching balance for groupId: $groupId, userId: $userId")
             val userLent = balanceRepository.getUserLentByGroupId(groupId, userId)
-            val userDebt = balanceRepository.getUserDebtsByGroupId(groupId, userId)
-            if (userLent == null || userDebt == null) {
+            val userOwes = balanceRepository.getUserOwesByGroupId(groupId, userId)
+
+            if (userLent.isNullOrEmpty() || userOwes.isNullOrEmpty()) {
                 _balanceError.update { oldState ->
                     oldState.copy("Something went wrong while getting the Balance")
                 }
+                Log.d("BALANCEIIII", "ERROR: Empty balance lists")
             } else {
+                Log.d("BALANCE", "User Owes: $userOwes")
                 _balance.update { oldState ->
                     oldState.copy(
                         userBalanceLent = userLent,
-                        userBalanceOwes = userDebt
+                        userBalanceOwes = userOwes
                     )
                 }
             }
-
-
         }
     }
 

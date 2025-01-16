@@ -1,27 +1,28 @@
 package com.example.roomy.db
 
+import android.util.Log
 import com.example.roomy.db.Supabase.supabase
 import com.example.roomy.db.data.Balance
 import io.github.jan.supabase.postgrest.from
 
 class BalanceRepository {
     // get all the user debts
-    suspend fun getUserDebtsByGroupId(groupId: Int, userId: String): List<Balance>? {
+    suspend fun getUserOwesByGroupId(groupId: Int, userId: String): List<Balance>? {
         try {
             val response = supabase.from("balance").select {
                 filter {
                     eq("group_id", groupId)
                     eq("user_owes", userId)
                 }
-            }
-                .decodeList<Balance>()
+            }.decodeList<Balance>()
             return response
         } catch (e: Exception) {
+            Log.e("HELP BALANCE", "Error fetching user owes: ${e.message}", e)
             return null
         }
     }
 
-    // get what the user lents whom
+    // get all the users the user lent money
     suspend fun getUserLentByGroupId(groupId: Int, userId: String): List<Balance>? {
         try {
             val response = supabase.from("balance").select {
@@ -29,13 +30,15 @@ class BalanceRepository {
                     eq("group_id", groupId)
                     eq("user_lent", userId)
                 }
-            }
-                .decodeList<Balance>()
+            }.decodeList<Balance>()
+            Log.d("TAG BALANCE", "User Lent: $response")
             return response
         } catch (e: Exception) {
+            Log.e("HELP BALANCE", "Error fetching user lent: ${e.message}", e)
             return null
         }
     }
+
 
     // update the balance when a user bought smth
     suspend fun updateBalance(userId: String, groupMemberId: String, amountOwe:Int, amountLent:Int): Boolean {

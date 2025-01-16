@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Balance(
-    @SerialName("payment_id") val id: Int,
+    @SerialName("balance_id") val id: Int,
     @SerialName("created_at") val created: String,
     @SerialName("group_id") val groupId: Int,
     @SerialName("user_owes") val userOwes: String,

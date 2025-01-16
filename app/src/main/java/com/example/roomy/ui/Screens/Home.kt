@@ -229,16 +229,17 @@ fun Home(
                             if (addedUsers.contains(usernameAdd) || usernameAdd.isEmpty()) {
                                 return@clickable
                             }
-                            userViewModel.getUserByUsername(usernameAdd)
-                            if(userErrorMessage.message == "No user found") {
-                                usernameAdd = ""
-                                groupViewModel.clearGroupError()
-                            } else {
-                                addedUsers.add(usernameAdd)
-                                Log.d("Users", "$addedUsers")
-                                usernameAdd = ""
+                            userViewModel.getUserByUsername(usernameAdd) { isUserFound ->
+                                if (!isUserFound) {
+                                    usernameAdd = ""
+                                    groupViewModel.clearGroupError()
+                                } else {
+                                    addedUsers.add(usernameAdd)
+                                    Log.d("Users", "$addedUsers")
+                                    usernameAdd = ""
+                                }
                             }
-//                    Add new member, if successfull make a list with added users emails/usernames under this textfield - just save locally from input to display
+//                    Add new member, if successfull make a list with added userss emails/usernames under this textfield - just save locally from input to display
 //                    If not succesfull, popup with error message ...
 //                    Ensure Users can only be added once
 

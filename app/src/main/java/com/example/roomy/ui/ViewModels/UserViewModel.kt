@@ -151,13 +151,15 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
     }
 
     // get a user by his username
-    fun getUserByUsername(username: String) {
+    fun getUserByUsername(username: String, callback: (Boolean) -> Unit) {
         viewModelScope.launch {
             val user = userRepository.getUserByName(username)
             if (user == null) {
                 _userError.update { oldState ->
                     oldState.copy("No user found")
                 }
+                callback(false)} else {
+                    callback(true)
             }
         }
     }

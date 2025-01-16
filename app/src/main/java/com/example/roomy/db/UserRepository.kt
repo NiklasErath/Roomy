@@ -111,6 +111,8 @@ class UserRepository {
             return response
         } catch (e: Exception) {
             // Log the error and throw an exception
+            Log.d("TAG", "Could not get the User information: ${userId}")
+
             Log.d("TAG", "Could not get the User information: ${e.message}")
             throw e
         }

@@ -52,6 +52,7 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
     // Login user
     suspend fun logInUser(userEmail: String, userPassword: String) {
         userRepository.signIn("n@n.com", "1234")
+        Log.d("SIGN IN ", "USER SIGN IN")
         val currentSession = userRepository.getSession()
         _session.update { oldState ->
             oldState.copy(
@@ -99,6 +100,30 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
 
 
             }
+
+
+        }
+    }
+
+    fun logout(callback: (Boolean) -> Unit){
+        viewModelScope.launch {
+            val logout = userRepository.logout()
+            if (!logout){
+                _userError.update { oldState ->
+                    oldState.copy("Logout failed")
+                }
+                callback(true)
+            } else {
+                _session.update { oldState ->
+                    oldState.copy("")
+                }
+                _loggedInUser.update { oldState ->
+                    oldState.copy("", "", "")
+                }
+                _loginState.value = LoginState.Idle
+                callback(false)
+            }
+
 
 
         }

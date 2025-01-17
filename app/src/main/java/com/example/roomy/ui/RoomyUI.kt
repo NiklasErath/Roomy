@@ -11,10 +11,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -58,6 +60,7 @@ import com.example.roomy.ui.Factory.UserViewModelFactory
 import com.example.roomy.ui.States.GroupMembersUiState
 import com.example.roomy.ui.ViewModels.ItemViewModel
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import com.example.roomy.db.BalanceRepository
 import com.example.roomy.ui.Factory.BalanceViewModelFactory
 import com.example.roomy.ui.ViewModels.BalanceViewModel
@@ -113,7 +116,12 @@ fun RoomyApp(
 
 
     val groupViewModel: GroupViewModel = viewModel(
-        factory = GroupViewModelFactory(groupRepository, userRepository, itemViewModel, balanceRepository )
+        factory = GroupViewModelFactory(
+            groupRepository,
+            userRepository,
+            itemViewModel,
+            balanceRepository
+        )
     )
 
     val balanceViewModel: BalanceViewModel = viewModel(
@@ -127,7 +135,7 @@ fun RoomyApp(
     if (userErrorMessage.message.isNotEmpty()) {
         Toast.makeText(context, userErrorMessage.message, Toast.LENGTH_LONG)
             .show()
-            userViewModel.clearUserError()
+        userViewModel.clearUserError()
     }
 
     if (itemErrorMessage.message.isNotEmpty()) {
@@ -177,7 +185,7 @@ fun RoomyApp(
                 balanceViewModel
 
 
-                )
+            )
 
         }
 
@@ -202,7 +210,7 @@ fun RoomyApp(
                 balanceViewModel
 
 
-                )
+            )
 
         }
 
@@ -377,68 +385,78 @@ fun Header(
     currentDestination: String?,
     groupViewModel: GroupViewModel
 ) {
-
     val currentGroup by groupViewModel.currentGroup.collectAsState()
-
     val groupMemberInformation by groupViewModel.groupMembers.collectAsState(
-        initial = GroupMembersUiState(
-            emptyList()
-        )
+        initial = GroupMembersUiState(emptyList())
     )
-
-
 
     Column(
         modifier = Modifier
+            .height(100.dp)
             .fillMaxWidth()
-            .padding(top = 40.dp)
+            .padding(top = 40.dp),
+        verticalArrangement = Arrangement.Center
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(
-                    Modifier.weight(1f),
-                    horizontalAlignment = Alignment.Start
-                ) {
+                if (currentDestination == "Groups") {
                     IconButton(
                         onClick = { navController.navigate(Screens.Home.name) },
-
-                        ) {
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Group",
+                            contentDescription = "Go Back"
                         )
                     }
 
-                }
 
-
-                Column(
-                    Modifier.weight(2f),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
                     Text(
                         text = currentGroup.name,
                         fontSize = 20.sp,
+                        modifier = Modifier
+                            .weight(1f)
+                            .align(Alignment.CenterVertically),
+                        textAlign = TextAlign.Center
                     )
+
+                    Row(
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .clickable { navController.navigate(Screens.GroupMembers.route) },
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        UserProfileCirclesStacked(groupMemberInformation)
+                    }
+                } else {
+                    Text(
+                        text = currentGroup.name,
+                        fontSize = 20.sp,
+                        modifier = Modifier
+                            .weight(1f)
+                            .align(Alignment.CenterVertically),
+                        textAlign = TextAlign.Start
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .clickable { navController.navigate(Screens.GroupMembers.route) },
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        UserProfileCirclesStacked(groupMemberInformation)
+                    }
                 }
-
-                Row (Modifier.weight(1f).clickable { navController.navigate(Screens.GroupMembers.route) }, verticalAlignment = Alignment.CenterVertically){
-
-                    UserProfileCirclesStacked(groupMemberInformation)
-
-
-                }
-
-
-
-                }
-
+            }
         }
     }
 }
+
+

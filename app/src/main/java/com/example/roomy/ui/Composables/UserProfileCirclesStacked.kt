@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,28 +23,26 @@ import com.example.roomy.ui.States.GroupMembersUiState
 fun UserProfileCirclesStacked(groupMemberInformation: GroupMembersUiState,  ) {
 
     Box(
-    Modifier.width(96.dp),
-    contentAlignment = Alignment.Center // Ensures content is centered vertically in the Box
+        modifier = Modifier
+            .wrapContentSize()
+            .padding(horizontal = 12.dp),
+        contentAlignment = Alignment.Center
     ) {
         val maxVisible = 3
         val memberCount = groupMemberInformation.memberInformation.size
         val extraMembers = memberCount - maxVisible
 
-        // Create a Row to stack the UserProfileCircles without affecting the space between
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentWidth(Alignment.Start),
+            modifier = Modifier.wrapContentSize(),
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            // Create stacked user profile circles
             groupMemberInformation.memberInformation.take(maxVisible)
                 .forEachIndexed { index, groupMembers ->
                     Box(
                         modifier = Modifier
-                            .offset(x = (-index * 12).dp) // Adjust the offset to stack the circles
-                            .zIndex((maxVisible - index).toFloat()) // Ensure the first circle is on top
+                            .offset(x = (-index * 12).dp)
+                            .zIndex((maxVisible - index).toFloat())
                     ) {
                         UserProfileCircle(
                             groupMembers.username,
@@ -51,26 +50,15 @@ fun UserProfileCirclesStacked(groupMemberInformation: GroupMembersUiState,  ) {
                             Color.Blue
                         )
                     }
-
                 }
         }
 
-        // Ensure vertical centering of the +n text inside the Row
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp),
-//                                .background(Color.Green),
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically // This ensures the text is vertically centered
-        ) {
-            // Display the extra members count (+n) if needed
-            if (extraMembers > 0) {
-                Text(
-                    text = "+$extraMembers",
-                    modifier = Modifier,
-                )
-            }
+        if (extraMembers > 0) {
+            Text(
+                text = "+$extraMembers",
+                modifier = Modifier.align(Alignment.CenterEnd)
+            )
         }
     }
+
 }

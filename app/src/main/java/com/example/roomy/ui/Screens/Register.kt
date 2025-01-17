@@ -27,6 +27,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.text.font.FontWeight
@@ -110,7 +111,10 @@ fun Register(
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         )
-
+        if (password.length in 1..6){
+            Text(text = "Password has to be more than 6 characters",
+                color = Color.Red,)
+        }
         Spacer(Modifier.height(10.dp))
 
         OutlinedTextField(
@@ -137,9 +141,13 @@ fun Register(
 
 
                 if (password != confirmPassword) {
-                    Toast.makeText(context, "Passowrd do not match!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Passwords do not match!", Toast.LENGTH_SHORT).show()
 
-                } else {
+                }
+                if (password.length <= 6) {
+                    Toast.makeText(context, "Password has to be more than 6 characters!", Toast.LENGTH_SHORT).show()
+
+                }else {
                     userViewModel.signUp(email, password, username)
 
 

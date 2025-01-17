@@ -43,9 +43,9 @@ fun Profile(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = "Profile/Settings Page")
-        Column (modifier = Modifier.padding(top = 20.dp)){
-        UserProfileCircle(currentUser.username, 100.dp, Color.Gray)
-    }
+        Column(modifier = Modifier.padding(top = 20.dp)) {
+            UserProfileCircle(currentUser.username, 100.dp, Color.Gray)
+        }
         Column(
             Modifier
                 .fillMaxSize()
@@ -57,7 +57,7 @@ fun Profile(
             Text(text = "Email: ${currentUser.email}")
 
 
-            Column(modifier = Modifier.padding(top=20.dp)) {
+            Column(modifier = Modifier.padding(top = 20.dp)) {
                 OutlinedTextField(
                     value = username,
                     onValueChange = { newValue -> username = newValue },
@@ -75,18 +75,32 @@ fun Profile(
                 Button(onClick = { userViewModel.updateUserName(username, currentUser.userId) }) {
                     Text(text = "Change username")
                 }
-                Button(onClick = {if(theme == "dark")
-                {theme = "white"}
-                else {theme = "dark"}}) {
-                    if(theme == "dark"){
-                        Text(text="Change to White mode")
+                Button(onClick = {
+                    if (theme == "dark") {
+                        theme = "white"
                     } else {
-                        Text(text= "Change to Dark mode")
+                        theme = "dark"
+                    }
+                }) {
+                    if (theme == "dark") {
+                        Text(text = "Change to White mode")
+                    } else {
+                        Text(text = "Change to Dark mode")
                     }
                 }
 
-                Button(onClick = { navController.navigate(Screens.GroupMembers.route)}) {
+                Button(onClick = { navController.navigate(Screens.GroupMembers.route) }) {
                     Text(text = "Manage Members")
+                }
+
+                Button(onClick = {
+                    userViewModel.logout() { loggedOut ->
+                        if (!loggedOut) {
+                            navController.navigate(Screens.Login.route)
+                        }
+                    }
+                }) {
+                    Text(text = "Logout")
                 }
             }
         }

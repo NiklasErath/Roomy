@@ -64,10 +64,10 @@ class UserRepository {
 
             Log.d("TAG", "Updating UserName Success")
 
-        return true
+            return true
         } catch (e: Exception) {
             Log.d("TAG", "Updating UserName failed")
-        return false
+            return false
 
         }
 
@@ -111,12 +111,12 @@ class UserRepository {
             return response
         } catch (e: Exception) {
             Log.d("TAG", "Could not get the User information: ${e.message}")
-             return null
+            return null
         }
 
     }
 
-// get the user information by name
+    // get the user information by name
     suspend fun getUserByName(name: String): UserInformation? {
         try {
             val response = supabase
@@ -155,14 +155,14 @@ class UserRepository {
             Log.d("TAG", "UserMail: ${response.email}")
 
 
-            if(response.email == userEmail){
+            if (response.email == userEmail) {
                 return true
 
-            }else{
+            } else {
                 return false
             }
 
-        }catch (e:Exception){
+        } catch (e: Exception) {
             Log.d("TAG", "Updating UserName failed")
             e.message?.let { Log.d("TAG", it) }
             return false
@@ -183,20 +183,29 @@ class UserRepository {
             Log.d("TAG", "UserName: ${response.username}")
 
 
-            if(response.username == userName){
+            if (response.username == userName) {
                 return true
 
-            }else{
+            } else {
                 return false
             }
 
-        }catch (e:Exception){
+        } catch (e: Exception) {
             Log.d("TAG", "Updating UserName failed")
             e.message?.let { Log.d("TAG", it) }
             return false
         }
 
 
+    }
+
+    suspend fun logout(): Boolean {
+        try {
+            supabase.auth.signOut()
+            return true
+        } catch (e: Exception) {
+            return false
+        }
     }
 
 }

@@ -415,7 +415,37 @@ fun Header(
                         )
                     }
 
+                    Text(
+                        text = currentGroup.name,
+                        fontSize = 20.sp,
+                        modifier = Modifier
+                            .weight(1f)
+                            .align(Alignment.CenterVertically),
+                        textAlign = TextAlign.Center
+                    )
 
+                    Row(
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .clickable { navController.navigate(Screens.GroupMembers.route) },
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        UserProfileCirclesStacked(groupMemberInformation)
+                    }
+                }
+                else if (currentDestination == "GroupMembers" || currentDestination == "RecipeSuggestion") {
+                    IconButton(
+                        onClick = { navController.navigateUp() },
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Go Back"
+                        )
+
+
+                    }
                     Text(
                         text = currentGroup.name,
                         fontSize = 20.sp,

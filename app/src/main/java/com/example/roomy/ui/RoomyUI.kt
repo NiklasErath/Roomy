@@ -29,10 +29,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -62,8 +67,10 @@ import com.example.roomy.ui.ViewModels.ItemViewModel
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import com.example.roomy.db.BalanceRepository
+import com.example.roomy.ui.Composables.Snackbar
 import com.example.roomy.ui.Factory.BalanceViewModelFactory
 import com.example.roomy.ui.ViewModels.BalanceViewModel
+import kotlinx.coroutines.launch
 
 
 enum class Screens(val route: String) {
@@ -128,32 +135,53 @@ fun RoomyApp(
         factory = BalanceViewModelFactory(balanceRepository)
     )
 
+//    Snackbar
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+    var snackbarData : String
+
+
     val userErrorMessage by userViewModel.userError.collectAsState()
     val itemErrorMessage by itemViewModel.itemError.collectAsState()
     val groupErrorMessage by groupViewModel.error.collectAsState()
 
-    if (userErrorMessage.message.isNotEmpty()) {
-        Toast.makeText(context, userErrorMessage.message, Toast.LENGTH_LONG)
-            .show()
-        userViewModel.clearUserError()
-    }
-
-    if (itemErrorMessage.message.isNotEmpty()) {
-        Toast.makeText(context, itemErrorMessage.message, Toast.LENGTH_LONG)
-            .show()
-        itemViewModel.clearItemError()
-    }
-
-    if (groupErrorMessage.message.isNotEmpty()) {
-        Toast.makeText(context, groupErrorMessage.message, Toast.LENGTH_LONG)
-            .show()
-        groupViewModel.clearGroupError()
-    }
+//    if (userErrorMessage.message.isNotEmpty()) {
+//        Toast.makeText(context, userErrorMessage.message, Toast.LENGTH_LONG)
+//            .show()
+//        userViewModel.clearUserError()
+//    }
+//
+//    if (itemErrorMessage.message.isNotEmpty()) {
+//        Toast.makeText(context, itemErrorMessage.message, Toast.LENGTH_LONG)
+//            .show()
+//        itemViewModel.clearItemError()
+//    }
+//
+//    if (groupErrorMessage.message.isNotEmpty()) {
+//        Toast.makeText(context, groupErrorMessage.message, Toast.LENGTH_LONG)
+//            .show()
+//        groupViewModel.clearGroupError()
+//    }
 
 
     if (displayBottomBarAndHeader) {
 
         Scaffold(
+
+            snackbarHost = {
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(vertical=100.dp),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    SnackbarHost(
+                        hostState = snackbarHostState,
+                        snackbar = { snackbarData -> Snackbar(snackbarData) },
+//                            modifier = Modifier
+//                                .padding(top = 16.dp) // Add some padding from the top edge
+                    )
+                }
+            },
 
             bottomBar = {
 
@@ -172,6 +200,38 @@ fun RoomyApp(
             modifier = Modifier.fillMaxSize(),
 
             ) { innerPadding ->
+
+
+            LaunchedEffect(userErrorMessage, itemErrorMessage, groupErrorMessage) {
+                when {
+                    userErrorMessage.message.isNotEmpty() -> {
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = userErrorMessage.message // Pass message directly
+                            )
+                            userViewModel.clearUserError()
+                        }
+                    }
+                    itemErrorMessage.message.isNotEmpty() -> {
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = itemErrorMessage.message // Pass message directly
+                            )
+                            itemViewModel.clearItemError()
+                        }
+                    }
+                    groupErrorMessage.message.isNotEmpty() -> {
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = groupErrorMessage.message // Pass message directly
+                            )
+                            groupViewModel.clearGroupError()
+                        }
+                    }
+                }
+            }
+
+
             AppNavHost(
                 navController,
                 Modifier
@@ -194,9 +254,55 @@ fun RoomyApp(
 
         Scaffold(
 
+            snackbarHost = {
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(vertical=100.dp),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    SnackbarHost(
+                        hostState = snackbarHostState,
+                        snackbar = { snackbarData -> Snackbar(snackbarData) },
+//                            modifier = Modifier
+//                                .padding(top = 16.dp) // Add some padding from the top edge
+                    )
+                }
+            },
+
             modifier = Modifier.fillMaxSize(),
 
             ) { innerPadding ->
+
+            LaunchedEffect(userErrorMessage, itemErrorMessage, groupErrorMessage) {
+                when {
+                    userErrorMessage.message.isNotEmpty() -> {
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = userErrorMessage.message // Pass message directly
+                            )
+                            userViewModel.clearUserError()
+                        }
+                    }
+                    itemErrorMessage.message.isNotEmpty() -> {
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = itemErrorMessage.message // Pass message directly
+                            )
+                            itemViewModel.clearItemError()
+                        }
+                    }
+                    groupErrorMessage.message.isNotEmpty() -> {
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = groupErrorMessage.message // Pass message directly
+                            )
+                            groupViewModel.clearGroupError()
+                        }
+                    }
+                }
+            }
+
+
             AppNavHost(
                 navController,
                 Modifier

@@ -2,7 +2,9 @@ package com.example.roomy.ui
 
 import android.widget.Toast
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,9 +15,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,15 +32,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
+import com.example.roomy.R
 import com.example.roomy.db.api.getSuggestedRecipe
 import com.example.roomy.ui.Composables.ExpandingAddItemElement
 import com.example.roomy.ui.Composables.UserProfileCircle
@@ -95,7 +107,7 @@ fun Group(
 
 
     LaunchedEffect(previousScreen) {
-        if(triggerNavCheck) {
+        if (triggerNavCheck) {
             when (previousScreen) {
                 Screens.Groups.name, Screens.Balance.name, Screens.Profile.name -> renderAfterFetching =
                     true
@@ -110,7 +122,7 @@ fun Group(
     LaunchedEffect(Unit) {
 
         itemViewModel.getAllItems(currentGroupIdInt)
-     groupViewModel.getGroupMembers(currentGroupIdInt)
+        groupViewModel.getGroupMembers(currentGroupIdInt)
 
     }
 
@@ -121,6 +133,69 @@ fun Group(
 
         }
     }
+
+
+    //            Note change this to our errorhandling process later on
+    Box(
+        Modifier
+            .fillMaxSize()
+            .zIndex(20F)
+    ) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(vertical = 80.dp, horizontal = 20.dp),
+            verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.End
+        ) {
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .size(80.dp) // Adjusted size for better padding visibility
+                    .border(
+                        border = BorderStroke(
+                            3.dp, Brush.linearGradient(
+                                colors = listOf(Color.Cyan, Color.Magenta, Color.Yellow),
+                                start = Offset(0f, 0f),
+                                end = Offset(100f, 100f)
+                            )
+                        ),
+                        shape = CircleShape
+                    )
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary)
+                    .clickable {
+                        if (inventoryItems.items.isEmpty()) {
+                            Toast
+                                .makeText(
+                                    context,
+                                    "Add some Items to your Inventory first",
+                                    Toast.LENGTH_SHORT
+                                )
+                                .show()
+
+                        } else {
+                            navController.navigate(Screens.RecipeSuggestion.name)
+                        }
+                    }
+                    .padding(10.dp)
+            ) {
+                Icon(
+                    painterResource(R.drawable.recipe),
+                    contentDescription = "Group",
+
+                    )
+                Text(text = "Recipe", fontSize = 12.sp)
+
+            }
+
+        }
+    }
+
+
+
 
     Box(
         modifier = Modifier
@@ -136,16 +211,7 @@ fun Group(
                 .verticalScroll(rememberScrollState())
         ) {
 
-//            Note change this to our errorhandling process later on
-            Button(onClick = { if(inventoryItems.items.isEmpty()){
-                Toast.makeText(context, "Add some Items to your Inventory first", Toast.LENGTH_SHORT).show()
-
-            }else {navController.navigate(Screens.RecipeSuggestion.name)}
-            }) {
-                Text(text = "Recipe Suggestion with Items")
-            }
-
-            Text(text="ShoppingList")
+            Text(text = "ShoppingList")
 
             if (shoppingListItems.items.isEmpty() && renderAfterFetching) {
                 Text(text = "Nothing here yet, add a new Item to your Shopping List")
@@ -241,7 +307,7 @@ fun Group(
             )
         }
 
-        fun resetAfterItemAdded(){
+        fun resetAfterItemAdded() {
             isExpanded = false
             isFocused = false
             itemName = ""
@@ -265,11 +331,8 @@ fun Group(
         )
 
 
-
     }
 }
-
-
 
 
 //ExpandingItemELement no as composable but in Group/Home Composable - leave here for future testing

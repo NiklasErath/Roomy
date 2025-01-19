@@ -67,6 +67,7 @@ import com.example.roomy.ui.ViewModels.ItemViewModel
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import com.example.roomy.db.BalanceRepository
+import com.example.roomy.db.PaymentsRepository
 import com.example.roomy.ui.Composables.Snackbar
 import com.example.roomy.ui.Factory.BalanceViewModelFactory
 import com.example.roomy.ui.ViewModels.BalanceViewModel
@@ -81,7 +82,7 @@ enum class Screens(val route: String) {
     Balance("Balance"),
     Profile("Profile"),
     GroupMembers("GroupMembers"),
-    RecipeSuggestion("RecipeSuggestion")
+    RecipeSuggestion("RecipeSuggestion"),
 }
 
 @Composable
@@ -96,6 +97,7 @@ fun RoomyApp(
     val groupRepository = GroupRepository()
     val itemRepository = ItemRepository()
     val balanceRepository = BalanceRepository()
+    val paymentsRepository = PaymentsRepository()
 
     val networkConnection = NetworkConnection()
     val context = LocalContext.current
@@ -127,12 +129,12 @@ fun RoomyApp(
             groupRepository,
             userRepository,
             itemViewModel,
-            balanceRepository
-        )
+            balanceRepository,
+            )
     )
 
     val balanceViewModel: BalanceViewModel = viewModel(
-        factory = BalanceViewModelFactory(balanceRepository)
+        factory = BalanceViewModelFactory(balanceRepository, paymentsRepository, groupRepository)
     )
 
 //    Snackbar

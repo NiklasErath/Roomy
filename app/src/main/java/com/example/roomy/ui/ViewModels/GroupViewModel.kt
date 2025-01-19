@@ -10,12 +10,14 @@ import com.example.roomy.db.BalanceRepository
 import com.example.roomy.db.UserRepository
 import com.example.roomy.db.data.GroupInformation
 import com.example.roomy.db.data.Groups
+import com.example.roomy.db.data.UserInformation
 import com.example.roomy.ui.States.GroupMembersUiState
 import com.example.roomy.ui.States.GroupState
 import com.example.roomy.ui.States.GroupsUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -96,7 +98,7 @@ class GroupViewModel(
 
 
     // Function to get all members for all groups
-    fun getAllGroupsMembers(groups: List<Groups>) {
+    private fun getAllGroupsMembers(groups: List<Groups>) {
         viewModelScope.launch {
 //               For each group, fetch its members
             val allMembers = mutableListOf<GroupMembersUiState>()
@@ -127,7 +129,7 @@ class GroupViewModel(
 
 
     // get the Group information by the group Id
-    fun getGroupInformationByGroupId(groups: List<Groups>) {
+    private fun getGroupInformationByGroupId(groups: List<Groups>) {
         viewModelScope.launch {
             val household = groups.map { group ->
                 Log.d("IDS", "${group.groupId}")
@@ -137,15 +139,8 @@ class GroupViewModel(
 //                val groups = groupRepository.getGroupMembers(group.groupId)
 //            }
 
-            if (household == null) {
-                _groupError.update { oldState ->
-                    oldState.copy("No group Information found")
-                }
-            } else {
-                _groupsInformation.update {
-                    it.copy(groupsInformation = household.filterNotNull())
-                }
-
+            _groupsInformation.update {
+                it.copy(groupsInformation = household.filterNotNull())
             }
         }
     }
@@ -170,6 +165,7 @@ class GroupViewModel(
 
                         addedUsers.forEach { item ->
                             addMemberByNameToGroup(item, groupId)
+
                         }
                     } catch (e: Exception) {
                         _groupError.update { oldState ->
@@ -198,7 +194,7 @@ class GroupViewModel(
                 }
             } else {
                 val usersInformation = users.map { users ->
-                    Log.d("IDS FOR INFO", "${users.userId}")
+                    Log.d("IDS FOR INFO", users.userId)
                     userRepository.getUserById(users.userId)
 
                 }
@@ -237,23 +233,6 @@ class GroupViewModel(
         }
     }
 
-
-    // add a new member to a group by userID
-    /*
-    fun addMemberToGroup(userId: String, groupId: Int) {
-        viewModelScope.launch {
-            val added = groupRepository.addMemberToGroup(userId, groupId)
-            if (!added) {
-                _groupError.update { oldState ->
-                    oldState.copy("User already in the group")
-                }
-            }
-        }
-    }
-
-     */
-
-
     //add a member to a group by his username
     fun addMemberByNameToGroup(username: String, groupId: Int) {
         viewModelScope.launch {
@@ -275,11 +254,11 @@ class GroupViewModel(
                         updatedMembers.add(user)
                         oldState.copy(memberInformation = updatedMembers)
                     }
-
 //                    Also update the current AllGroupMembers here if a new group is created
                     _allGroupsMembers.update { oldGroups ->
                         oldGroups + _groupMembers.value
                     }
+
                 }
             }
 

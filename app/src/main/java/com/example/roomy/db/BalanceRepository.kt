@@ -6,32 +6,14 @@ import com.example.roomy.db.data.Balance
 import io.github.jan.supabase.postgrest.from
 
 class BalanceRepository {
-    // get all the user debts
-    suspend fun getUserOwesByGroupId(groupId: Int, userId: String): List<Balance>? {
-        try {
-            val response = supabase.from("balance").select {
-                filter {
-                    eq("group_id", groupId)
-                    eq("user_owes", userId)
-                }
-            }.decodeList<Balance>()
-            return response
-        } catch (e: Exception) {
-            Log.e("HELP BALANCE", "Error fetching user owes: ${e.message}", e)
-            return null
-        }
-    }
 
-    // get all the users the user lent money
-    suspend fun getUserLentByGroupId(groupId: Int, userId: String): List<Balance>? {
+    suspend fun getBalanceByGroupId(groupId: Int): List<Balance>? {
         try {
             val response = supabase.from("balance").select {
                 filter {
                     eq("group_id", groupId)
-                    eq("user_lent", userId)
                 }
             }.decodeList<Balance>()
-            Log.d("TAG BALANCE", "User Lent: $response")
             return response
         } catch (e: Exception) {
             Log.e("HELP BALANCE", "Error fetching user lent: ${e.message}", e)
@@ -41,16 +23,29 @@ class BalanceRepository {
 
 
     // update the balance when a user bought smth
-    suspend fun updateBalance(userId: String, groupMemberId: String, amountOwe:Int, amountLent:Int): Boolean {
+    suspend fun updateBalance(
+        userId: String,
+        groupMemberId: String,
+        amountOwe: Int,
+        amountLent: Int
+    ): Boolean {
         try {
             supabase.from("balance").update(
                 { set("amount", amountOwe) }
-            )  { filter { eq("user_owes", groupMemberId)
-            eq("user_lent", userId)} }
-            supabase.from("balance").update (
+            ) {
+                filter {
+                    eq("user_owes", groupMemberId)
+                    eq("user_lent", userId)
+                }
+            }
+            supabase.from("balance").update(
                 { set("amount", amountLent) }
-            ){ filter { eq("user_lent", groupMemberId)
-                eq("user_owes", userId)} }
+            ) {
+                filter {
+                    eq("user_lent", groupMemberId)
+                    eq("user_owes", userId)
+                }
+            }
             return true
         } catch (e: Exception) {
             return false
@@ -58,28 +53,16 @@ class BalanceRepository {
     }
 
     // add Balance when a user joins a group
-    suspend fun addBalance(groupId: Int, userId: String, groupMemberId: String): Boolean {
+    suspend fun addBalance(groupId: Int, owedBy: String, owedTo: String, amount: Int): Boolean {
         try {
-            val userBalanceOwe = Balance(
-                id = 0,
-                created = "",
+            val userBalance = Balance(
                 groupId = groupId,
-                userOwes = userId,
-                userLent = groupMemberId,
-                amount = 0,
+                owedBy = owedBy,
+                owedTo = owedTo,
+                amount = amount,
             )
 
-            val userBalanceLent = Balance(
-                id = 0,
-                created = "",
-                groupId = groupId,
-                userOwes = groupMemberId,
-                userLent = userId,
-                amount = 0,
-            )
-
-            supabase.from("balance").insert(userBalanceOwe)
-            supabase.from("balance").insert(userBalanceLent)
+            supabase.from("balance").insert(userBalance)
 
             return true
         } catch (e: Exception) {

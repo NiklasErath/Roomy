@@ -9,6 +9,7 @@ import com.example.roomy.db.PaymentsRepository
 import com.example.roomy.db.UserRepository
 import com.example.roomy.ui.ViewModels.GroupViewModel
 import com.example.roomy.ui.ViewModels.ItemViewModel
+import com.example.roomy.ui.ViewModels.StateViewModel
 
 
 class GroupViewModelFactory(
@@ -16,7 +17,9 @@ class GroupViewModelFactory(
     private  val userRepository: UserRepository,
     private  val itemViewModel: ItemViewModel,
     private val balanceRepository: BalanceRepository,
-    private val paymentsRepository: PaymentsRepository
+    private val paymentsRepository: PaymentsRepository,
+    private val stateViewModel: StateViewModel
+
 
 ) : ViewModelProvider.Factory {
 
@@ -28,6 +31,7 @@ class GroupViewModelFactory(
                 itemViewModel = itemViewModel,
                 balanceRepository = balanceRepository,
                 paymentsRepository = paymentsRepository,
+                stateViewModel = stateViewModel
             ) as T
         }
 

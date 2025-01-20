@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.roomy.R
 import com.example.roomy.ui.Item
+import com.example.roomy.ui.States.newGroupState
 import com.example.roomy.ui.ViewModels.ItemViewModel
 
 @Composable
@@ -49,7 +50,7 @@ fun ExpandingAddItemElement(
     updateFocusState: (Boolean) -> Unit,
     updateExpandState: (Boolean) -> Unit,
     updateItemName: (String) -> Unit,
-    currentGroupId: Int,
+    currentGroup: newGroupState,
     itemViewModel: ItemViewModel,
     resetAfterItemAdded: () -> Unit
 ) {
@@ -65,7 +66,7 @@ fun ExpandingAddItemElement(
 
     val placeHolderItem = com.example.roomy.db.data.Item(
         name = itemName,
-        groupId = currentGroupId,
+        groupId = currentGroup.groupId,
         status = "shoppingList",
         icon = R.drawable.placeholder
     )
@@ -131,14 +132,14 @@ fun ExpandingAddItemElement(
                                     ?: R.drawable.placeholder
                                 val suggestedItem = com.example.roomy.db.data.Item(
                                     name = suggestedItemName,
-                                    groupId = currentGroupId,
+                                    groupId = currentGroup.groupId,
                                     status = "shoppingList",
                                     icon = iconResId
                                 )
                                 Item(item = suggestedItem,
                                     onClick = {
                                         itemViewModel.addItem(
-                                            suggestedItem
+                                            suggestedItem, currentGroup.groupId
                                         )
                                         resetAfterItemAdded()
 
@@ -151,7 +152,7 @@ fun ExpandingAddItemElement(
                                 Item(item = placeHolderItem,
                                     onClick = {
                                         itemViewModel.addItem(
-                                            placeHolderItem
+                                            placeHolderItem, currentGroup.groupId
                                         )
                                         resetAfterItemAdded()
 

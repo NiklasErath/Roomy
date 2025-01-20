@@ -31,13 +31,15 @@ sealed class UserError {
     data class Error(val message: String)
 }
 
-class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
+class UserViewModel(private val userRepository: UserRepository, private val stateViewModel: StateViewModel) : ViewModel() {
 
     private val _session = MutableStateFlow(SessionState(""))
     private val _loggedInUser = MutableStateFlow(UserState("", "", ""))
 
     val currentUserSession = _session.asStateFlow()
     val loggedInUser = _loggedInUser.asStateFlow()
+
+
 
     // error Message
     private val _userError = MutableStateFlow(UserError.Error(""))
@@ -114,6 +116,7 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
                 }
                 callback(true)
             } else {
+                stateViewModel.clearGroupsState()
                 _session.update { oldState ->
                     oldState.copy("")
                 }
@@ -204,6 +207,8 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
                         oldState.copy("username could not be updated")
                     }
                 } else {
+                    stateViewModel.updateUserName(username, userId )
+
                     _loggedInUser.update { oldstate ->
                         oldstate.copy(
                             userId = userId,

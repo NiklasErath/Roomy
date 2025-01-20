@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Button
@@ -26,10 +25,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.roomy.db.BalanceRepository
 import com.example.roomy.ui.States.GroupMembersUiState
+import com.example.roomy.ui.States.newGroupState
 import com.example.roomy.ui.ViewModels.BalanceViewModel
 import com.example.roomy.ui.ViewModels.GroupViewModel
 import com.example.roomy.ui.ViewModels.UserViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
 fun Balance(
@@ -38,9 +37,10 @@ fun Balance(
     balanceViewModel: BalanceViewModel,
     groupViewModel: GroupViewModel,
     userViewModel: UserViewModel,
+    currentGroup: newGroupState
 ) {
 
-    val currentGroup by groupViewModel.currentGroup.collectAsState()
+    val currentGroup by groupViewModel.currentGroupInformation.collectAsState()
     val currentGroupIdInt: Int = currentGroup.id?.let { it } ?: 0
 
     var newPayment by remember { mutableStateOf("") }

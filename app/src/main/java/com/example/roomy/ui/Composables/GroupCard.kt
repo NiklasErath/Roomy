@@ -1,6 +1,5 @@
 package com.example.roomy.ui
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,7 +30,7 @@ import com.example.roomy.ui.ViewModels.GroupViewModel
 @Composable
 fun GroupCard(
     groupViewModel: GroupViewModel,
-    group: newGroupState,
+    currentGroup: newGroupState,
     navController: NavController,
 ){
 
@@ -40,7 +38,7 @@ fun GroupCard(
         Modifier
             .clickable {
 
-                groupViewModel.setCurrentGroup(GroupInformation(id = group.groupId, creatorId = group.creatorId, name = group.groupName))
+                groupViewModel.setCurrentGroupInformation(GroupInformation(id = currentGroup.groupId, creatorId = currentGroup.creatorId, name = currentGroup.groupName))
                 navController.navigate(Screens.Groups.name)
             }
             .fillMaxWidth()
@@ -55,7 +53,7 @@ fun GroupCard(
                 , horizontalArrangement = Arrangement.Start
             ) {
 
-                Text(text = " ${group.groupName}" , fontSize = integerResource(id = R.integer.heading2).sp)
+                Text(text = " ${currentGroup.groupName}" , fontSize = integerResource(id = R.integer.heading2).sp)
             }
 
             Row(
@@ -64,7 +62,7 @@ fun GroupCard(
                 , horizontalArrangement = Arrangement.Start
             ) {
 
-                if(group.itemCount != -1){
+                if(currentGroup.shoppingListItems.size != -1){
                     Box(
                         modifier = Modifier
                             .padding(8.dp) // Adds padding around the Box
@@ -73,7 +71,7 @@ fun GroupCard(
                         contentAlignment = Alignment.Center // Centers the text inside the Box
                     ) {
                         // Conditional text rendering
-                        if (group.itemCount == 0) {
+                        if (currentGroup.shoppingListItems.isEmpty()) {
                             Text(
                                 fontSize = 14.sp,
                                 text = "No Items added",
@@ -82,7 +80,7 @@ fun GroupCard(
                             Text(
                             fontSize = 14.sp,
 
-                            text = "${group.itemCount} items",
+                            text = "${currentGroup.shoppingListItems.size} items",
                             )
                         }
                     }
@@ -97,7 +95,7 @@ fun GroupCard(
                 horizontalArrangement = Arrangement.Start
             ) {
 
-                UserProfileCirclesStacked(GroupMembersUiState(group.groupMembers))
+                UserProfileCirclesStacked(GroupMembersUiState(currentGroup.groupMembers))
 
 //            Text(text = " ${groupInformation.name}" , fontSize = integerResource(id = R.integer.heading1).sp)
             }

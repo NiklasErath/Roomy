@@ -1,23 +1,16 @@
 package com.example.roomy.ui
 
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
@@ -25,7 +18,6 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -41,10 +33,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -56,7 +46,6 @@ import com.example.roomy.db.GroupRepository
 import com.example.roomy.db.ItemRepository
 import com.example.roomy.db.NetworkConnection
 import com.example.roomy.db.UserRepository
-import com.example.roomy.ui.Composables.UserProfileCircle
 import com.example.roomy.ui.Composables.UserProfileCirclesStacked
 import com.example.roomy.ui.ViewModels.GroupViewModel
 import com.example.roomy.ui.Factory.GroupViewModelFactory
@@ -71,8 +60,10 @@ import com.example.roomy.db.BalanceRepository
 import com.example.roomy.db.PaymentsRepository
 import com.example.roomy.ui.Composables.Snackbar
 import com.example.roomy.ui.Factory.BalanceViewModelFactory
+import com.example.roomy.ui.Factory.StateViewModelFactory
 import com.example.roomy.ui.States.newGroupState
 import com.example.roomy.ui.ViewModels.BalanceViewModel
+import com.example.roomy.ui.ViewModels.StateViewModel
 import kotlinx.coroutines.launch
 
 
@@ -117,12 +108,19 @@ fun RoomyApp(
     }
 
 
-    val userViewModel: UserViewModel = viewModel(
-        factory = UserViewModelFactory(userRepository)
+//    Initialize StateViewModel which hold our global UI States and pass it to other ViewModels for updates
+    val stateViewModel: StateViewModel = viewModel(
+        factory = StateViewModelFactory()
     )
 
+
+    val userViewModel: UserViewModel = viewModel(
+        factory = UserViewModelFactory(userRepository, stateViewModel)
+    )
+
+
     val itemViewModel: ItemViewModel = viewModel(
-        factory = ItemViewModelFactory(itemRepository)
+        factory = ItemViewModelFactory(itemRepository, stateViewModel)
     )
 
 
@@ -132,26 +130,28 @@ fun RoomyApp(
             userRepository,
             itemViewModel,
             balanceRepository,
-            paymentsRepository
+            paymentsRepository,
+            stateViewModel
             )
     )
+
 
     val balanceViewModel: BalanceViewModel = viewModel(
         factory = BalanceViewModelFactory(balanceRepository, paymentsRepository, groupRepository)
     )
 
-    val currentGroup by groupViewModel.currentGroup.collectAsState()
+    val currentGroupInformation by groupViewModel.currentGroupInformation.collectAsState()
 
     // Step 2: Collect all groups state
-    val allGroupsState by groupViewModel.allGroupsState.collectAsState(
+    val allGroupsState by stateViewModel.allGroupsState.collectAsState(
         initial = emptyList()
     )
 
     // Step 3: Find the corresponding GroupState based on the currentGroup.id
-    val group by remember(currentGroup.id, allGroupsState) {
+    val currentGroup by remember(currentGroupInformation.id, allGroupsState) {
         derivedStateOf {
             // Find the corresponding GroupState based on the currentGroup.id
-            allGroupsState.find { it.groupId == currentGroup.id }
+            allGroupsState.find { it.groupId == currentGroupInformation.id }
                 ?: newGroupState(
                     groupId = -1,
                     groupName = "Unknown",
@@ -203,7 +203,7 @@ fun RoomyApp(
 
             topBar = {
 
-                Header(navController, currentDestination, group)
+                Header(navController, currentDestination, currentGroup)
 
 
             },
@@ -254,7 +254,9 @@ fun RoomyApp(
                 itemViewModel,
                 networkConnection,
                 balanceRepository,
-                balanceViewModel
+                balanceViewModel,
+                currentGroup,
+                allGroupsState
 
 
             )
@@ -325,7 +327,9 @@ fun RoomyApp(
                 itemViewModel,
                 networkConnection,
                 balanceRepository,
-                balanceViewModel
+                balanceViewModel,
+                currentGroup,
+                allGroupsState
 
 
             )
@@ -346,7 +350,9 @@ fun AppNavHost(
     itemViewModel: ItemViewModel,
     networkConnection: NetworkConnection,
     balanceRepository: BalanceRepository,
-    balanceViewModel: BalanceViewModel
+    balanceViewModel: BalanceViewModel,
+    currentGroup: newGroupState,
+    allGroupsState: List<newGroupState>
 ) {
     NavHost(
         navController = navController,
@@ -383,6 +389,9 @@ fun AppNavHost(
         composable(
             Screens.Home.route,
         ) {
+            val previousBackSTackEntry = navController.previousBackStackEntry
+            val previousScreen = previousBackSTackEntry?.destination?.route ?: "No previous entry"
+
             Box {
                 Home(
 
@@ -390,8 +399,9 @@ fun AppNavHost(
                     groupViewModel,
                     userViewModel,
                     itemViewModel,
-
                     networkConnection,
+                    allGroupsState,
+                    previousScreen
                 )
             }
         }
@@ -408,7 +418,8 @@ fun AppNavHost(
                     groupViewModel,
                     itemViewModel,
                     navController,
-                    previousScreen
+                    previousScreen,
+                    currentGroup
                 )
             }
         }
@@ -422,7 +433,8 @@ fun AppNavHost(
                     balanceRepository,
                     balanceViewModel,
                     groupViewModel,
-                    userViewModel
+                    userViewModel,
+                    currentGroup
                 )
             }
         }
@@ -433,7 +445,8 @@ fun AppNavHost(
             Box {
                 Profile(
                     userViewModel,
-                    navController
+                    navController,
+                    currentGroup
                 )
             }
         }
@@ -444,7 +457,8 @@ fun AppNavHost(
                 GroupMembers(
                     navController,
                     groupViewModel,
-                    userViewModel
+                    userViewModel,
+                    currentGroup
                 )
             }
         }
@@ -455,7 +469,8 @@ fun AppNavHost(
             Box {
                 RecipeSuggestion(
                     navController,
-                    itemViewModel
+                    itemViewModel,
+                    currentGroup
                 )
             }
         }

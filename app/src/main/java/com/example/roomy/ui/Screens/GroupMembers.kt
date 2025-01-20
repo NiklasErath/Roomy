@@ -28,6 +28,7 @@ import com.example.roomy.ui.States.GroupMembersUiState
 import com.example.roomy.ui.ViewModels.GroupViewModel
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import com.example.roomy.ui.States.newGroupState
 import com.example.roomy.ui.ViewModels.UserViewModel
 
 
@@ -36,18 +37,19 @@ import com.example.roomy.ui.ViewModels.UserViewModel
 fun GroupMembers(
     navController: NavController,
     groupViewModel: GroupViewModel,
-    userViewModel: UserViewModel
+    userViewModel: UserViewModel,
+    currentGroup: newGroupState
 
 ) {
-    val currentGroup by groupViewModel.currentGroup.collectAsState()
+    val currentGroupInformation by groupViewModel.currentGroupInformation.collectAsState()
 
-    val currentGroupIdInt: Int = currentGroup.id?.let { it } ?: 0
-
-    val groupMemberInformation by groupViewModel.groupMembers.collectAsState(
-        initial = GroupMembersUiState(
-            emptyList()
-        )
-    )
+//    val currentGroupIdInt: Int = currentGroupInformation.id?.let { it } ?: 0
+//
+//    val groupMemberInformation by groupViewModel.groupMembers.collectAsState(
+//        initial = GroupMembersUiState(
+//            emptyList()
+//        )
+//    )
 
     val context = LocalContext.current
 
@@ -57,12 +59,12 @@ fun GroupMembers(
 
     LaunchedEffect(Unit) {
 
-        currentGroup.id?.let { groupViewModel.getGroupMembers(it) }
+        currentGroupInformation.id?.let { groupViewModel.getGroupMembers(it) }
 
     }
     Column {
         LazyColumn {
-            itemsIndexed(groupMemberInformation.memberInformation) { index: Int, memberInformation ->
+            itemsIndexed(currentGroup.groupMembers) { index: Int, memberInformation ->
                 OutlinedCard(
                     modifier = Modifier
                         .padding(12.dp)
@@ -73,7 +75,7 @@ fun GroupMembers(
                             Button(onClick = {
                                 groupViewModel.kickUser(
                                     memberInformation.id,
-                                    currentGroupIdInt
+                                    currentGroup.groupId
                                 )
                             }) {
                                 Text(text = "Kick Member")
@@ -101,7 +103,7 @@ fun GroupMembers(
                     if (usernameAdd.isBlank()) {
                         Toast.makeText(context, "Please enter a username", Toast.LENGTH_LONG).show()
                     } else {
-                        groupViewModel.addMemberByNameToGroup(usernameAdd, currentGroupIdInt)
+                        groupViewModel.addMemberByNameToGroup(usernameAdd, currentGroup.groupId)
                         usernameAdd = ""
                     }
                 },
@@ -109,16 +111,16 @@ fun GroupMembers(
             ) {
                 Text(text = "Add")
             }
-            if (currentUser.userId == currentGroup.creatorId) {
+            if (currentUser.userId == currentGroupInformation.creatorId) {
                 Button(onClick = {
-                    groupViewModel.deleteGroup(currentGroupIdInt)
+                    groupViewModel.deleteGroup(currentGroup.groupId)
                     navController.navigate("Home")
                 }) {
                     Text(text = "Delete group")
                 }
             } else {
                 Button(onClick = {
-                    groupViewModel.kickUser(currentUser.userId, currentGroupIdInt)
+                    groupViewModel.kickUser(currentUser.userId, currentGroup.groupId)
                     navController.navigate("Home")
 
                 }) {

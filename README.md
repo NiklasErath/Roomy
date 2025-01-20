@@ -145,3 +145,12 @@ No in-app FAQ or Help section for quick reference.
 -	User Control and Freedom: Confusing back arrows and the ability for a user to remove themselves from a group without confirmation.
 -	Error Prevention: Being able to add duplicate users or create a group without a name.
 -	Visibility of System Status: No feedback when mandatory fields (e.g., username) are empty.
+
+
+
+
+
+To access the OpenAI Recipe Feature with your own API key add this line in your gradle.properties file
+Clean, Sync, Rebuild Project:
+
+OPENAI_API_KEY="yourkey"

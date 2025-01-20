@@ -3,6 +3,7 @@ package com.example.roomy.db
 import android.util.Log
 import androidx.compose.foundation.layout.Column
 import com.example.roomy.db.Supabase.supabase
+import com.example.roomy.db.data.GroupInformation
 import com.example.roomy.db.data.Groups
 import com.example.roomy.db.data.Item
 import com.example.roomy.db.data.ShoppingList
@@ -22,6 +23,29 @@ class ItemRepository {
             val inventoryItems = supabase
                 .from("items")
                 .select { filter { eq("status", "inventory"); eq("group_id", groupId) } }
+                .decodeList<Item>()
+
+            return Pair(shoppingListItems, inventoryItems)
+        } catch (e: Exception) {
+            // Log the error and throw an exception
+            Log.d("TAG", "Could not get the ShoppingLists: ${e.message}")
+            return null
+        }
+    }
+
+    suspend fun getAllItemsForGroups(groupIds: List<Int>): Pair<List<Item>, List<Item>> ? {
+        try {
+
+            val shoppingListItems = supabase
+                .from("items")
+                .select (columns = Columns.ALL)
+                {filter { eq("status", "shoppingList"); isIn("group_id", groupIds) } }
+                .decodeList<Item>()
+
+            val inventoryItems = supabase
+                .from("items")
+                .select (columns = Columns.ALL)
+                {filter { eq("status", "inventory"); isIn("group_id", groupIds) } }
                 .decodeList<Item>()
 
             return Pair(shoppingListItems, inventoryItems)

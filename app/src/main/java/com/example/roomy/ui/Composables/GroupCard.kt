@@ -1,5 +1,6 @@
 package com.example.roomy.ui
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,21 +26,21 @@ import com.example.roomy.R
 import com.example.roomy.db.data.GroupInformation
 import com.example.roomy.ui.Composables.UserProfileCirclesStacked
 import com.example.roomy.ui.States.GroupMembersUiState
+import com.example.roomy.ui.States.newGroupState
 import com.example.roomy.ui.ViewModels.GroupViewModel
 
 @Composable
 fun GroupCard(
     groupViewModel: GroupViewModel,
-    groupInformation: GroupInformation,
+    group: newGroupState,
     navController: NavController,
-    groupMembersUiState: GroupMembersUiState,
-    itemCount: Int
 ){
 
     OutlinedCard(
         Modifier
             .clickable {
-                groupViewModel.setCurrentGroup(groupInformation)
+
+                groupViewModel.setCurrentGroup(GroupInformation(id = group.groupId, creatorId = group.creatorId, name = group.groupName))
                 navController.navigate(Screens.Groups.name)
             }
             .fillMaxWidth()
@@ -54,7 +55,7 @@ fun GroupCard(
                 , horizontalArrangement = Arrangement.Start
             ) {
 
-                Text(text = " ${groupInformation.name}" , fontSize = integerResource(id = R.integer.heading2).sp)
+                Text(text = " ${group.groupName}" , fontSize = integerResource(id = R.integer.heading2).sp)
             }
 
             Row(
@@ -63,7 +64,7 @@ fun GroupCard(
                 , horizontalArrangement = Arrangement.Start
             ) {
 
-                if(itemCount != -1){
+                if(group.itemCount != -1){
                     Box(
                         modifier = Modifier
                             .padding(8.dp) // Adds padding around the Box
@@ -72,7 +73,7 @@ fun GroupCard(
                         contentAlignment = Alignment.Center // Centers the text inside the Box
                     ) {
                         // Conditional text rendering
-                        if (itemCount == 0) {
+                        if (group.itemCount == 0) {
                             Text(
                                 fontSize = 14.sp,
                                 text = "No Items added",
@@ -81,7 +82,7 @@ fun GroupCard(
                             Text(
                             fontSize = 14.sp,
 
-                            text = "$itemCount items",
+                            text = "${group.itemCount} items",
                             )
                         }
                     }
@@ -96,7 +97,7 @@ fun GroupCard(
                 horizontalArrangement = Arrangement.Start
             ) {
 
-                UserProfileCirclesStacked(groupMembersUiState)
+                UserProfileCirclesStacked(GroupMembersUiState(group.groupMembers))
 
 //            Text(text = " ${groupInformation.name}" , fontSize = integerResource(id = R.integer.heading1).sp)
             }

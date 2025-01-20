@@ -35,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -70,6 +71,7 @@ import com.example.roomy.db.BalanceRepository
 import com.example.roomy.db.PaymentsRepository
 import com.example.roomy.ui.Composables.Snackbar
 import com.example.roomy.ui.Factory.BalanceViewModelFactory
+import com.example.roomy.ui.States.newGroupState
 import com.example.roomy.ui.ViewModels.BalanceViewModel
 import kotlinx.coroutines.launch
 
@@ -137,6 +139,30 @@ fun RoomyApp(
         factory = BalanceViewModelFactory(balanceRepository, paymentsRepository, groupRepository)
     )
 
+    val currentGroup by groupViewModel.currentGroup.collectAsState()
+
+    // Step 2: Collect all groups state
+    val allGroupsState by groupViewModel.allGroupsState.collectAsState(
+        initial = emptyList()
+    )
+
+    // Step 3: Find the corresponding GroupState based on the currentGroup.id
+    val group by remember(currentGroup.id, allGroupsState) {
+        derivedStateOf {
+            // Find the corresponding GroupState based on the currentGroup.id
+            allGroupsState.find { it.groupId == currentGroup.id }
+                ?: newGroupState(
+                    groupId = -1,
+                    groupName = "Unknown",
+                    creatorId = "Unknown",
+                    groupMembers = emptyList(),
+                    shoppingListItems = emptyList(),
+                    inventoryItems = emptyList(),
+                    itemCount = 0
+                )  // Fallback default group state
+        }
+    }
+
 //    Snackbar
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
@@ -147,23 +173,6 @@ fun RoomyApp(
     val itemErrorMessage by itemViewModel.itemError.collectAsState()
     val groupErrorMessage by groupViewModel.error.collectAsState()
 
-//    if (userErrorMessage.message.isNotEmpty()) {
-//        Toast.makeText(context, userErrorMessage.message, Toast.LENGTH_LONG)
-//            .show()
-//        userViewModel.clearUserError()
-//    }
-//
-//    if (itemErrorMessage.message.isNotEmpty()) {
-//        Toast.makeText(context, itemErrorMessage.message, Toast.LENGTH_LONG)
-//            .show()
-//        itemViewModel.clearItemError()
-//    }
-//
-//    if (groupErrorMessage.message.isNotEmpty()) {
-//        Toast.makeText(context, groupErrorMessage.message, Toast.LENGTH_LONG)
-//            .show()
-//        groupViewModel.clearGroupError()
-//    }
 
 
     if (displayBottomBarAndHeader) {
@@ -193,7 +202,7 @@ fun RoomyApp(
 
             topBar = {
 
-                Header(navController, currentDestination, groupViewModel)
+                Header(navController, currentDestination, group)
 
 
             },
@@ -491,12 +500,11 @@ fun BottomNavigationBar(
 fun Header(
     navController: NavController,
     currentDestination: String?,
-    groupViewModel: GroupViewModel
-) {
-    val currentGroup by groupViewModel.currentGroup.collectAsState()
-    val groupMemberInformation by groupViewModel.groupMembers.collectAsState(
-        initial = GroupMembersUiState(emptyList())
-    )
+    group: newGroupState) {
+//    val currentGroup by groupViewModel.currentGroup.collectAsState()
+//    val groupMemberInformation by groupViewModel.groupMembers.collectAsState(
+//        initial = GroupMembersUiState(emptyList())
+//    )
 
     Column(
         modifier = Modifier
@@ -524,7 +532,7 @@ fun Header(
                     }
 
                     Text(
-                        text = currentGroup.name,
+                        text = group.groupName,
                         fontSize = 20.sp,
                         modifier = Modifier
                             .weight(1f)
@@ -539,7 +547,7 @@ fun Header(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.End
                     ) {
-                        UserProfileCirclesStacked(groupMemberInformation)
+                        UserProfileCirclesStacked(GroupMembersUiState(group.groupMembers))
                     }
                 }
                 else if (currentDestination == "GroupMembers" || currentDestination == "RecipeSuggestion") {
@@ -555,7 +563,7 @@ fun Header(
 
                     }
                     Text(
-                        text = currentGroup.name,
+                        text = group.groupName,
                         fontSize = 20.sp,
                         modifier = Modifier
                             .weight(1f)
@@ -570,11 +578,11 @@ fun Header(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.End
                     ) {
-                        UserProfileCirclesStacked(groupMemberInformation)
+                        UserProfileCirclesStacked(GroupMembersUiState(group.groupMembers))
                     }
                 } else {
                     Text(
-                        text = currentGroup.name,
+                        text = group.groupName,
                         fontSize = 20.sp,
                         modifier = Modifier
                             .weight(1f)
@@ -589,7 +597,7 @@ fun Header(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.End
                     ) {
-                        UserProfileCirclesStacked(groupMemberInformation)
+                        UserProfileCirclesStacked(GroupMembersUiState(group.groupMembers))
                     }
                 }
             }

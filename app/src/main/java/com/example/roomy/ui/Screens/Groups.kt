@@ -1,5 +1,6 @@
 package com.example.roomy.ui
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.BorderStroke
@@ -26,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,6 +54,7 @@ import com.example.roomy.ui.Composables.ExpandingAddItemElement
 import com.example.roomy.ui.Composables.UserProfileCircle
 import com.example.roomy.ui.States.GroupMembersUiState
 import com.example.roomy.ui.States.ItemsUiState
+import com.example.roomy.ui.States.newGroupState
 import com.example.roomy.ui.ViewModels.GroupViewModel
 import com.example.roomy.ui.ViewModels.ItemViewModel
 
@@ -64,15 +67,43 @@ fun Group(
     previousScreen: String
 ) {
 
+
+
     val context = LocalContext.current
 
     var itemName by remember { mutableStateOf("") }
 
     val finishedFetching by itemViewModel.finishedFetching
 
-    var renderAfterFetching by remember { mutableStateOf(false) }
+    var renderAfterFetching by remember { mutableStateOf(true) }
+
 
     val currentGroup by groupViewModel.currentGroup.collectAsState()
+
+    // Step 2: Collect all groups state
+    val allGroupsState by groupViewModel.allGroupsState.collectAsState(
+        initial = emptyList()
+    )
+
+    // Step 3: Find the corresponding GroupState based on the currentGroup.id
+    val group by remember(currentGroup.id, allGroupsState) {
+        derivedStateOf {
+            // Find the corresponding GroupState based on the currentGroup.id
+            allGroupsState.find { it.groupId == currentGroup.id }
+                ?: newGroupState(
+                    groupId = -1,
+                    groupName = "Unknown",
+                    creatorId = "Unknown",
+                    groupMembers = emptyList(),
+                    shoppingListItems = emptyList(),
+                    inventoryItems = emptyList(),
+                    itemCount = 0
+                )  // Fallback default group state
+        }
+    }
+
+    Log.d("llllllllllllllllllllllllllllllllllllllllll", "$group")
+
 
     val inventoryItems by itemViewModel.allInventoryItems.collectAsState(
         initial = ItemsUiState(emptyList())
@@ -81,13 +112,13 @@ fun Group(
     val shoppingListItems by itemViewModel.allShoppingListItems.collectAsState(
         initial = ItemsUiState(emptyList())
     )
-    val groupMemberInformation by groupViewModel.groupMembers.collectAsState(
-        initial = GroupMembersUiState(
-            emptyList()
-        )
-    )
+//    val groupMemberInformation by groupViewModel.groupMembers.collectAsState(
+//        initial = GroupMembersUiState(
+//            emptyList()
+//        )
+//    )
 
-    val currentGroupIdInt: Int = currentGroup.id?.let { it } ?: 0
+//    val currentGroupIdInt: Int = currentGroup.id?.let { it } ?: 0
 
 
     var isExpanded by remember { mutableStateOf(false) }
@@ -106,26 +137,28 @@ fun Group(
     var triggerNavCheck by remember { mutableStateOf(true) }
 
 
-    LaunchedEffect(previousScreen) {
-        if (triggerNavCheck) {
-            when (previousScreen) {
-                Screens.Groups.name, Screens.Balance.name, Screens.Profile.name -> renderAfterFetching =
-                    true
-
-                else -> renderAfterFetching = false
-            }
-            triggerNavCheck = false
-        }
-    }
+//    LaunchedEffect(previousScreen) {
+//        if (triggerNavCheck) {
+//            when (previousScreen) {
+//                Screens.Groups.name, Screens.Balance.name, Screens.Profile.name -> renderAfterFetching =
+//                    true
+//
+//                else -> renderAfterFetching = false
+//            }
+//            triggerNavCheck = false
+//        }
+//    }
 
 
     LaunchedEffect(Unit) {
 
-        itemViewModel.getAllItems(currentGroupIdInt)
-        groupViewModel.getGroupMembers(currentGroupIdInt)
+//        Fix later - this doesnt have to be done on launch, just acces the newGroupsState
+        itemViewModel.setAllItems(group)
+//        groupViewModel.getGroupMembers(currentGroupIdInt)
 
     }
 
+//    Still needed? Im not sure
     LaunchedEffect(finishedFetching) {
         if (finishedFetching) {
             renderAfterFetching = true
@@ -133,6 +166,8 @@ fun Group(
 
         }
     }
+    Log.d("ShoppingListssssssssssssssssssss", "Shopping List Items: ${group.shoppingListItems}")
+
 
 
     //            Note change this to our errorhandling process later on
@@ -167,7 +202,7 @@ fun Group(
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primary)
                     .clickable {
-                        if (inventoryItems.items.isEmpty()) {
+                        if (group.inventoryItems.isEmpty()) {
                             Toast
                                 .makeText(
                                     context,
@@ -215,7 +250,9 @@ fun Group(
 
             if (shoppingListItems.items.isEmpty() && renderAfterFetching) {
                 Text(text = "Nothing here yet, add a new Item to your Shopping List")
-            } else if (renderAfterFetching) {
+            } else {
+
+
 
                 shoppingListItems.items.chunked(3).forEach { rowItems ->
                     Row(
@@ -251,7 +288,7 @@ fun Group(
 
             if (inventoryItems.items.isEmpty() && renderAfterFetching) {
                 Text(text = "Nothing here yet, add a new Item to your Shopping List")
-            } else if (renderAfterFetching) {
+            } else {
 
                 inventoryItems.items.chunked(3).forEach { rowItems ->
                     Row(
@@ -325,7 +362,7 @@ fun Group(
             updateExpandState = { isExpanded = it },
             updateFocusState = { isFocused = it },
             updateItemName = { itemName = it },
-            currentGroupId = currentGroupIdInt,
+            currentGroupId = group.groupId,
             itemViewModel = itemViewModel,
             resetAfterItemAdded = { resetAfterItemAdded() }
         )

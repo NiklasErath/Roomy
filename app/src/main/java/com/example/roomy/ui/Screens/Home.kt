@@ -62,20 +62,24 @@ fun Home(
 
     val addGroupState by groupViewModel.addGroupState
 
-    val groupItemsCount by itemViewModel.allGroupsItemsCount.collectAsState()
+//    val groupItemsCount by itemViewModel.allGroupsItemsCount.collectAsState()
 
     val currentUserId = userViewModel.currentUserSession.collectAsState().value.userId
 
-    val groupInformationState by groupViewModel.groupsInformation.collectAsState(
-        initial = GroupsUiState(
-            emptyList()
-        )
-    )
+//    val groupInformationState by groupViewModel.groupsInformation.collectAsState(
+//        initial = GroupsUiState(
+//            emptyList()
+//        )
+//    )
 
-    val userErrorMessage by userViewModel.userError.collectAsState()
+//    val userErrorMessage by userViewModel.userError.collectAsState()
 
 
-    val allGroupsMembers by groupViewModel.allGroupsMembers.collectAsState(
+//    val allGroupsMembers by groupViewModel.allGroupsMembers.collectAsState(
+//        initial = emptyList()
+//    )
+
+    val allGroupsState by groupViewModel.allGroupsState.collectAsState(
         initial = emptyList()
     )
 
@@ -90,6 +94,8 @@ fun Home(
     //        groupViewModel.getGroupMembers(2)
     }
 
+//    Launcheffect for adding a new Group,
+//    Basically makers sure we navigate to the Groups Screen after the Group is created ... necessary?
     LaunchedEffect(addGroupState) {
         if (addGroupState is AddGroupState.Success) {
             navController.navigate(Screens.Groups.name)
@@ -118,19 +124,19 @@ fun Home(
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            if (groupInformationState.groupsInformation.isEmpty() || allGroupsMembers.isEmpty()) {
+            if (allGroupsState.isEmpty()) {
                 item {
                     Text(text = "No groups")
                 }
             } else {
-                itemsIndexed(groupInformationState.groupsInformation) { index, groupInformation ->
+                itemsIndexed(allGroupsState) { index, group ->
 
-                    val itemCount = groupItemsCount[groupInformation.id] ?: -1
-
-
+//                    val itemCount = group.itemCount
 
 
-                    GroupCard(groupViewModel, groupInformation, navController, allGroupsMembers[index], itemCount)
+
+
+                    GroupCard(groupViewModel, group, navController)
 
                 }
 

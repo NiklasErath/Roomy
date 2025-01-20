@@ -13,7 +13,7 @@ import io.ktor.util.escapeHTML
 class GroupRepository {
 
     // get the groups of the loggedIn user
-    suspend fun getGroupsByUserId(userId: String): List<Groups>? {
+    suspend fun getGroupIdsByUserId(userId: String): List<Groups>? {
         try {
             val response = supabase
                 .from("parent_group")
@@ -28,12 +28,33 @@ class GroupRepository {
     }
 
     // get the group information of a group by groupId
-    suspend fun getGroupInformationById(groupId: Int): GroupInformation? {
+//    suspend fun getGroupInformationById(groupId: Int): GroupInformation? {
+//        try {
+//            val response = supabase
+//                .from("group_information")
+//                .select { filter { eq("group_id", groupId) } }
+//                .decodeSingle<GroupInformation>()
+//            return response
+//        } catch (e: Exception) {
+//            Log.d("TAG", "Could not get the groups: ${e.message}")
+//            return null
+//        }
+//    }
+
+    // get the group information of a group by groupId
+
+    suspend fun getGroupInformationByIds(groupIds: List<Int>): List<GroupInformation>? {
         try {
             val response = supabase
                 .from("group_information")
-                .select { filter { eq("group_id", groupId) } }
-                .decodeSingle<GroupInformation>()
+                .select (columns = Columns.ALL){
+                    filter{
+                        isIn("group_id", groupIds)
+                    }
+                }
+                .decodeList<GroupInformation>()
+            Log.d("GroupInfooooooooooooooooooooooooooooo", "$response")
+
             return response
         } catch (e: Exception) {
             Log.d("TAG", "Could not get the groups: ${e.message}")

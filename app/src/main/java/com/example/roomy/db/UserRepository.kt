@@ -3,6 +3,8 @@ package com.example.roomy.db
 import android.util.Log
 import co.touchlab.kermit.Tag
 import com.example.roomy.db.Supabase.supabase
+import com.example.roomy.db.data.GroupInformation
+import com.example.roomy.db.data.Groups
 import com.example.roomy.db.data.UserInformation
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
@@ -111,6 +113,69 @@ class UserRepository {
             return response
         } catch (e: Exception) {
             Log.d("TAG", "Could not get the User information: ${e.message}")
+            return null
+        }
+
+    }
+
+//    suspend fun getGroupInformationById(groupIds: List<Int>): List<GroupInformation>? {
+//        try {
+//            val response = supabase
+//                .from("group_information")
+//                .select (columns = Columns.ALL){
+//                    filter{
+//                        isIn("group_id", groupIds)
+//                    }
+//                }
+//                .decodeList<GroupInformation>()
+//            Log.d("GroupInfooooooooooooooooooooooooooooo", "$response")
+//
+//            return response
+//        } catch (e: Exception) {
+//            Log.d("TAG", "Could not get the groups: ${e.message}")
+//            return null
+//        }
+//    }
+
+    suspend fun getUsersByGroupIds(groupIds: List<Int>): List<Groups>? {
+
+        try {
+            val response = supabase
+                .from("parent_group")
+                .select(columns = Columns.ALL){
+                    filter {
+                        isIn("group_id", groupIds)
+                    }
+                }
+                .decodeList<Groups>()  // Decode the response into a list of Groups <group_id, user_id>
+
+            return response
+
+        } catch (e: Exception) {
+            Log.d("TAG", "Could not get the groups User IDs: ${e.message}")
+            return null
+        }
+
+
+    }
+
+
+    suspend fun getUserInformationByIds(userIds: List<String>): List<UserInformation>? {
+
+        try {
+            val response = supabase
+                .from("user_information")
+                .select(columns = Columns.ALL){
+                    filter {
+                        isIn("user_id", userIds)
+                    }
+                }
+                .decodeList<UserInformation>()  // Decode the response into a list of Groups <group_id, user_id>
+
+            return response
+
+        } catch (e: Exception) {
+            Log.d("TAG", "Could not get the groups User IDs: ${e.message}")
             return null
         }
 

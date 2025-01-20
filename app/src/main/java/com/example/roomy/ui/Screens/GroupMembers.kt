@@ -68,14 +68,16 @@ fun GroupMembers(
                         .padding(12.dp)
                 ) {
                     Row() {
-                        Text(text = "${memberInformation.username}")
-                        Button(onClick = {
-                            groupViewModel.kickUser(
-                                "${memberInformation.id}",
-                                currentGroupIdInt
-                            )
-                        }) {
-                            Text(text = "Kick Member")
+                        Text(text = memberInformation.username)
+                        if (memberInformation.id != currentUser.userId) {
+                            Button(onClick = {
+                                groupViewModel.kickUser(
+                                    memberInformation.id,
+                                    currentGroupIdInt
+                                )
+                            }) {
+                                Text(text = "Kick Member")
+                            }
                         }
                     }
 

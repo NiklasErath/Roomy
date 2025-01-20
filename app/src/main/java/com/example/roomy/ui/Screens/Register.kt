@@ -94,6 +94,10 @@ fun Register(
                 )
             }
         )
+        if (username.length in 1..2){
+            Text(text = "The username must be at least 3 characters long",
+                color = Color.Red,)
+        }
 
         Spacer(Modifier.height(10.dp))
 
@@ -147,7 +151,12 @@ fun Register(
                 if (password.length <= 6) {
                     Toast.makeText(context, "Password has to be more than 6 characters!", Toast.LENGTH_SHORT).show()
 
-                }else {
+                }
+                if (username.length <= 2){
+                    Toast.makeText(context, "Username has to be more than 3 characters!", Toast.LENGTH_SHORT).show()
+
+                }
+                else {
                     userViewModel.signUp(email, password, username)
 
 

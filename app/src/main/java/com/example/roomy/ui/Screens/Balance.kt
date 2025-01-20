@@ -88,7 +88,7 @@ fun Balance(
                             ?: "Unknown User"
                     if (Balance.owedBy != currentUser.userId) {
                         OutlinedCard(modifier = Modifier.padding(12.dp)) {
-                            Text(text = "$owedBy owes $owedTo ${Balance.amount} $")
+                            Text(text = "$owedTo owes $owedBy ${Balance.amount} $")
                         }
                     } else {
                         OutlinedCard(modifier = Modifier.padding(12.dp)) {

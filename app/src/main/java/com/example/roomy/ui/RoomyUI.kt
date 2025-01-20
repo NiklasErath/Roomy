@@ -132,6 +132,7 @@ fun RoomyApp(
             userRepository,
             itemViewModel,
             balanceRepository,
+            paymentsRepository
             )
     )
 

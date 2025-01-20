@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.roomy.db.GroupRepository
 import androidx.lifecycle.ViewModel
 import com.example.roomy.db.BalanceRepository
+import com.example.roomy.db.PaymentsRepository
 import com.example.roomy.db.UserRepository
 import com.example.roomy.db.data.GroupInformation
 import com.example.roomy.db.data.Groups
@@ -38,7 +39,9 @@ class GroupViewModel(
     private val groupRepository: GroupRepository,
     private val userRepository: UserRepository,
     private val itemViewModel: ItemViewModel,
-    private val balanceRepository: BalanceRepository
+    private val balanceRepository: BalanceRepository,
+    private val paymentsRepository: PaymentsRepository
+
 ) : ViewModel() {
 
     private val _allGroupsState = MutableStateFlow<List<newGroupState>>(emptyList())
@@ -337,6 +340,8 @@ class GroupViewModel(
                 _groupError.update { oldState ->
                     oldState.copy("Group could not be deleted")
                 }
+            } else {
+                balanceRepository.deleteBalanceByGroupId(groupId)
             }
         }
     }
@@ -354,6 +359,7 @@ class GroupViewModel(
                     val updatedMembers = oldState.memberInformation.filter { it.id != userId }
                     oldState.copy(memberInformation = updatedMembers)
                 }
+                balanceRepository.deleteBalanceByUserId(groupId, userId)
             }
         }
     }

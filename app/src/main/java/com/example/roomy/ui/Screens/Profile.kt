@@ -35,6 +35,8 @@ fun Profile(
 
     var username by remember { mutableStateOf("") }
     var theme by remember { mutableStateOf("") }
+    var isChangeUsernameVisible by remember { mutableStateOf(false) }
+
 
     Column(
         Modifier
@@ -58,22 +60,43 @@ fun Profile(
 
 
             Column(modifier = Modifier.padding(top = 20.dp)) {
-                OutlinedTextField(
-                    value = username,
-                    onValueChange = { newValue -> username = newValue },
-                    Modifier.fillMaxWidth(),
-                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Filled.Person,
-                            contentDescription = "username",
-                            modifier = Modifier
-                        )
+                if (isChangeUsernameVisible) {
+
+
+                    OutlinedTextField(
+                        value = username,
+                        onValueChange = { newValue -> username = newValue },
+                        Modifier.fillMaxWidth(),
+                        label = { Text("new username") },
+                        trailingIcon = {
+                            Icon(
+                                imageVector = Icons.Filled.Person,
+                                contentDescription = "username",
+                                modifier = Modifier
+                            )
+                        }
+
+
+                    )
+                    if (username.length in 1..2){
+                        Text(text = "The username must be at least 3 characters long",
+                            color = Color.Red,)
                     }
-
-
-                )
-                Button(onClick = { userViewModel.updateUserName(username, currentUser.userId) }) {
-                    Text(text = "Change username")
+                    Button(onClick = {
+                        if (username.length >= 3){
+                        userViewModel.updateUserName(
+                            username,
+                            currentUser.userId,
+                        )
+                        isChangeUsernameVisible = false
+                        username = ""
+                    }}) {
+                        Text(text = "Change username")
+                    }
+                } else {
+                    Button(onClick = { isChangeUsernameVisible = true }) {
+                        Text(text = "Change username")
+                    }
                 }
                 Button(onClick = {
                     if (theme == "dark") {

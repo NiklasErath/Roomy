@@ -201,7 +201,7 @@ fun Home(
                 Modifier.fillMaxWidth(),
 //                leadingIcon = {Icon(imageVector = Icons.Filled.Edit, contentDescription = "AddUser")},
                 label = { Text("Invite someone New") },
-                placeholder = { Text("example@outlook.com") },
+                placeholder = { Text("username") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
 
                 trailingIcon = {

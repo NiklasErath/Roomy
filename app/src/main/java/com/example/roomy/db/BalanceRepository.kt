@@ -4,9 +4,11 @@ import android.util.Log
 import com.example.roomy.db.Supabase.supabase
 import com.example.roomy.db.data.Balance
 import io.github.jan.supabase.postgrest.from
+import kotlin.math.abs
 
 class BalanceRepository {
 
+    // get the Balance from a group
     suspend fun getBalanceByGroupId(groupId: Int): List<Balance>? {
         try {
             val response = supabase.from("balance").select {
@@ -61,14 +63,85 @@ class BalanceRepository {
                 owedTo = owedTo,
                 amount = amount,
             )
+            Log.d("BALANCE", "FUNCTIOn")
 
-            supabase.from("balance").insert(userBalance)
+
+            val existingBalance: Balance? = supabase.from("balance").select {
+                filter {
+                    eq("group_id", groupId)
+                    eq("owed_by", owedBy)
+                    eq("owed_to", owedTo)
+                }
+            }.decodeSingleOrNull<Balance>()
+
+            Log.d("BALANCE", "$existingBalance")
+            if (existingBalance == null) {
+                supabase.from("balance").insert(userBalance)
+            } else {
+                val newAmount = existingBalance.amount + amount
+                val balanceId = existingBalance.id
+                Log.d("BALANCE", "$newAmount")
+                supabase.from("balance").update({ set("amount", newAmount) }) {
+                    filter {
+                        if (balanceId != null) {
+                            eq("balance_id", balanceId)
+                        }
+                    }
+                }
+            }
+
+            val counterBalance: Balance? = supabase.from("balance").select {
+                filter {
+                    eq("group_id", groupId)
+                    eq("owed_by", owedTo)
+                    eq("owed_to", owedBy)
+                }
+            }.decodeSingleOrNull<Balance>()
+
+            if (counterBalance != null) {
+                val newCounterAmount = counterBalance.amount - amount
+                if (newCounterAmount > 0) {
+                    supabase.from("balance").update({ set("amount", newCounterAmount) }) {
+                        filter {
+                            counterBalance.id?.let { eq("balance_id", it) }
+                        }
+                    }
+                } else {
+                    try {
+                        counterBalance.id?.let { deleteBalanceByBalanceId(it) }
+                        Log.d("DELETE", "DELETED")
+                        /*
+                        if (newCounterAmount < 0){
+                            val newBalance = abs(newCounterAmount)
+                            addBalance(groupId, owedTo, owedBy, newBalance)
+                        }
+
+                         */
+                    } catch (e: Exception) {
+                        Log.d("TAG", "delete Balance failed")
+                    }
+                }
+            }
 
             return true
         } catch (e: Exception) {
             return false
         }
 
+    }
+
+    // use when deleting a balance
+    private suspend fun deleteBalanceByBalanceId(balanceId: Int): Boolean {
+        try {
+            supabase.from("balance").delete { filter { eq("balance_id", balanceId) } }
+            Log.d("DELETE", "DELETE TRUUUEE")
+
+            return true
+        } catch (e: Exception) {
+            Log.d("DELETE", "DELETEFAIL")
+
+            return false
+        }
     }
 
     // use when deleting a group

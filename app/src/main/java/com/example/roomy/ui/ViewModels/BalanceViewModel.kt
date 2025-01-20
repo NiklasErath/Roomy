@@ -11,10 +11,12 @@ import com.example.roomy.db.Supabase.supabase
 import com.example.roomy.db.data.Balance
 import com.example.roomy.db.data.Groups
 import com.example.roomy.ui.States.BalanceUiState
+import com.example.roomy.ui.States.GroupState
 import com.example.roomy.ui.States.GroupsUiState
 import com.example.roomy.ui.States.PaymentsUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -31,13 +33,14 @@ class BalanceViewModel(
 
     private val _balance = MutableStateFlow(BalanceUiState(emptyList()))
     private val _balanceError = MutableStateFlow(BalanceError.Error(""))
+    private val _groupMembers = MutableStateFlow(GroupState(emptyList()))
 
 
     private val _payments = MutableStateFlow(PaymentsUiState(emptyList()))
 
     val balance = _balance.asStateFlow()
     val payments = _payments.asStateFlow()
-
+    val groupMembers = _groupMembers.asStateFlow()
 
     suspend fun getBalanceByGroupId(groupId: Int) {
         viewModelScope.launch {
@@ -156,8 +159,13 @@ class BalanceViewModel(
                     updatedPayments.add(payment)
                     oldState.copy(payments = updatedPayments)
                 }
-              //  val dividedAmount = amount /
-               // Log.d("AMOUNT", "$dividedAmount")
+                val dividedAmount = amount / _groupMembers.value.groups.size
+                Log.d("AMOUNT", "$dividedAmount")
+                groupMembers.value.groups.map { groups ->
+                    if (groups.userId != userId) {
+                        balanceRepository.addBalance(groupId, userId, groups.userId, dividedAmount)
+                    }
+                }
             }
         }
     }
@@ -169,6 +177,22 @@ class BalanceViewModel(
                 _balanceError.update { oldState ->
                     oldState.copy("deleting payment failed, please try again")
                 }
+            }
+        }
+    }
+
+    fun getGroupMembers(groupId: Int) {
+        viewModelScope.launch {
+            val users = groupRepository.getGroupMembers(groupId)
+            if (users == null) {
+                _balanceError.update { oldState ->
+                    oldState.copy("Could not fetch group Members")
+                }
+            } else {
+                _groupMembers.update { oldState ->
+                    oldState.copy(users)
+                }
+                Log.d("MEMBERS", "users")
             }
         }
     }

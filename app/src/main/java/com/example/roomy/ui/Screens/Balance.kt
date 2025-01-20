@@ -59,6 +59,7 @@ fun Balance(
     LaunchedEffect(Unit) {
 
         currentGroup.id?.let { groupViewModel.getGroupMembers(it) }
+        balanceViewModel.getGroupMembers(currentGroupIdInt)
         balanceViewModel.getBalanceByGroupId(currentGroupIdInt)
         balanceViewModel.getPaymentsByGroupId(currentGroupIdInt)
     }
@@ -89,6 +90,7 @@ fun Balance(
                         }
                     }
                 }
+                /*
                 itemsIndexed(balanceViewModel.balance.value.userBalance) { index: Int, Balance ->
                     val userNameLent =
                         groupMemberInformation.memberInformation.find { it.id == Balance.owedBy }?.username
@@ -102,6 +104,8 @@ fun Balance(
                         }
                     }
                 }
+
+                 */
             }
 
             Column(

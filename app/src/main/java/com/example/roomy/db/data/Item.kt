@@ -2,6 +2,7 @@ package com.example.roomy.db.data
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.util.UUID
 
 @Serializable
 data class Item(

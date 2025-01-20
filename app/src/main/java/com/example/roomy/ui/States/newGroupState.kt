@@ -11,5 +11,4 @@ data class newGroupState (
     val shoppingListItems: List<Item> = emptyList(),  // This could be a list of shopping items or inventory items
     val inventoryItems: List<Item> = emptyList(),
     val itemCount: Int
-
 )

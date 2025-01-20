@@ -7,16 +7,14 @@ import com.example.roomy.ui.ViewModels.GroupViewModel
 import com.example.roomy.ui.ViewModels.ItemViewModel
 import com.example.roomy.ui.ViewModels.StateViewModel
 
-class ItemViewModelFactory(
-    private val itemRepository: ItemRepository,
-    private val stateViewModel: StateViewModel
+class StateViewModelFactory(
 ) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
 
-        if (modelClass.isAssignableFrom(ItemViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(StateViewModel::class.java)) {
 
-            return ItemViewModel(itemRepository = itemRepository, stateViewModel = stateViewModel) as T
+            return StateViewModel() as T
         }
 
         throw IllegalArgumentException("Unknown ViewModel class")

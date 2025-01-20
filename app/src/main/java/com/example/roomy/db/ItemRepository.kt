@@ -63,9 +63,6 @@ class ItemRepository {
         try {
 
             var newItem = supabase.from("items").insert(item) { select() }.decodeSingle<Item>()
-            Log.d("TAG", "Could not Add Item: ${newItem}")
-
-
 
             return newItem
 
@@ -97,7 +94,7 @@ class ItemRepository {
             return true
         } catch (e: Exception) {
             // Log the error and throw an exception
-            Log.d("TAG", "Could not Add Item: ${e.message}")
+            Log.d("TAG", "Could not Update Item: ${e.message}")
             return false
         }
     }

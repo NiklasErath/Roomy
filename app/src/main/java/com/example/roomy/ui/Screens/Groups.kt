@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -49,10 +48,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.example.roomy.R
-import com.example.roomy.db.api.getSuggestedRecipe
 import com.example.roomy.ui.Composables.ExpandingAddItemElement
-import com.example.roomy.ui.Composables.UserProfileCircle
-import com.example.roomy.ui.States.GroupMembersUiState
+import com.example.roomy.ui.Composables.RecipeButton
 import com.example.roomy.ui.States.ItemsUiState
 import com.example.roomy.ui.States.newGroupState
 import com.example.roomy.ui.ViewModels.GroupViewModel
@@ -64,7 +61,8 @@ fun Group(
     groupViewModel: GroupViewModel,
     itemViewModel: ItemViewModel,
     navController: NavController,
-    previousScreen: String
+    previousScreen: String,
+    currentGroup: newGroupState
 ) {
 
 
@@ -75,43 +73,15 @@ fun Group(
 
     val finishedFetching by itemViewModel.finishedFetching
 
-    var renderAfterFetching by remember { mutableStateOf(true) }
+//    var renderAfterFetching by remember { mutableStateOf(true) }
 
-
-    val currentGroup by groupViewModel.currentGroup.collectAsState()
-
-    // Step 2: Collect all groups state
-    val allGroupsState by groupViewModel.allGroupsState.collectAsState(
-        initial = emptyList()
-    )
-
-    // Step 3: Find the corresponding GroupState based on the currentGroup.id
-    val group by remember(currentGroup.id, allGroupsState) {
-        derivedStateOf {
-            // Find the corresponding GroupState based on the currentGroup.id
-            allGroupsState.find { it.groupId == currentGroup.id }
-                ?: newGroupState(
-                    groupId = -1,
-                    groupName = "Unknown",
-                    creatorId = "Unknown",
-                    groupMembers = emptyList(),
-                    shoppingListItems = emptyList(),
-                    inventoryItems = emptyList(),
-                    itemCount = 0
-                )  // Fallback default group state
-        }
-    }
-
-    Log.d("llllllllllllllllllllllllllllllllllllllllll", "$group")
-
-
-    val inventoryItems by itemViewModel.allInventoryItems.collectAsState(
-        initial = ItemsUiState(emptyList())
-    )
-
-    val shoppingListItems by itemViewModel.allShoppingListItems.collectAsState(
-        initial = ItemsUiState(emptyList())
-    )
+//    val inventoryItems by itemViewModel.allInventoryItems.collectAsState(
+//        initial = ItemsUiState(emptyList())
+//    )
+//
+//    val shoppingListItems by itemViewModel.allShoppingListItems.collectAsState(
+//        initial = ItemsUiState(emptyList())
+//    )
 //    val groupMemberInformation by groupViewModel.groupMembers.collectAsState(
 //        initial = GroupMembersUiState(
 //            emptyList()
@@ -150,84 +120,29 @@ fun Group(
 //    }
 
 
-    LaunchedEffect(Unit) {
-
-//        Fix later - this doesnt have to be done on launch, just acces the newGroupsState
-        itemViewModel.setAllItems(group)
-//        groupViewModel.getGroupMembers(currentGroupIdInt)
-
-    }
+//    LaunchedEffect(Unit) {
+//
+////        Fix later - this doesnt have to be done on launch, just acces the newGroupsState
+////        itemViewModel.setAllItems(currentGroup)
+////        groupViewModel.getGroupMembers(currentGroupIdInt)
+//
+//    }
 
 //    Still needed? Im not sure
-    LaunchedEffect(finishedFetching) {
-        if (finishedFetching) {
-            renderAfterFetching = true
-            itemViewModel.resetFinishedFetching()
-
-        }
-    }
-    Log.d("ShoppingListssssssssssssssssssss", "Shopping List Items: ${group.shoppingListItems}")
+//    LaunchedEffect(finishedFetching) {
+//        if (finishedFetching) {
+//            renderAfterFetching = true
+//            itemViewModel.resetFinishedFetching()
+//
+//        }
+//    }
 
 
 
     //            Note change this to our errorhandling process later on
-    Box(
-        Modifier
-            .fillMaxSize()
-            .zIndex(20F)
-    ) {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(vertical = 80.dp, horizontal = 20.dp),
-            verticalArrangement = Arrangement.Bottom,
-            horizontalAlignment = Alignment.End
-        ) {
 
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .size(80.dp) // Adjusted size for better padding visibility
-                    .border(
-                        border = BorderStroke(
-                            3.dp, Brush.linearGradient(
-                                colors = listOf(Color.Cyan, Color.Magenta, Color.Yellow),
-                                start = Offset(0f, 0f),
-                                end = Offset(100f, 100f)
-                            )
-                        ),
-                        shape = CircleShape
-                    )
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary)
-                    .clickable {
-                        if (group.inventoryItems.isEmpty()) {
-                            Toast
-                                .makeText(
-                                    context,
-                                    "Add some Items to your Inventory first",
-                                    Toast.LENGTH_SHORT
-                                )
-                                .show()
 
-                        } else {
-                            navController.navigate(Screens.RecipeSuggestion.name)
-                        }
-                    }
-                    .padding(10.dp)
-            ) {
-                Icon(
-                    painterResource(R.drawable.recipe),
-                    contentDescription = "Group",
-
-                    )
-                Text(text = "Recipe", fontSize = 12.sp)
-
-            }
-
-        }
-    }
+    RecipeButton(currentGroup, context, navController)
 
 
 
@@ -248,13 +163,13 @@ fun Group(
 
             Text(text = "ShoppingList")
 
-            if (shoppingListItems.items.isEmpty() && renderAfterFetching) {
+            if (currentGroup.shoppingListItems.isEmpty()) {
                 Text(text = "Nothing here yet, add a new Item to your Shopping List")
             } else {
 
 
 
-                shoppingListItems.items.chunked(3).forEach { rowItems ->
+                currentGroup.shoppingListItems.chunked(3).forEach { rowItems ->
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -268,10 +183,10 @@ fun Group(
                                 Item(
                                     item,
                                     onClick = {
-                                        itemViewModel.moveToInventory(item)
+                                        itemViewModel.moveToInventory(item, currentGroup.groupId)
                                     },
                                     onLongClick = {
-                                        itemViewModel.deleteItem(item)
+                                        itemViewModel.deleteItem(item, currentGroup.groupId)
                                     })
                             }
                         }
@@ -286,11 +201,11 @@ fun Group(
             Spacer(Modifier.height(50.dp))
             Text(text = "Inventory")
 
-            if (inventoryItems.items.isEmpty() && renderAfterFetching) {
+            if (currentGroup.inventoryItems.isEmpty()) {
                 Text(text = "Nothing here yet, add a new Item to your Shopping List")
             } else {
 
-                inventoryItems.items.chunked(3).forEach { rowItems ->
+                currentGroup.inventoryItems.chunked(3).forEach { rowItems ->
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -306,10 +221,10 @@ fun Group(
                                 Item(
                                     item,
                                     onClick = {
-                                        itemViewModel.moveToShoppingList(item)
+                                        itemViewModel.moveToShoppingList(item, currentGroup.groupId)
                                     },
                                     onLongClick = {
-                                        itemViewModel.deleteItem(item)
+                                        itemViewModel.deleteItem(item, currentGroup.groupId)
 
                                     })
 
@@ -362,7 +277,7 @@ fun Group(
             updateExpandState = { isExpanded = it },
             updateFocusState = { isFocused = it },
             updateItemName = { itemName = it },
-            currentGroupId = group.groupId,
+            currentGroup = currentGroup,
             itemViewModel = itemViewModel,
             resetAfterItemAdded = { resetAfterItemAdded() }
         )

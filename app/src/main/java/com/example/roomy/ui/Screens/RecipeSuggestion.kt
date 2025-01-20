@@ -18,25 +18,27 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.roomy.db.api.getSuggestedRecipe
 import com.example.roomy.ui.States.ItemsUiState
+import com.example.roomy.ui.States.newGroupState
 import com.example.roomy.ui.ViewModels.ItemViewModel
 import com.example.roomy.ui.ViewModels.UserViewModel
 
 @Composable
 fun RecipeSuggestion(
     navController: NavController,
-    itemViewModel: ItemViewModel
+    itemViewModel: ItemViewModel,
+    currentGroup: newGroupState
 ) {
 
     var recipe by remember { mutableStateOf("Fetching Recipe ...") }
 
-    val shoppingListItems by itemViewModel.allInventoryItems.collectAsState(
-        initial = ItemsUiState(emptyList())
-    )
-    val shoppingListItemsNames = shoppingListItems.items.map { it.name }
+//    val shoppingListItems by itemViewModel.allInventoryItems.collectAsState(
+//        initial = ItemsUiState(emptyList())
+//    )
+    val shoppingListItemsNames = currentGroup.shoppingListItems.map { it.name }
 
 
     LaunchedEffect(shoppingListItemsNames) {
-        if (shoppingListItemsNames.isNotEmpty()) {
+        if (currentGroup.shoppingListItems.isNotEmpty()) {
             getSuggestedRecipe(shoppingListItemsNames) { fetchedRecipe ->
                 recipe = fetchedRecipe
             }

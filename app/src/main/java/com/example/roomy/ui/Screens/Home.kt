@@ -44,6 +44,7 @@ import androidx.navigation.NavController
 import com.example.roomy.R
 import com.example.roomy.db.NetworkConnection
 import com.example.roomy.ui.States.GroupsUiState
+import com.example.roomy.ui.States.newGroupState
 import com.example.roomy.ui.ViewModels.AddGroupState
 import com.example.roomy.ui.ViewModels.GroupViewModel
 import com.example.roomy.ui.ViewModels.ItemViewModel
@@ -56,7 +57,9 @@ fun Home(
     groupViewModel: GroupViewModel,
     userViewModel: UserViewModel,
     itemViewModel: ItemViewModel,
-    networkConnection: NetworkConnection
+    networkConnection: NetworkConnection,
+    allGroupsState: List<newGroupState>,
+    previousScreen: String
 ) {
 
 
@@ -79,26 +82,43 @@ fun Home(
 //        initial = emptyList()
 //    )
 
-    val allGroupsState by groupViewModel.allGroupsState.collectAsState(
-        initial = emptyList()
-    )
+//    val allGroupsState by groupViewModel.allGroupsState.collectAsState(
+//        initial = emptyList()
+//    )
 
-    LaunchedEffect(Unit) {
-        groupViewModel.getGroupsByUserId(currentUserId)
-
-//        if (groupInformationState.groupsInformation.isNotEmpty()) {
-//            val groupIds = groupInformationState.groupsInformation.mapNotNull { it.id }
+//    LaunchedEffect(Unit) {
+//        groupViewModel.getGroupsByUserId(currentUserId)
 //
-//            itemViewModel.getAllItemCountsForGroups(groupIds)
+////        if (groupInformationState.groupsInformation.isNotEmpty()) {
+////            val groupIds = groupInformationState.groupsInformation.mapNotNull { it.id }
+////
+////            itemViewModel.getAllItemCountsForGroups(groupIds)
+////        }
+//    //        groupViewModel.getGroupMembers(2)
+//    }
+
+//    var triggerNavCheck by remember { mutableStateOf(true) }
+
+//    This allows to controll rerenders only when necessary, note because of db and uistate mismatches we disable rerenders wehn coming from Groupmembers page
+//    Triggernavchek maybe neccessary to make sure previousscreen can be used correctly
+    LaunchedEffect(previousScreen) {
+//        if (triggerNavCheck) {
+        when (previousScreen) {
+            Screens.Login.name, Screens.Groups.name, Screens.Profile.name, Screens.Balance.name, Screens.Home.name -> groupViewModel.getGroupsByUserId(
+                currentUserId
+            )
+        }
+//            triggerNavCheck = false
 //        }
-    //        groupViewModel.getGroupMembers(2)
     }
+
 
 //    Launcheffect for adding a new Group,
 //    Basically makers sure we navigate to the Groups Screen after the Group is created ... necessary?
     LaunchedEffect(addGroupState) {
         if (addGroupState is AddGroupState.Success) {
-            navController.navigate(Screens.Groups.name)
+//            navController.navigate(Screens.Groups.name)
+            groupViewModel.getGroupsByUserId(currentUserId)
             groupViewModel.resetGroupState()
 
         }
@@ -107,14 +127,16 @@ fun Home(
     var newGroupName by remember { mutableStateOf("Home") }
     var usernameAdd by remember { mutableStateOf("") }
 
-    val addedUsers = remember { mutableStateListOf<String>()}
+    val addedUsers = remember { mutableStateListOf<String>() }
 
 
     var addGroupPopUp by remember { mutableStateOf(false) }
 
 
     Column(
-        Modifier.fillMaxSize().padding(top = 12.dp)
+        Modifier
+            .fillMaxSize()
+            .padding(top = 12.dp)
 
     ) {
         Text(text = "My Groups", fontSize = integerResource(id = R.integer.heading1).sp)
@@ -132,8 +154,6 @@ fun Home(
                 itemsIndexed(allGroupsState) { index, group ->
 
 //                    val itemCount = group.itemCount
-
-
 
 
                     GroupCard(groupViewModel, group, navController)

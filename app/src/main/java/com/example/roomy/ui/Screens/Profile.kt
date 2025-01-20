@@ -23,12 +23,14 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
 import com.example.roomy.ui.Composables.UserProfileCircle
+import com.example.roomy.ui.States.newGroupState
 import com.example.roomy.ui.ViewModels.UserViewModel
 
 @Composable
 fun Profile(
     userViewModel: UserViewModel,
-    navController: NavController
+    navController: NavController,
+    currentGroup: newGroupState
 ) {
 
     val currentUser by userViewModel.loggedInUser.collectAsState()

@@ -54,18 +54,13 @@ class BalanceRepository {
         }
     }
 
-    // add Balance when a user joins a group
+    // Balance function
+    // add Balance when there is a new payment
     suspend fun addBalance(groupId: Int, owedBy: String, owedTo: String, amount: Int): Boolean {
         try {
-            val userBalance = Balance(
-                groupId = groupId,
-                owedBy = owedBy,
-                owedTo = owedTo,
-                amount = amount,
-            )
-            Log.d("BALANCE", "FUNCTIOn")
+            Log.d("BALANCE", "Processing balance adjustment")
 
-
+            // try to get the existing balance or counter balance
             val existingBalance: Balance? = supabase.from("balance").select {
                 filter {
                     eq("group_id", groupId)
@@ -74,61 +69,87 @@ class BalanceRepository {
                 }
             }.decodeSingleOrNull<Balance>()
 
-            Log.d("BALANCE", "$existingBalance")
-            if (existingBalance == null) {
-                supabase.from("balance").insert(userBalance)
-            } else {
-                val newAmount = existingBalance.amount + amount
-                val balanceId = existingBalance.id
-                Log.d("BALANCE", "$newAmount")
-                supabase.from("balance").update({ set("amount", newAmount) }) {
+            val counterBalance: Balance? = if (existingBalance == null) {
+                supabase.from("balance").select {
                     filter {
-                        if (balanceId != null) {
-                            eq("balance_id", balanceId)
+                        eq("group_id", groupId)
+                        eq("owed_by", owedTo)
+                        eq("owed_to", owedBy)
+                    }
+                }.decodeSingleOrNull<Balance>()
+            } else {
+                null
+            }
+
+            // when there is an existingBalance (positive for the user)
+            if (existingBalance != null) {
+                val newAmount = existingBalance.amount + amount
+                if (newAmount > 0) {
+                    existingBalance.id?.let { balanceId ->
+                        supabase.from("balance").update({ set("amount", newAmount) }) {
+                            filter {
+                                eq("balance_id", balanceId)
+                            }
                         }
                     }
+                    Log.d("BALANCE", "Updated existing balance amount: $newAmount")
+                } else {
+                    existingBalance.id?.let { balanceId ->
+                        deleteBalanceByBalanceId(balanceId)
+                    }
+                    Log.d("BALANCE", "Deleted existing balance due to zero or negative amount")
                 }
             }
 
-            val counterBalance: Balance? = supabase.from("balance").select {
-                filter {
-                    eq("group_id", groupId)
-                    eq("owed_by", owedTo)
-                    eq("owed_to", owedBy)
-                }
-            }.decodeSingleOrNull<Balance>()
-
+            // when there is an counterBalance (negative for the user)
             if (counterBalance != null) {
                 val newCounterAmount = counterBalance.amount - amount
                 if (newCounterAmount > 0) {
-                    supabase.from("balance").update({ set("amount", newCounterAmount) }) {
-                        filter {
-                            counterBalance.id?.let { eq("balance_id", it) }
+                    counterBalance.id?.let { balanceId ->
+                        supabase.from("balance").update({ set("amount", newCounterAmount) }) {
+                            filter {
+                                eq("balance_id", balanceId)
+                            }
                         }
                     }
-                } else {
-                    try {
-                        counterBalance.id?.let { deleteBalanceByBalanceId(it) }
-                        Log.d("DELETE", "DELETED")
-                        /*
-                        if (newCounterAmount < 0){
-                            val newBalance = abs(newCounterAmount)
-                            addBalance(groupId, owedTo, owedBy, newBalance)
-                        }
+                } else if (newCounterAmount < 0) {
 
-                         */
-                    } catch (e: Exception) {
-                        Log.d("TAG", "delete Balance failed")
+                    // when the new CounterAmount is smaller then 0 delete the balance
+                    val newBalanceAmount = -newCounterAmount
+                    counterBalance.id?.let { balanceId ->
+                        deleteBalanceByBalanceId(balanceId)
                     }
+
+                    // after deleting the balance add a new one ( positive for the user)
+                    val newBalance = Balance(
+                        groupId = groupId,
+                        owedBy = owedBy,
+                        owedTo = owedTo,
+                        amount = newBalanceAmount
+                    )
+                    supabase.from("balance").insert(newBalance)
+
                 }
+            }
+
+            // if neither existingBalance nor counterBalance exist -  insert a new balance if amount > 0
+            if (existingBalance == null && counterBalance == null && amount > 0) {
+                val userBalance = Balance(
+                    groupId = groupId,
+                    owedBy = owedBy,
+                    owedTo = owedTo,
+                    amount = amount
+                )
+                supabase.from("balance").insert(userBalance)
             }
 
             return true
         } catch (e: Exception) {
+            Log.e("TAG", "Error in addBalance: ${e.localizedMessage}", e)
             return false
         }
-
     }
+
 
     // use when deleting a balance
     private suspend fun deleteBalanceByBalanceId(balanceId: Int): Boolean {

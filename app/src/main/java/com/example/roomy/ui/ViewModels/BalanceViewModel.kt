@@ -161,7 +161,7 @@ class BalanceViewModel(
                 }
                 val dividedAmount = amount / _groupMembers.value.groups.size
                 Log.d("AMOUNT", "$dividedAmount")
-                groupMembers.value.groups.map { groups ->
+                groupMembers.value.groups.forEach { groups ->
                     if (groups.userId != userId) {
                         balanceRepository.addBalance(groupId, userId, groups.userId, dividedAmount)
                     }

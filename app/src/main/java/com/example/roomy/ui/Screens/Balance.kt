@@ -1,8 +1,10 @@
 package com.example.roomy.ui
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -84,28 +86,16 @@ fun Balance(
                     val owedTo =
                         groupMemberInformation.memberInformation.find { it.id == Balance.owedTo }?.username
                             ?: "Unknown User"
-                    if (Balance.amount != 0) {
+                    if (Balance.owedBy != currentUser.userId) {
+                        OutlinedCard(modifier = Modifier.padding(12.dp)) {
+                            Text(text = "$owedBy owes $owedTo ${Balance.amount} $")
+                        }
+                    } else {
                         OutlinedCard(modifier = Modifier.padding(12.dp)) {
                             Text(text = "$owedBy lent $owedTo ${Balance.amount} $")
                         }
                     }
                 }
-                /*
-                itemsIndexed(balanceViewModel.balance.value.userBalance) { index: Int, Balance ->
-                    val userNameLent =
-                        groupMemberInformation.memberInformation.find { it.id == Balance.owedBy }?.username
-                            ?: "Unknown User"
-                    val userNameOwes =
-                        groupMemberInformation.memberInformation.find { it.id == Balance.owedTo }?.username
-                            ?: "Unknown User"
-                    if (Balance.amount != 0) {
-                        OutlinedCard(modifier = Modifier.padding(12.dp)) {
-                            Text(text = "$userNameOwes owes $userNameLent ${Balance.amount}")
-                        }
-                    }
-                }
-
-                 */
             }
 
             Column(
@@ -118,18 +108,27 @@ fun Balance(
                     text = "Payments",
                     modifier = Modifier.fillMaxWidth(), fontWeight = FontWeight.Bold
                 )
-                LazyColumn {
-                    itemsIndexed(payments.payments) { index: Int, Payment ->
-                        val userName =
-                            groupMemberInformation.memberInformation.find { it.id == Payment.paidBy }?.username
-                                ?: "Unknown User"
-                        OutlinedCard(modifier = Modifier.padding(12.dp)) {
-                            Text(text = "$userName bought ${Payment.items} for ${Payment.amount} $")
-
+                Box(
+                    modifier = Modifier
+                        .height(400.dp)
+                        .fillMaxWidth()
+                ) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp)
+                    ) {
+                        itemsIndexed(payments.payments) { index: Int, Payment ->
+                            val userName =
+                                groupMemberInformation.memberInformation.find { it.id == Payment.paidBy }?.username
+                                    ?: "Unknown User"
+                            OutlinedCard(modifier = Modifier.padding(12.dp)) {
+                                Text(text = "$userName bought ${Payment.items} for ${Payment.amount} $")
+                            }
                         }
                     }
-
                 }
+
             }
             Column(
                 Modifier

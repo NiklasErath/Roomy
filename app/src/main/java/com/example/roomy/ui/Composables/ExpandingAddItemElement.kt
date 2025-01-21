@@ -1,5 +1,6 @@
 package com.example.roomy.ui.Composables
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -42,6 +43,7 @@ import com.example.roomy.ui.ViewModels.ItemViewModel
 
 @Composable
 fun ExpandingAddItemElement(
+    context: Context,
     animatedHeight: Dp,
     isExpanded: Boolean,
     isFocused: Boolean,
@@ -63,16 +65,12 @@ fun ExpandingAddItemElement(
             }
         }
     }
-
     val placeHolderItem = com.example.roomy.db.data.Item(
         name = itemName,
         groupId = currentGroup.groupId,
         status = "shoppingList",
-        icon = R.drawable.placeholder
+        icon = null
     )
-    val dragOffset = remember { mutableStateOf(0f) }
-
-
     Box(
         Modifier
             .fillMaxSize()
@@ -94,8 +92,6 @@ fun ExpandingAddItemElement(
             verticalArrangement = if (isExpanded || isFocused) Arrangement.SpaceBetween else Arrangement.Bottom
         ) {
 
-//            Spacer(Modifier.height(0.dp))
-            // Additional Content at the top
             if (isExpanded) {
 
                 Box(
@@ -106,14 +102,13 @@ fun ExpandingAddItemElement(
                         .weight(1f, false)
                         .padding(horizontal = 20.dp)
 
-// Let the content grow but limit to max available space
-//                        .padding(horizontal = 16.dp)
+
                 ) {
 
                     if (itemName == "") {
                         Text(
-                            text = "Type something to get some suggestions",
-                            modifier = Modifier.align(Alignment.Center),
+                            text = "Start typing to get some suggestions",
+                            modifier = Modifier.padding(top=12.dp).align(Alignment.Center),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                         )
@@ -144,7 +139,8 @@ fun ExpandingAddItemElement(
                                         resetAfterItemAdded()
 
                                     },
-                                    onLongClick = {}
+                                    onLongClick = {},
+                                    context
 
                                 )
                             }
@@ -157,7 +153,8 @@ fun ExpandingAddItemElement(
                                         resetAfterItemAdded()
 
                                     },
-                                    onLongClick = {}
+                                    onLongClick = {},
+                                    context
 
 
                                 )
@@ -165,11 +162,6 @@ fun ExpandingAddItemElement(
                             }
                         }
                     }
-//                    Text(
-//                        text = "Additional Content Shown in Overlay",
-//                        modifier = Modifier.padding(16.dp),
-//                        style = MaterialTheme.typography.bodyLarge
-//                    )
                 }
 
             }
@@ -201,36 +193,14 @@ fun ExpandingAddItemElement(
                         .onFocusChanged { focusState ->
                             updateFocusState(focusState.isFocused)
                             if (focusState.isFocused) updateExpandState(true)
-                        }
-
-
-//                        .padding(horizontal = 10.dp)
-                    ,
+                        },
 
                     value = itemName,
-                    onValueChange = { newValue -> if( newValue.length < 50)updateItemName(newValue) },
+                    onValueChange = { newValue -> if (newValue.length < 50) updateItemName(newValue) },
                     placeholder = { Text(text = "We could use ...") },
-                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Filled.AddCircle,
-                            contentDescription = "Add Item",
-                            Modifier.clickable {
-                                updateExpandState(true)                            // Logic to add items
-                            }
-                        )
-                    }
                 )
             }
         }
     }
 }
 
-
-//currentGroup.id?.let {
-//                                itemViewModel.addItem(
-//                                    itemName,
-//                                    it, "shoppingList", 1, "iconString"
-//                                )
-//                            }
-//
-//                        })

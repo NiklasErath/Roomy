@@ -85,13 +85,13 @@ fun GroupCard(
                         if (currentGroup.shoppingListItems.isEmpty()) {
                             Text(
                                 fontSize = 14.sp,
-                                text = "No Items added",
+                                text = "No items",
                             )
                         } else {
                             Text(
                             fontSize = 14.sp,
 
-                            text = "${currentGroup.shoppingListItems.size} items",
+                            text = "${currentGroup.shoppingListItems.size} item" + (if (currentGroup.shoppingListItems.size > 1) "s" else ""),
                             )
                         }
                     }

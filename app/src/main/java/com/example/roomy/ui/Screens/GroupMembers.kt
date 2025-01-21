@@ -41,27 +41,10 @@ fun GroupMembers(
     currentGroup: newGroupState
 
 ) {
-    val currentGroupInformation by groupViewModel.currentGroupInformation.collectAsState()
-
-//    val currentGroupIdInt: Int = currentGroupInformation.id?.let { it } ?: 0
-//
-//    val groupMemberInformation by groupViewModel.groupMembers.collectAsState(
-//        initial = GroupMembersUiState(
-//            emptyList()
-//        )
-//    )
-
     val context = LocalContext.current
-
     val currentUser by userViewModel.loggedInUser.collectAsState()
-
     var usernameAdd by remember { mutableStateOf("") }
 
-    LaunchedEffect(Unit) {
-
-        currentGroupInformation.id?.let { groupViewModel.getGroupMembers(it) }
-
-    }
     Column {
         LazyColumn {
             itemsIndexed(currentGroup.groupMembers) { index: Int, memberInformation ->
@@ -111,7 +94,7 @@ fun GroupMembers(
             ) {
                 Text(text = "Add")
             }
-            if (currentUser.userId == currentGroupInformation.creatorId) {
+            if (currentUser.userId == currentGroup.creatorId) {
                 Button(onClick = {
                     groupViewModel.deleteGroup(currentGroup.groupId)
                     navController.navigate("Home")

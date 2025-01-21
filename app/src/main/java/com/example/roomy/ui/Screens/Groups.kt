@@ -142,7 +142,7 @@ fun Group(
     //            Note change this to our errorhandling process later on
 
 
-    RecipeButton(currentGroup, context, navController)
+    RecipeButton(currentGroup, context, navController, groupViewModel)
 
 
 

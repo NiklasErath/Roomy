@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.roomy.R
 import com.example.roomy.db.NetworkConnection
+import com.example.roomy.ui.Composables.AddGroupButton
 import com.example.roomy.ui.States.GroupsUiState
 import com.example.roomy.ui.States.newGroupState
 import com.example.roomy.ui.ViewModels.AddGroupState
@@ -62,7 +63,6 @@ fun Home(
     groupViewModel: GroupViewModel,
     userViewModel: UserViewModel,
     itemViewModel: ItemViewModel,
-    networkConnection: NetworkConnection,
     allGroupsState: List<newGroupState>,
     previousScreen: String
 ) {
@@ -156,28 +156,37 @@ fun Home(
                 }
             }
         }
+    }
+
+    if(!addGroupPopUp) {
+        AddGroupButton(onClick = { addGroupPopUp = true })
+    }
+
+
+
 
         // Button positioned at the bottom center
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Transparent)
-                .padding(bottom = 40.dp) // Optional padding
-                .align(Alignment.BottomCenter),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Button(onClick = { addGroupPopUp = true }) {
-                Icon(imageVector = Icons.Filled.Add, contentDescription = "Add Group")
-            }
-        }
-    }
+//        Row(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .background(Color.Transparent)
+//                .padding(bottom = 40.dp) // Optional padding
+//                .align(Alignment.BottomCenter),
+//            horizontalArrangement = Arrangement.End
+//        ) {
+//            Button(onClick = { addGroupPopUp = true }) {
+//                Icon(imageVector = Icons.Filled.Add, contentDescription = "Add Group")
+//            }
+//        }
+//    }
 
 
     if (addGroupPopUp) {
         Column(
             Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background),
+                .background(MaterialTheme.colorScheme.background)
+                .clickable {  },
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly
         ) {

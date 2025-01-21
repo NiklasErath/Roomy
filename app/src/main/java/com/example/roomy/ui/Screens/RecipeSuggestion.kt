@@ -1,5 +1,6 @@
 package com.example.roomy.ui
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -34,12 +35,12 @@ fun RecipeSuggestion(
 //    val shoppingListItems by itemViewModel.allInventoryItems.collectAsState(
 //        initial = ItemsUiState(emptyList())
 //    )
-    val shoppingListItemsNames = currentGroup.shoppingListItems.map { it.name }
+    val inventoryListItemsNames = currentGroup.inventoryItems.map { it.name }
 
 
-    LaunchedEffect(shoppingListItemsNames) {
-        if (currentGroup.shoppingListItems.isNotEmpty()) {
-            getSuggestedRecipe(shoppingListItemsNames) { fetchedRecipe ->
+    LaunchedEffect(inventoryListItemsNames) {
+        if (currentGroup.inventoryItems.isNotEmpty()) {
+            getSuggestedRecipe(inventoryListItemsNames) { fetchedRecipe ->
                 recipe = fetchedRecipe
             }
         }

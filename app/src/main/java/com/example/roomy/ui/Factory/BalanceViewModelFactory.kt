@@ -16,7 +16,7 @@ class BalanceViewModelFactory(private val balanceRepository: BalanceRepository, 
 
         if (modelClass.isAssignableFrom(BalanceViewModel::class.java)) {
 
-            return BalanceViewModel(balanceRepository, paymentsRepository, groupRepository, stateViewModel) as T
+            return BalanceViewModel(balanceRepository, paymentsRepository, stateViewModel) as T
         }
 
         throw IllegalArgumentException("Unknown ViewModel class")

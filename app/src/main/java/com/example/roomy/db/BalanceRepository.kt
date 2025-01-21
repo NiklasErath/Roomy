@@ -56,7 +56,9 @@ class BalanceRepository {
 
     // Balance function
     // add Balance when there is a new payment
-    suspend fun addBalance(groupId: Int, owedBy: String, owedTo: String, amount: Int): Boolean {
+    suspend fun addBalance(groupId: Int, owedBy: String, owedTo: String, amount: Int): Balance? {
+
+        var updatedBalance: Balance? = null
         try {
             Log.d("BALANCE", "Processing balance adjustment")
 
@@ -81,16 +83,16 @@ class BalanceRepository {
                 null
             }
 
-            // when there is an existingBalance (positive for the user)
+            // if there is an existingBalance (positive for the user)
             if (existingBalance != null) {
                 val newAmount = existingBalance.amount + amount
                 if (newAmount > 0) {
                     existingBalance.id?.let { balanceId ->
-                        supabase.from("balance").update({ set("amount", newAmount) }) {
+                        updatedBalance = supabase.from("balance").update({ set("amount", newAmount) }) { select()
                             filter {
                                 eq("balance_id", balanceId)
                             }
-                        }
+                        }.decodeSingleOrNull<Balance>()
                     }
                     Log.d("BALANCE", "Updated existing balance amount: $newAmount")
                 } else {
@@ -101,16 +103,16 @@ class BalanceRepository {
                 }
             }
 
-            // when there is an counterBalance (negative for the user)
+            // if there is an counterBalance (negative for the user)
             if (counterBalance != null) {
                 val newCounterAmount = counterBalance.amount - amount
                 if (newCounterAmount > 0) {
                     counterBalance.id?.let { balanceId ->
-                        supabase.from("balance").update({ set("amount", newCounterAmount) }) {
+                        updatedBalance = supabase.from("balance").update({ set("amount", newCounterAmount) }) { select()
                             filter {
                                 eq("balance_id", balanceId)
-                            }
-                        }
+                                 }
+                        }.decodeSingleOrNull<Balance>()
                     }
                 } else if (newCounterAmount < 0) {
 
@@ -127,7 +129,7 @@ class BalanceRepository {
                         owedTo = owedTo,
                         amount = newBalanceAmount
                     )
-                    supabase.from("balance").insert(newBalance)
+                    updatedBalance = supabase.from("balance").insert(newBalance) { select()} .decodeSingleOrNull<Balance>()
 
                 }
             }
@@ -140,14 +142,14 @@ class BalanceRepository {
                     owedTo = owedTo,
                     amount = amount
                 )
-                supabase.from("balance").insert(userBalance)
+                updatedBalance = supabase.from("balance").insert(userBalance) { select()} .decodeSingleOrNull<Balance>()
             }
 
-            return true
         } catch (e: Exception) {
             Log.e("TAG", "Error in addBalance: ${e.localizedMessage}", e)
-            return false
+            return null
         }
+        return updatedBalance
     }
 
 
@@ -196,13 +198,13 @@ class BalanceRepository {
         try {
             supabase.from("balance").delete {
                 filter {
-                    eq("user_owes", userId)
+                    eq("owed_by", userId)
                     eq("group_id", userId)
                 }
             }
             supabase.from("balance").delete {
                 filter {
-                    eq("user_lent", userId)
+                    eq("owed_to", userId)
                     eq("group_id", groupId)
                 }
             }

@@ -14,6 +14,7 @@ import com.example.roomy.db.data.Groups
 import com.example.roomy.db.data.UserInformation
 import com.example.roomy.ui.States.GroupMembersUiState
 import com.example.roomy.ui.States.GroupsUiState
+import com.example.roomy.ui.States.PaymentsUiState
 import com.example.roomy.ui.States.newGroupState
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -101,11 +102,14 @@ class GroupViewModel(
                 val groupInformationDeferred = async { groupRepository.getGroupInformationByIds(groupIds) ?: emptyList() }
                 val groupMembersDeferred = async { getAllGroupsMembers(groupIds) }
                 val itemsDeferred = async { itemViewModel.getAllItemsForGroups(groupIds) }
+                val paymentsDeferred = async { paymentsRepository.getPaymentsByGroupIds(groupIds) ?: emptyList()}
+
 
                 // Wait for all async tasks to complete
                 val groupInformation = groupInformationDeferred.await()
                 val groupMembers = groupMembersDeferred.await()
                 val items = itemsDeferred.await()
+                val allPayments = paymentsDeferred.await()
 
 //                Create a combined Group State containing all Necessary Information for UI Rendering
                 val combinedGroupState = groupIds.map { groupId ->
@@ -113,6 +117,7 @@ class GroupViewModel(
                     val membersUiState = groupMembers.find { it.groupId == groupId }
                     val members = membersUiState?.memberInformation ?: emptyList()
                     val (shoppingListItems, inventoryItems) = items[groupId] ?: Pair(emptyList(), emptyList())
+                    val groupPayments = allPayments.filter { it.groupId == groupId }
 
                     newGroupState(
                         groupId = groupId,
@@ -121,7 +126,8 @@ class GroupViewModel(
                         groupMembers = members,
                         shoppingListItems = shoppingListItems,  // Shopping list items
                         inventoryItems = inventoryItems,  // Inventory items
-                        itemCount = shoppingListItems.size
+                        itemCount = shoppingListItems.size,
+                        payments = groupPayments
                     )
                 }
 
@@ -356,15 +362,14 @@ class GroupViewModel(
                 }
             } else {
                 stateViewModel.deleteGroup(groupId)
-
                 balanceRepository.deleteBalanceByGroupId(groupId)
+                paymentsRepository.deleteGroupPayments(groupId)
             }
         }
     }
 
     // kick a user
     fun kickUser(userId: String, groupId: Int) {
-        stateViewModel.kickUser(groupId, userId)
         viewModelScope.launch {
             val kicked = groupRepository.kickMemberFromGroup(userId, groupId)
             if (!kicked) {
@@ -372,11 +377,9 @@ class GroupViewModel(
                     oldState.copy("Kick user failed")
                 }
             } else {
-//                _groupMembers.update { oldState ->
-//                    val updatedMembers = oldState.memberInformation.filter { it.id != userId }
-//                    oldState.copy(memberInformation = updatedMembers)
-//                }
+                stateViewModel.kickUser(groupId, userId)
                 balanceRepository.deleteBalanceByUserId(groupId, userId)
+                paymentsRepository.deleteUserPayments(userId, groupId)
             }
         }
     }

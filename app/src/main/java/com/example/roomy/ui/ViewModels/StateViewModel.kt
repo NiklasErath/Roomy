@@ -1,21 +1,15 @@
 package com.example.roomy.ui.ViewModels
 
 import android.util.Log
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.roomy.db.ItemRepository
+import com.example.roomy.db.data.Balance
 import com.example.roomy.db.data.Item
+import com.example.roomy.db.data.Payments
 import com.example.roomy.db.data.UserInformation
-import com.example.roomy.ui.States.ItemsUiState
 import com.example.roomy.ui.States.newGroupState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 
 //Holds globalstate of all groups the user is part of and updates it accordingly when things change
@@ -29,10 +23,7 @@ class StateViewModel(
 
     //    Initially set the new global Groupstate frm the groupviewmodel
     fun setAllGroupsState(newGroupState: List<newGroupState>) {
-
         _allGroupsState.update { newGroupState }
-
-
     }
 
 
@@ -83,7 +74,7 @@ class StateViewModel(
         }
     }
 
-//    Delete an Item from the current Group
+    //    Delete an Item from the current Group
     fun deleteItemFromGroup(groupId: Int, item: Item) {
         _allGroupsState.update { groups ->
             groups.map { group ->
@@ -113,7 +104,7 @@ class StateViewModel(
         }
     }
 
-//    Add a new item to the group
+    //    Add a new item to the group
     fun addItemToGroup(groupId: Int, item: Item) {
         _allGroupsState.update { groups ->
             groups.map { group ->
@@ -132,14 +123,14 @@ class StateViewModel(
         }
     }
 
-//Delete a group from the global state
+    //Delete a group from the global state
     fun deleteGroup(groupId: Int) {
         _allGroupsState.update { groups ->
             groups.filterNot { it.groupId == groupId }  // Exclude the group with matching groupId
         }
     }
 
-//    Kick out a user
+    //    Kick out a user
     fun kickUser(groupId: Int, userId: String) {
 
         _allGroupsState.update { groups ->
@@ -161,7 +152,7 @@ class StateViewModel(
     }
 
 
-//    Add a new user to a group
+    //    Add a new user to a group
     fun addUser(groupId: Int, user: UserInformation) {
 
         _allGroupsState.update { groups ->
@@ -183,7 +174,7 @@ class StateViewModel(
 
     }
 
-//    Update the username
+    //    Update the username
     fun updateUserName(userName: String, userId: String) {
 
         _allGroupsState.update { groups ->
@@ -204,7 +195,57 @@ class StateViewModel(
         }
     }
 
-    fun clearGroupsState(){
+    fun addBalance(balance: Balance, groupId: Int) {
+        _allGroupsState.update { groups ->
+            groups.map { group ->
+                if (group.groupId == groupId) {
+                    group.copy(balances = group.balances + balance)
+                } else {
+                    group
+                }
+            }
+        }
+    }
+
+    fun deleteBalance(deletedBalance: Balance, groupId: Int) {
+        _allGroupsState.update { groups ->
+            groups.map { group ->
+                if (group.groupId == groupId) {
+                    group.copy(
+                        balances = group.balances - deletedBalance
+                    )
+                } else {
+                    group
+                }
+            }
+        }
+    }
+
+    fun addNewPayment(addedPayment: Payments, groupId: Int) {
+        _allGroupsState.update { groups ->
+            groups.map { group ->
+                if (group.groupId == groupId) {
+                    group.copy(payments = group.payments + addedPayment)
+                } else {
+                    group
+                }
+            }
+        }
+    }
+
+    fun deletePayments(deletedPayments: Payments, groupId: Int) {
+        _allGroupsState.update { groups ->
+            groups.map { group ->
+                if (group.groupId == groupId) {
+                    group.copy(payments = group.payments - deletedPayments)
+                } else {
+                    group
+                }
+            }
+        }
+    }
+
+    fun clearGroupsState() {
 
         _allGroupsState.value = emptyList()
 

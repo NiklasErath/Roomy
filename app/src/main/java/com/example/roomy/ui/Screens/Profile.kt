@@ -98,6 +98,10 @@ fun Profile(
                     }}) {
                         Text(text = "Change username")
                     }
+                    Button(onClick = { isChangeUsernameVisible = false
+                        username = ""}) {
+                        Text(text = "Cancel")
+                    }
                 } else {
                     Button(onClick = { isChangeUsernameVisible = true }) {
                         Text(text = "Change username")

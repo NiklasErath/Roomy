@@ -475,7 +475,6 @@ fun AppNavHost(
             Box {
                 Balance(
                     navController,
-                    balanceRepository,
                     balanceViewModel,
                     groupViewModel,
                     userViewModel,

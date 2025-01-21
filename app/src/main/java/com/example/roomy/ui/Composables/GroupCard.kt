@@ -37,7 +37,7 @@ fun GroupCard(
     OutlinedCard(
         Modifier
             .clickable {
-
+                // set the current group by clicking on a group card
                 groupViewModel.setCurrentGroupInformation(GroupInformation(id = currentGroup.groupId, creatorId = currentGroup.creatorId, name = currentGroup.groupName))
                 navController.navigate(Screens.Groups.name)
             }

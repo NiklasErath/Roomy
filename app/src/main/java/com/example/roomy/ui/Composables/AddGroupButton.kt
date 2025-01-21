@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -35,14 +37,10 @@ import com.example.roomy.R
 import com.example.roomy.db.data.Item
 import com.example.roomy.ui.Screens
 import com.example.roomy.ui.States.newGroupState
-import com.example.roomy.ui.ViewModels.GroupViewModel
 
 @Composable
-fun RecipeButton(
-    currentGroup: newGroupState,
-    context: Context,
-    navController: NavController,
-    groupViewModel: GroupViewModel
+fun AddGroupButton(
+    onClick: () -> Unit
 
 ) {
 
@@ -54,7 +52,7 @@ fun RecipeButton(
         Column(
             Modifier
                 .fillMaxSize()
-                .padding(vertical = 80.dp, horizontal = 20.dp),
+                .padding(vertical = 40.dp, horizontal = 10.dp),
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.End
         ) {
@@ -77,28 +75,13 @@ fun RecipeButton(
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primary)
                     .clickable {
-                        if (currentGroup.inventoryItems.isEmpty()) {
-                            groupViewModel.setGroupError("Add some Items to your Inventory first")
-//                            Toast
-//                                .makeText(
-//                                    context,
-//                                    "Add some Items to your Inventory first",
-//                                    Toast.LENGTH_SHORT
-//                                )
-//                                .show()
+                        onClick()
 
-                        } else {
-                            navController.navigate(Screens.RecipeSuggestion.name)
-                        }
                     }
-                    .padding(10.dp)
-            ) {
-                Icon(
-                    painterResource(R.drawable.recipe),
-                    contentDescription = "Group",
 
-                    )
-                Text(text = "Recipe", fontSize = 12.sp)
+//                    .padding(10.dp)
+            ) {
+                Icon(imageVector = Icons.Filled.Add, contentDescription = "Add Group", Modifier.size(40.dp))
 
             }
 

@@ -7,7 +7,6 @@ object ItemSuggestionMap {
     val nameToIconId: HashMap<String, Int> = hashMapOf(
 
 
-        "Placeholder" to R.drawable.letter_a,
         "Bananas" to R.drawable.banana,
         "Cheese" to R.drawable.cheese,
         "Cherries" to R.drawable.cherry,
@@ -125,7 +124,7 @@ object ItemSuggestionMap {
 
 val suggestedItems =
     listOf(
-        "Placeholder", "Bananas", "Cheese", "Cherries", "Cola", "Eggs", "Milk", "Steak",
+        "Bananas", "Cheese", "Cherries", "Cola", "Eggs", "Milk", "Steak",
         "Apples", "Oranges", "Grapes", "Lemons", "Pineapple", "Strawberries", "Peaches",
         "Watermelon", "Avocados", "Pears", "Carrots", "Broccoli", "Spinach", "Potatoes",
         "Tomatoes", "Cucumbers", "Lettuce", "Bell Peppers", "Zucchini", "Onions", "Butter",

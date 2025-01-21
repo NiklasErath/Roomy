@@ -208,7 +208,7 @@ fun ExpandingAddItemElement(
                     ,
 
                     value = itemName,
-                    onValueChange = { newValue -> updateItemName(newValue) },
+                    onValueChange = { newValue -> if( newValue.length < 50)updateItemName(newValue) },
                     placeholder = { Text(text = "We could use ...") },
                     trailingIcon = {
                         Icon(

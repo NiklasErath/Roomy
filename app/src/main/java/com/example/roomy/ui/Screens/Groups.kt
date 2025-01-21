@@ -142,7 +142,7 @@ fun Group(
     //            Note change this to our errorhandling process later on
 
 
-    RecipeButton(currentGroup, context, navController)
+    RecipeButton(currentGroup, context, navController, groupViewModel)
 
 
 
@@ -172,7 +172,7 @@ fun Group(
                 currentGroup.shoppingListItems.chunked(3).forEach { rowItems ->
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(3.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         rowItems.forEach { item ->
@@ -195,7 +195,7 @@ fun Group(
                             Spacer(modifier = Modifier.weight(1f))
                         }
                     }
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(3.dp))
                 }
             }
             Spacer(Modifier.height(50.dp))
@@ -208,7 +208,7 @@ fun Group(
                 currentGroup.inventoryItems.chunked(3).forEach { rowItems ->
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(3.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         rowItems.forEach { item ->
@@ -237,7 +237,7 @@ fun Group(
                             Spacer(modifier = Modifier.weight(1f))
                         }
                     }
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(3.dp))
                 }
             }
         }

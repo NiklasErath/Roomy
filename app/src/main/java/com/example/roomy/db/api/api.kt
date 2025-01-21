@@ -41,8 +41,7 @@ interface OpenAIService {
 
 fun getSuggestedRecipe(shoppingItems: List<String>, callback: (String) -> Unit){
     val messages = listOf(
-        mapOf("role" to "system", "content" to "You are a helpful assistant for creating recipes based on the ingredients. Provide fitting recipes with the provided Ingredients but only if it is feasible and Save to eat. " +
-                "Also if there is a possibility to create a good meal with one or two more ingredients, suggest the user to buy these items. But always provide an alternative with the items at home if possible"),
+        mapOf("role" to "system", "content" to "You will provide a Recipe based on the given Items. You can expect that base items like spices and flower are at home already. If it is not possible to create a Meal with just the given items and some very basics that should be at home like spices tell the user to add more Items to the list to get a recipe. If a meal might be almost possible and only 1 or 2 items are missing, Tell the user FIRST that he could buy these items to create the following recipe. Under no circumstance should you return a recipe buildt with a lot of ingredients that are not in the given List  "),
         mapOf("role" to "user", "content" to "I have the following items: ${shoppingItems.joinToString(", ")}. Can you suggest a recipe?")
     )
 

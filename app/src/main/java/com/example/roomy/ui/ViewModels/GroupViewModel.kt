@@ -421,6 +421,12 @@ class GroupViewModel(
 
     }
 
+    fun setGroupError(newError:String){
+        _groupError.update { oldState->
+            oldState.copy(newError)
+        }
+    }
+
     // clear the group error state
     fun clearGroupError() {
         _groupError.update { oldState ->

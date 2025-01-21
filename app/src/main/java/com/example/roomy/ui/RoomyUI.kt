@@ -1,23 +1,29 @@
 package com.example.roomy.ui
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -33,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -94,9 +101,17 @@ fun RoomyApp(
     val balanceRepository = BalanceRepository()
     val paymentsRepository = PaymentsRepository()
 
-    val networkConnection = NetworkConnection()
+
+    val networkConnection = remember { NetworkConnection() }
+
+
+//    val networkConnection = NetworkConnection()
     val context = LocalContext.current
 
+    if (!networkConnection.isNetworkAvailable(context)) {
+        Toast.makeText(context, "No internet connection. Please try again.", Toast.LENGTH_LONG)
+            .show()
+    }
 
     val currentDestination = navBackStackEntry?.destination?.route
     val displayBottomBarAndHeader = when (currentDestination) {
@@ -104,10 +119,7 @@ fun RoomyApp(
         else -> true
     }
 
-    if (!networkConnection.isNetworkAvailable(context)) {
-        Toast.makeText(context, "No internet connection. Please try again.", Toast.LENGTH_LONG)
-            .show()
-    }
+
 
 
 //    Initialize StateViewModel which hold our global UI States and pass it to other ViewModels for updates
@@ -199,21 +211,70 @@ fun RoomyApp(
     val groupErrorMessage by groupViewModel.error.collectAsState()
     val balanceErrorMessage by balanceViewModel.balanceError.collectAsState()
 
+    val currentBackStackEntry = navController.currentBackStackEntryAsState()
+
+    // LaunchEffect clears the current Snackbar so it doesnt persist on Navigation/Screen Changes
+    LaunchedEffect(currentBackStackEntry.value?.destination?.route) {
+        snackbarHostState.currentSnackbarData?.dismiss()
+
+    }
 
 
-    if (displayBottomBarAndHeader) {
+    LaunchedEffect(userErrorMessage, itemErrorMessage, groupErrorMessage, balanceErrorMessage) {
+        when {
+            userErrorMessage.message.isNotEmpty() -> {
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar(
+                        message = userErrorMessage.message // Pass message directly
+                    )
+                }
+                userViewModel.clearUserError()
+
+            }
+            itemErrorMessage.message.isNotEmpty() -> {
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar(
+                        message = itemErrorMessage.message // Pass message directly
+                    )
+                }
+                itemViewModel.clearItemError()
+
+            }
+            groupErrorMessage.message.isNotEmpty() -> {
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar(
+                        message = groupErrorMessage.message // Pass message directly
+                    )
+                }
+                groupViewModel.clearGroupError()
+
+            }
+            balanceErrorMessage.message.isNotEmpty() -> {
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar(
+                        message = balanceErrorMessage.message // Pass message directly
+                    )
+                }
+                balanceViewModel.clearBalanceError()
+
+            }
+        }
+    }
+
+
+    if (displayBottomBarAndHeader && networkConnection.isNetworkAvailable(context)) {
 
         Scaffold(
 
             snackbarHost = {
                 Column(
-                    modifier = Modifier.fillMaxSize().padding(vertical=100.dp),
+                    modifier = Modifier.fillMaxSize().imePadding().padding(vertical=100.dp),
                     verticalArrangement = Arrangement.Top,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     SnackbarHost(
                         hostState = snackbarHostState,
-                        snackbar = { snackbarData -> Snackbar(snackbarData) },
+                        snackbar = { snackbarData -> Snackbar(snackbarData, Modifier.padding(top = 80.dp)) },
 //                            modifier = Modifier
 //                                .padding(top = 16.dp) // Add some padding from the top edge
                     )
@@ -239,43 +300,6 @@ fun RoomyApp(
             ) { innerPadding ->
 
 
-            LaunchedEffect(userErrorMessage, itemErrorMessage, groupErrorMessage, balanceErrorMessage) {
-                when {
-                    userErrorMessage.message.isNotEmpty() -> {
-                        coroutineScope.launch {
-                            snackbarHostState.showSnackbar(
-                                message = userErrorMessage.message // Pass message directly
-                            )
-                            userViewModel.clearUserError()
-                        }
-                    }
-                    itemErrorMessage.message.isNotEmpty() -> {
-                        coroutineScope.launch {
-                            snackbarHostState.showSnackbar(
-                                message = itemErrorMessage.message // Pass message directly
-                            )
-                            itemViewModel.clearItemError()
-                        }
-                    }
-                    groupErrorMessage.message.isNotEmpty() -> {
-                        coroutineScope.launch {
-                            snackbarHostState.showSnackbar(
-                                message = groupErrorMessage.message // Pass message directly
-                            )
-                            groupViewModel.clearGroupError()
-                        }
-                    }
-
-                    balanceErrorMessage.message.isNotEmpty() -> {
-                        coroutineScope.launch {
-                            snackbarHostState.showSnackbar(
-                                message = balanceErrorMessage.message // Pass message directly
-                            )
-                            balanceViewModel.clearBalanceError()
-                        }
-                    }
-                }
-            }
 
 
             AppNavHost(
@@ -286,7 +310,6 @@ fun RoomyApp(
                 userViewModel,
                 groupViewModel,
                 itemViewModel,
-                networkConnection,
                 balanceRepository,
                 balanceViewModel,
                 currentGroup,
@@ -299,19 +322,19 @@ fun RoomyApp(
         }
 
 
-    } else {
+    } else if(networkConnection.isNetworkAvailable(context)) {
 
         Scaffold(
 
             snackbarHost = {
                 Column(
-                    modifier = Modifier.fillMaxSize().padding(vertical=100.dp),
+                    modifier = Modifier.fillMaxSize().imePadding().padding(vertical=100.dp),
                     verticalArrangement = Arrangement.Top,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     SnackbarHost(
                         hostState = snackbarHostState,
-                        snackbar = { snackbarData -> Snackbar(snackbarData) },
+                        snackbar = { snackbarData -> Snackbar(snackbarData, Modifier) },
 //                            modifier = Modifier
 //                                .padding(top = 16.dp) // Add some padding from the top edge
                     )
@@ -322,44 +345,6 @@ fun RoomyApp(
 
             ) { innerPadding ->
 
-            LaunchedEffect(userErrorMessage, itemErrorMessage, groupErrorMessage, balanceErrorMessage) {
-                when {
-                    userErrorMessage.message.isNotEmpty() -> {
-                        coroutineScope.launch {
-                            snackbarHostState.showSnackbar(
-                                message = userErrorMessage.message // Pass message directly
-                            )
-                            userViewModel.clearUserError()
-                        }
-                    }
-                    itemErrorMessage.message.isNotEmpty() -> {
-                        coroutineScope.launch {
-                            snackbarHostState.showSnackbar(
-                                message = itemErrorMessage.message // Pass message directly
-                            )
-                            itemViewModel.clearItemError()
-                        }
-                    }
-                    groupErrorMessage.message.isNotEmpty() -> {
-                        coroutineScope.launch {
-                            snackbarHostState.showSnackbar(
-                                message = groupErrorMessage.message // Pass message directly
-                            )
-                            groupViewModel.clearGroupError()
-                        }
-                    }
-                    balanceErrorMessage.message.isNotEmpty() -> {
-                        coroutineScope.launch {
-                            snackbarHostState.showSnackbar(
-                                message = balanceErrorMessage.message // Pass message directly
-                            )
-                            balanceViewModel.clearBalanceError()
-                        }
-                    }
-                }
-            }
-
-
             AppNavHost(
                 navController,
                 Modifier
@@ -368,7 +353,6 @@ fun RoomyApp(
                 userViewModel,
                 groupViewModel,
                 itemViewModel,
-                networkConnection,
                 balanceRepository,
                 balanceViewModel,
                 currentGroup,
@@ -382,6 +366,41 @@ fun RoomyApp(
 
 
     }
+//    If there is no Internet Connection show this Screen as a warning
+    else{
+
+        Scaffold(
+
+            modifier = Modifier.fillMaxSize(),
+
+            ) { innerPadding ->
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(16.dp),  // Optional: add some padding around
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center  // Center content vertically
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Warning,  // Use a network-off icon
+                    contentDescription = "No internet connection",
+                    modifier = Modifier.size(100.dp),  // Adjust size of the icon
+                    tint = Color.Gray  // Optional: Set the icon color to gray
+                )
+                Spacer(modifier = Modifier.height(16.dp))  // Space between icon and text
+                Text(
+                    text = "Please connect to the internet and restart the Application.",
+                    style = MaterialTheme.typography.titleLarge,  // Use h6 style for text
+                    color = Color.Gray,  // Set text color to gray
+                    textAlign = TextAlign.Center
+                )
+            }
+
+        }
+
+    }
 }
 
 
@@ -392,7 +411,6 @@ fun AppNavHost(
     userViewModel: UserViewModel,
     groupViewModel: GroupViewModel,
     itemViewModel: ItemViewModel,
-    networkConnection: NetworkConnection,
     balanceRepository: BalanceRepository,
     balanceViewModel: BalanceViewModel,
     currentGroup: newGroupState,
@@ -444,7 +462,6 @@ fun AppNavHost(
                     groupViewModel,
                     userViewModel,
                     itemViewModel,
-                    networkConnection,
                     allGroupsState,
                     previousScreen
                 )
@@ -634,7 +651,7 @@ fun Header(
                     Row(
                         modifier = Modifier
                             .wrapContentSize()
-                            .clickable { navController.navigate(Screens.GroupMembers.route) },
+                            .clickable { if(currentDestination != Screens.GroupMembers.name){ navController.navigate(Screens.GroupMembers.route) }},
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.End
                     ) {

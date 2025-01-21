@@ -1,7 +1,9 @@
 package com.example.roomy.ui
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,6 +29,7 @@ import com.example.roomy.ui.States.GroupMembersUiState
 import com.example.roomy.ui.States.newGroupState
 import com.example.roomy.ui.ViewModels.GroupViewModel
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun GroupCard(
     groupViewModel: GroupViewModel,
@@ -36,11 +39,19 @@ fun GroupCard(
 
     OutlinedCard(
         Modifier
-            .clickable {
-                // set the current group by clicking on a group card
-                groupViewModel.setCurrentGroupInformation(GroupInformation(id = currentGroup.groupId, creatorId = currentGroup.creatorId, name = currentGroup.groupName))
-                navController.navigate(Screens.Groups.name)
-            }
+            // set the current group by clicking on a group card
+            //navigate to manageMember Screen on long click
+            .combinedClickable(
+                onClick = {
+
+                    groupViewModel.setCurrentGroupInformation(GroupInformation(id = currentGroup.groupId, creatorId = currentGroup.creatorId, name = currentGroup.groupName))
+                    navController.navigate(Screens.Groups.name)
+                },
+                onLongClick = {
+                    groupViewModel.setCurrentGroupInformation(GroupInformation(id = currentGroup.groupId, creatorId = currentGroup.creatorId, name = currentGroup.groupName))
+                    navController.navigate(Screens.GroupMembers.name)
+                }
+            )
             .fillMaxWidth()
             ,
 

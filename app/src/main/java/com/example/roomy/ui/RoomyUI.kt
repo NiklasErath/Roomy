@@ -58,6 +58,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import com.example.roomy.db.BalanceRepository
 import com.example.roomy.db.PaymentsRepository
+import com.example.roomy.db.Supabase.UserSessionManager
 import com.example.roomy.ui.Composables.Snackbar
 import com.example.roomy.ui.Factory.BalanceViewModelFactory
 import com.example.roomy.ui.Factory.StateViewModelFactory
@@ -81,8 +82,9 @@ enum class Screens(val route: String) {
 @Composable
 fun RoomyApp(
     modifier: Modifier = Modifier,
-
     ) {
+
+
 
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -119,6 +121,21 @@ fun RoomyApp(
     )
 
 
+
+
+//    Check currentUser session
+
+    val startDestination: String
+
+    if (UserSessionManager.getSessionToken(context) != null){
+        userViewModel.logInAndFetchInformationWithSessionToken(context)
+        startDestination = Screens.Home.name
+
+    }else{
+        startDestination = Screens.Login.name
+    }
+
+
     val itemViewModel: ItemViewModel = viewModel(
         factory = ItemViewModelFactory(itemRepository, stateViewModel)
     )
@@ -136,8 +153,15 @@ fun RoomyApp(
     )
 
 
+
+
+
+
+
+
+
     val balanceViewModel: BalanceViewModel = viewModel(
-        factory = BalanceViewModelFactory(balanceRepository, paymentsRepository, groupRepository)
+        factory = BalanceViewModelFactory(balanceRepository, paymentsRepository, groupRepository, stateViewModel)
     )
 
     val currentGroupInformation by groupViewModel.currentGroupInformation.collectAsState()
@@ -173,6 +197,7 @@ fun RoomyApp(
     val userErrorMessage by userViewModel.userError.collectAsState()
     val itemErrorMessage by itemViewModel.itemError.collectAsState()
     val groupErrorMessage by groupViewModel.error.collectAsState()
+    val balanceErrorMessage by balanceViewModel.balanceError.collectAsState()
 
 
 
@@ -214,7 +239,7 @@ fun RoomyApp(
             ) { innerPadding ->
 
 
-            LaunchedEffect(userErrorMessage, itemErrorMessage, groupErrorMessage) {
+            LaunchedEffect(userErrorMessage, itemErrorMessage, groupErrorMessage, balanceErrorMessage) {
                 when {
                     userErrorMessage.message.isNotEmpty() -> {
                         coroutineScope.launch {
@@ -240,6 +265,15 @@ fun RoomyApp(
                             groupViewModel.clearGroupError()
                         }
                     }
+
+                    balanceErrorMessage.message.isNotEmpty() -> {
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = balanceErrorMessage.message // Pass message directly
+                            )
+                            balanceViewModel.clearBalanceError()
+                        }
+                    }
                 }
             }
 
@@ -256,7 +290,8 @@ fun RoomyApp(
                 balanceRepository,
                 balanceViewModel,
                 currentGroup,
-                allGroupsState
+                allGroupsState,
+                startDestination
 
 
             )
@@ -287,7 +322,7 @@ fun RoomyApp(
 
             ) { innerPadding ->
 
-            LaunchedEffect(userErrorMessage, itemErrorMessage, groupErrorMessage) {
+            LaunchedEffect(userErrorMessage, itemErrorMessage, groupErrorMessage, balanceErrorMessage) {
                 when {
                     userErrorMessage.message.isNotEmpty() -> {
                         coroutineScope.launch {
@@ -313,6 +348,14 @@ fun RoomyApp(
                             groupViewModel.clearGroupError()
                         }
                     }
+                    balanceErrorMessage.message.isNotEmpty() -> {
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = balanceErrorMessage.message // Pass message directly
+                            )
+                            balanceViewModel.clearBalanceError()
+                        }
+                    }
                 }
             }
 
@@ -329,7 +372,8 @@ fun RoomyApp(
                 balanceRepository,
                 balanceViewModel,
                 currentGroup,
-                allGroupsState
+                allGroupsState,
+                startDestination
 
 
             )
@@ -352,11 +396,12 @@ fun AppNavHost(
     balanceRepository: BalanceRepository,
     balanceViewModel: BalanceViewModel,
     currentGroup: newGroupState,
-    allGroupsState: List<newGroupState>
+    allGroupsState: List<newGroupState>,
+    startDestination: String
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screens.Login.route,
+        startDestination = startDestination,
         modifier = modifier
 //                .padding(horizontal = if (currentDestination != Screens.Login.name) 0.dp else 20.dp),
 //            .padding(horizontal = 20.dp),

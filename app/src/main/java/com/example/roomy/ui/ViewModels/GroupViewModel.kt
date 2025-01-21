@@ -58,6 +58,10 @@ class GroupViewModel(
     private val _allGroupsMembers = MutableStateFlow<List<GroupMembersUiState>>(emptyList())
     private val _groupMembers = MutableStateFlow(GroupMembersUiState(emptyList()))
 
+    private val _fetchingAllGroups = MutableStateFlow(true)
+    val fetchingAllGroups = _fetchingAllGroups.asStateFlow()
+
+
     // error State
     private val _groupError = MutableStateFlow(GroupError.Error(""))
     val error = _groupError.asStateFlow()
@@ -123,6 +127,10 @@ class GroupViewModel(
 
 //                Set the new GroupState
                 stateViewModel.setAllGroupsState(combinedGroupState)
+
+//                Used to display the loader in the Home screen while fetching
+                _fetchingAllGroups.update { false }
+
 
             }
 
@@ -275,6 +283,9 @@ class GroupViewModel(
 
     // create a new group with information needed
     fun createNewGroup(groupName: String, userId: String, addedUsers: List<String>) {
+//        Set this state to true here to give the allow loader rendering while UIState has to update
+        _fetchingAllGroups.update { true }
+
         viewModelScope.launch {
             val newGroup = groupRepository.createGroup(groupName, userId)
             if (newGroup == null) {

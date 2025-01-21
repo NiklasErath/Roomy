@@ -19,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
@@ -38,6 +39,8 @@ fun Profile(
     var username by remember { mutableStateOf("") }
     var theme by remember { mutableStateOf("") }
     var isChangeUsernameVisible by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
 
 
     Column(
@@ -119,11 +122,11 @@ fun Profile(
                 }
 
                 Button(onClick = {
-                    userViewModel.logout() { loggedOut ->
+                    userViewModel.logout({ loggedOut ->
                         if (!loggedOut) {
                             navController.navigate(Screens.Login.route)
                         }
-                    }
+                    }, context)
                 }) {
                     Text(text = "Logout")
                 }

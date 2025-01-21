@@ -99,7 +99,7 @@ fun Login(
 
         Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End){
             Button(onClick = {
-                userViewModel.logInAndFetchUserInformation(email, password);
+                userViewModel.logInAndFetchUserInformation(email, password, context);
 //                viewModel.getUserInformation()
 //        navController.navigate(Screens.Groups.name)
             }) {

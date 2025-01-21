@@ -1,13 +1,14 @@
 package com.example.roomy.db
 
+import android.content.Context
 import android.util.Log
-import co.touchlab.kermit.Tag
+import com.example.roomy.db.Supabase.UserSessionManager
 import com.example.roomy.db.Supabase.supabase
-import com.example.roomy.db.data.GroupInformation
 import com.example.roomy.db.data.Groups
 import com.example.roomy.db.data.UserInformation
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import java.util.UUID
@@ -43,6 +44,7 @@ class UserRepository {
                 email = userEmail
                 password = userPassword
             }
+
             Log.d("TAG", "Sign-in successful: $result")
         } catch (e: Exception) {
             Log.d("TAG", "Sign in failed")
@@ -76,11 +78,13 @@ class UserRepository {
 
     }
 
-    // get the current session
-    fun getSession(): String {
+
+    // get the current session and store the SessionToken in SharedPreferences
+    fun getSessionAndAccessToken(context: Context): String {
         val session = supabase.auth.currentSessionOrNull()
 
-        Log.d("UserID", "${session?.user?.id}")
+        Log.d("UserID", "${session?.user}")
+
 
         val currentUserId = session?.user?.id
             ?: throw IllegalStateException("User is not logged in. Please log in.")
@@ -88,8 +92,24 @@ class UserRepository {
         Log.d("UUID", "$uuid")
 
 
+//        Save Access Token in Shared Preferences
+        val accessToken = session.accessToken
+        UserSessionManager.saveSessionToken(context, accessToken)
+
+
         return currentUserId
     }
+
+
+    suspend fun fetchSessionWithToken(sessionToken: String): UserSession? {
+        try {
+            val session = supabase.auth.currentSessionOrNull()
+            return session
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
 
     // get the user Information by the userId
     suspend fun getUserById(userId: String): UserInformation? {
@@ -142,7 +162,7 @@ class UserRepository {
         try {
             val response = supabase
                 .from("parent_group")
-                .select(columns = Columns.ALL){
+                .select(columns = Columns.ALL) {
                     filter {
                         isIn("group_id", groupIds)
                     }
@@ -165,7 +185,7 @@ class UserRepository {
         try {
             val response = supabase
                 .from("user_information")
-                .select(columns = Columns.ALL){
+                .select(columns = Columns.ALL) {
                     filter {
                         isIn("user_id", userIds)
                     }

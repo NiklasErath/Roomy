@@ -1,17 +1,22 @@
 package com.example.roomy.ui.ViewModels
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.roomy.db.Supabase.UserSessionManager
 import com.example.roomy.db.UserRepository
 import com.example.roomy.ui.States.SessionState
 import com.example.roomy.ui.States.UserState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.UUID
+import kotlin.concurrent.timer
 
 sealed class LoginState {
     object Idle : LoginState()
@@ -31,14 +36,16 @@ sealed class UserError {
     data class Error(val message: String)
 }
 
-class UserViewModel(private val userRepository: UserRepository, private val stateViewModel: StateViewModel) : ViewModel() {
+class UserViewModel(
+    private val userRepository: UserRepository,
+    private val stateViewModel: StateViewModel
+) : ViewModel() {
 
     private val _session = MutableStateFlow(SessionState(""))
     private val _loggedInUser = MutableStateFlow(UserState("", "", ""))
 
     val currentUserSession = _session.asStateFlow()
     val loggedInUser = _loggedInUser.asStateFlow()
-
 
 
     // error Message
@@ -52,10 +59,10 @@ class UserViewModel(private val userRepository: UserRepository, private val stat
     val registerState: State<RegisterState> = _registerState
 
     // Login user
-    suspend fun logInUser(userEmail: String, userPassword: String) {
-        userRepository.signIn("n@n.com", "1234")
+    suspend fun logInUser(userEmail: String, userPassword: String, context: Context) {
+        userRepository.signIn(userEmail, userPassword)
         Log.d("SIGN IN ", "USER SIGN IN")
-        val currentSession = userRepository.getSession()
+        val currentSession = userRepository.getSessionAndAccessToken(context)
         _session.update { oldState ->
             oldState.copy(
                 userId = currentSession
@@ -66,7 +73,6 @@ class UserViewModel(private val userRepository: UserRepository, private val stat
 
     // get the Information of the user by ID
     suspend fun getUserInformation() {
-        Log.d("Tag", "geeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeet userId from currentUserSession")
         Log.d("Tag", currentUserSession.value.userId)
 
         val user = userRepository.getUserById(currentUserSession.value.userId)
@@ -87,15 +93,15 @@ class UserViewModel(private val userRepository: UserRepository, private val stat
     }
 
     // login the user and get all his information
-    fun logInAndFetchUserInformation(userEmail: String, userPassword: String) {
+    fun logInAndFetchUserInformation(userEmail: String, userPassword: String, context: Context) {
         viewModelScope.launch {
             _loginState.value = LoginState.Loading
 
             try {
-
-                logInUser(userEmail, userPassword)
+                logInUser(userEmail, userPassword, context)
                 getUserInformation()
                 _loginState.value = LoginState.Success
+                resetLoginState()
 
             } catch (e: Exception) {
                 _loginState.value = LoginState.Error(e.message ?: "Unknown Error")
@@ -107,15 +113,59 @@ class UserViewModel(private val userRepository: UserRepository, private val stat
         }
     }
 
-    fun logout(callback: (Boolean) -> Unit){
+
+    fun logInAndFetchInformationWithSessionToken(context: Context) {
+        val token = UserSessionManager.getSessionToken(context)
+
+        if (token == null) {
+            // If token is null, immediately exit and notify user
+            _loginState.value = LoginState.Idle
+            _userError.update { oldState -> oldState.copy("Login from Session failed") }
+            return
+        }
+
+        // If the token exists, proceed with session fetching
+        viewModelScope.launch {
+            try {
+                val session = userRepository.fetchSessionWithToken(token)
+
+//                Log.e("SIGN IN ERROR", "Failed to log in: ${e.message}")
+
+                if (session?.user != null) {
+                    val currentUserId = session.user!!.id
+                    _session.update { oldState -> oldState.copy(userId = currentUserId) }
+
+                    getUserInformation()
+                    _loginState.value = LoginState.Success
+                    resetLoginState()
+
+                } else {
+                    _loginState.value = LoginState.Error("NavLogin")
+                }
+                // Update login state to success
+            } catch (e: Exception) {
+                // Handle any exceptions that occur during the session fetching
+                Log.e("SIGN IN ERROR", "Failed to log in: ${e.message}")
+
+                // Notify user error
+                _userError.update { oldState -> oldState.copy("Failed to get user information from token") }
+
+                // Reset login state to idle
+                _loginState.value = LoginState.Idle
+            }
+        }
+    }
+
+    fun logout(callback: (Boolean) -> Unit, context: Context) {
         viewModelScope.launch {
             val logout = userRepository.logout()
-            if (!logout){
+            if (!logout) {
                 _userError.update { oldState ->
                     oldState.copy("Logout failed")
                 }
                 callback(true)
             } else {
+                UserSessionManager.clearSession(context)
                 stateViewModel.clearGroupsState()
                 _session.update { oldState ->
                     oldState.copy("")
@@ -128,12 +178,11 @@ class UserViewModel(private val userRepository: UserRepository, private val stat
             }
 
 
-
         }
     }
 
     // register
-    fun signUp(userEmail: String, userPassword: String, userName: String) {
+    fun signUp(userEmail: String, userPassword: String, userName: String, context: Context) {
         viewModelScope.launch {
 
             try {
@@ -148,7 +197,7 @@ class UserViewModel(private val userRepository: UserRepository, private val stat
                 userRepository.signUp(userEmail, userPassword)
                 userRepository.signIn(userEmail, userPassword)
 
-                val currentSession = userRepository.getSession()
+                val currentSession = userRepository.getSessionAndAccessToken(context)
                 _session.update { oldState ->
                     oldState.copy(
                         userId = currentSession
@@ -186,8 +235,9 @@ class UserViewModel(private val userRepository: UserRepository, private val stat
                 _userError.update { oldState ->
                     oldState.copy("No user found")
                 }
-                callback(false)} else {
-                    callback(true)
+                callback(false)
+            } else {
+                callback(true)
             }
         }
     }
@@ -207,7 +257,7 @@ class UserViewModel(private val userRepository: UserRepository, private val stat
                         oldState.copy("username could not be updated")
                     }
                 } else {
-                    stateViewModel.updateUserName(username, userId )
+                    stateViewModel.updateUserName(username, userId)
 
                     _loggedInUser.update { oldstate ->
                         oldstate.copy(
@@ -222,33 +272,21 @@ class UserViewModel(private val userRepository: UserRepository, private val stat
         }
     }
 
-    // clear the user error state
-    fun clearUserError(){
-    _userError.update { oldState->
-        oldState.copy("")
-    }
+    //  Clear LoginState for Future Logins
+    fun resetLoginState() {
+        viewModelScope.launch {
+            delay(100) // Adjust the delay time as needed (e.g., 2 seconds)
+            _loginState.value = LoginState.Idle
+        }
+
     }
 
-//    fun signUp(userEmail: String, userPassword: String, userName: String) {
-//        viewModelScope.launch {
-//            try {
-//                userRepository.signUp(userEmail, userPassword)
-//
-//                val currentSession = userRepository.getSession()
-//                _session.update { oldState ->
-//                    oldState.copy(
-//                        userId = currentSession
-//                    )
-//
-//                }
-//            }catch (e:Exception){
-//                                _registerState.value = RegisterState.Error(e.message ?: "Unknown Error")
-//
-//
-//            }
-//
-//        }
-//    }
+    // clear the user error state
+    fun clearUserError() {
+        _userError.update { oldState ->
+            oldState.copy("")
+        }
+    }
 
 
 }

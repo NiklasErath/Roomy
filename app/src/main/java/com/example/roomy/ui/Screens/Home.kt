@@ -5,9 +5,11 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -36,6 +38,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -48,6 +52,7 @@ import com.example.roomy.ui.States.newGroupState
 import com.example.roomy.ui.ViewModels.AddGroupState
 import com.example.roomy.ui.ViewModels.GroupViewModel
 import com.example.roomy.ui.ViewModels.ItemViewModel
+import com.example.roomy.ui.ViewModels.LoginState
 import com.example.roomy.ui.ViewModels.UserViewModel
 import kotlinx.coroutines.delay
 
@@ -62,40 +67,17 @@ fun Home(
     previousScreen: String
 ) {
 
+    val context = LocalContext.current
 
     val addGroupState by groupViewModel.addGroupState
 
-//    val groupItemsCount by itemViewModel.allGroupsItemsCount.collectAsState()
-
     val currentUserId = userViewModel.currentUserSession.collectAsState().value.userId
 
-//    val groupInformationState by groupViewModel.groupsInformation.collectAsState(
-//        initial = GroupsUiState(
-//            emptyList()
-//        )
-//    )
-
-//    val userErrorMessage by userViewModel.userError.collectAsState()
+    val fetchingAllGroups = groupViewModel.fetchingAllGroups.collectAsState()
 
 
-//    val allGroupsMembers by groupViewModel.allGroupsMembers.collectAsState(
-//        initial = emptyList()
-//    )
+    val loginState by userViewModel.loginState
 
-//    val allGroupsState by groupViewModel.allGroupsState.collectAsState(
-//        initial = emptyList()
-//    )
-
-//    LaunchedEffect(Unit) {
-//        groupViewModel.getGroupsByUserId(currentUserId)
-//
-////        if (groupInformationState.groupsInformation.isNotEmpty()) {
-////            val groupIds = groupInformationState.groupsInformation.mapNotNull { it.id }
-////
-////            itemViewModel.getAllItemCountsForGroups(groupIds)
-////        }
-//    //        groupViewModel.getGroupMembers(2)
-//    }
 
 //    var triggerNavCheck by remember { mutableStateOf(true) }
 
@@ -107,9 +89,19 @@ fun Home(
             Screens.Login.name, Screens.Groups.name, Screens.Profile.name, Screens.Balance.name, Screens.Home.name -> groupViewModel.getGroupsByUserId(
                 currentUserId
             )
+
         }
 //            triggerNavCheck = false
 //        }
+    }
+
+
+    LaunchedEffect(loginState) {
+        if (loginState is LoginState.Success) {
+            groupViewModel.getGroupsByUserId(
+                currentUserId
+            )
+        }
     }
 
 
@@ -133,53 +125,53 @@ fun Home(
     var addGroupPopUp by remember { mutableStateOf(false) }
 
 
-    Column(
-        Modifier
+    Box(
+        modifier = Modifier
             .fillMaxSize()
             .padding(top = 12.dp)
-
     ) {
-        Text(text = "My Groups", fontSize = integerResource(id = R.integer.heading1).sp)
-        Spacer(Modifier.height(40.dp))
-
-
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
         ) {
-            if (allGroupsState.isEmpty()) {
-                item {
-                    Text(text = "No groups")
-                }
+            Text(text = "My Groups", fontSize = integerResource(id = R.integer.heading1).sp)
+            Spacer(Modifier.height(40.dp))
+
+            if (fetchingAllGroups.value) {
+                LoadingIndicator(modifier = Modifier.padding(bottom = 300.dp))
             } else {
-                itemsIndexed(allGroupsState) { index, group ->
-
-//                    val itemCount = group.itemCount
-
-
-                    GroupCard(groupViewModel, group, navController)
-
-                }
-
-
-            }
-            item {
-                Spacer(Modifier.height(100.dp))
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-
-                    Button(onClick = {
-                        addGroupPopUp = true
-
-                    }) {
-                        Icon(imageVector = Icons.Filled.Add, contentDescription = "Add Group")
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.weight(1f) // Ensures the LazyColumn takes up remaining space
+                ) {
+                    if (allGroupsState.isEmpty()) {
+                        item {
+                            Text(text = "No groups")
+                        }
+                    } else {
+                        itemsIndexed(allGroupsState) { index, group ->
+                            GroupCard(groupViewModel, group, navController)
+                        }
                     }
-
                 }
-
             }
         }
 
-
+        // Button positioned at the bottom center
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Transparent)
+                .padding(bottom = 40.dp) // Optional padding
+                .align(Alignment.BottomCenter),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Button(onClick = { addGroupPopUp = true }) {
+                Icon(imageVector = Icons.Filled.Add, contentDescription = "Add Group")
+            }
+        }
     }
+
 
     if (addGroupPopUp) {
         Column(

@@ -24,7 +24,8 @@ import kotlinx.coroutines.launch
 class BalanceViewModel(
     private val balanceRepository: BalanceRepository,
     private val paymentsRepository: PaymentsRepository,
-    private val groupRepository: GroupRepository
+    private val groupRepository: GroupRepository,
+    private val stateViewModel: StateViewModel
 ) : ViewModel() {
 
     sealed class BalanceError {
@@ -41,6 +42,8 @@ class BalanceViewModel(
     val balance = _balance.asStateFlow()
     val payments = _payments.asStateFlow()
     val groupMembers = _groupMembers.asStateFlow()
+    val balanceError = _balanceError.asStateFlow()
+
 
     suspend fun getBalanceByGroupId(groupId: Int) {
         viewModelScope.launch {
@@ -194,6 +197,12 @@ class BalanceViewModel(
                 }
                 Log.d("MEMBERS", "users")
             }
+        }
+    }
+
+    fun clearBalanceError(){
+        _balanceError.update { oldState->
+            oldState.copy("")
         }
     }
 

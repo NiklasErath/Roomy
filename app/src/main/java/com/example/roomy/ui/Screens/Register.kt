@@ -115,8 +115,8 @@ fun Register(
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         )
-        if (password.length in 1..6){
-            Text(text = "Password has to be more than 6 characters",
+        if (password.length in 1..5){
+            Text(text = "Password has to be more than 5 characters",
                 color = Color.Red,)
         }
         Spacer(Modifier.height(10.dp))
@@ -148,17 +148,16 @@ fun Register(
                     Toast.makeText(context, "Passwords do not match!", Toast.LENGTH_SHORT).show()
 
                 }
-                if (password.length <= 6) {
-                    Toast.makeText(context, "Password has to be more than 6 characters!", Toast.LENGTH_SHORT).show()
+                else if (password.length <= 5) {
+                    Toast.makeText(context, "Password has to be more than 5 characters!", Toast.LENGTH_SHORT).show()
 
                 }
-                if (username.length <= 2){
+                else if (username.length <= 2){
                     Toast.makeText(context, "Username has to be more than 3 characters!", Toast.LENGTH_SHORT).show()
 
                 }
                 else {
-                    userViewModel.signUp(email, password, username)
-
+                    userViewModel.signUp(email, password, username, context)
 
                 }
 

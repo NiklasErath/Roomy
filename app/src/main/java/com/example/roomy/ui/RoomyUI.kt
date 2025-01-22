@@ -196,7 +196,7 @@ fun RoomyApp(modifier: Modifier) {
 
     }
 
-
+    // if there is an error then display a snackbar with the error message
     LaunchedEffect(userErrorMessage, itemErrorMessage, groupErrorMessage, balanceErrorMessage) {
         when {
             userErrorMessage.message.isNotEmpty() -> {
@@ -212,7 +212,7 @@ fun RoomyApp(modifier: Modifier) {
             itemErrorMessage.message.isNotEmpty() -> {
                 coroutineScope.launch {
                     snackbarHostState.showSnackbar(
-                        message = itemErrorMessage.message // Pass message directly
+                        message = itemErrorMessage.message
                     )
                 }
                 itemViewModel.clearItemError()
@@ -222,7 +222,7 @@ fun RoomyApp(modifier: Modifier) {
             groupErrorMessage.message.isNotEmpty() -> {
                 coroutineScope.launch {
                     snackbarHostState.showSnackbar(
-                        message = groupErrorMessage.message // Pass message directly
+                        message = groupErrorMessage.message
                     )
                 }
                 groupViewModel.clearGroupError()
@@ -232,7 +232,7 @@ fun RoomyApp(modifier: Modifier) {
             balanceErrorMessage.message.isNotEmpty() -> {
                 coroutineScope.launch {
                     snackbarHostState.showSnackbar(
-                        message = balanceErrorMessage.message // Pass message directly
+                        message = balanceErrorMessage.message
                     )
                 }
                 balanceViewModel.clearBalanceError()
@@ -241,11 +241,9 @@ fun RoomyApp(modifier: Modifier) {
         }
     }
 
-
+    // set snackbar position if network connection and display bottom and header
     if (displayBottomBarAndHeader && networkConnection.isNetworkAvailable(context)) {
-
         Scaffold(
-
             snackbarHost = {
                 Column(
                     modifier = Modifier
@@ -263,31 +261,18 @@ fun RoomyApp(modifier: Modifier) {
                                 Modifier.padding(top = 80.dp)
                             )
                         },
-//                            modifier = Modifier
-//                                .padding(top = 16.dp) // Add some padding from the top edge
                     )
                 }
             },
 
             bottomBar = {
-
                 BottomNavigationBar(navController, currentDestination)
-
             },
 
             topBar = {
-
                 Header(navController, currentDestination, currentGroup)
-
-
             },
-
-
-            modifier = Modifier.fillMaxSize(),
-
-            ) { innerPadding ->
-
-
+            modifier = Modifier.fillMaxSize(),) { innerPadding ->
             AppNavHost(
                 navController,
                 Modifier
@@ -296,22 +281,15 @@ fun RoomyApp(modifier: Modifier) {
                 userViewModel,
                 groupViewModel,
                 itemViewModel,
-                balanceRepository,
                 balanceViewModel,
                 currentGroup,
                 allGroupsState,
                 startDestination
-
-
             )
-
         }
-
-
+        // set snackbar position if network connection
     } else if (networkConnection.isNetworkAvailable(context)) {
-
         Scaffold(
-
             snackbarHost = {
                 Column(
                     modifier = Modifier
@@ -324,8 +302,6 @@ fun RoomyApp(modifier: Modifier) {
                     SnackbarHost(
                         hostState = snackbarHostState,
                         snackbar = { snackbarData -> Snackbar(snackbarData, Modifier) },
-//                            modifier = Modifier
-//                                .padding(top = 16.dp) // Add some padding from the top edge
                     )
                 }
             },
@@ -342,7 +318,6 @@ fun RoomyApp(modifier: Modifier) {
                 userViewModel,
                 groupViewModel,
                 itemViewModel,
-                balanceRepository,
                 balanceViewModel,
                 currentGroup,
                 allGroupsState,
@@ -355,7 +330,7 @@ fun RoomyApp(modifier: Modifier) {
 
 
     }
-//    If there is no Internet Connection show this Screen as a warning
+    // set snackbar position if network connection is not available
     else {
 
         Scaffold(
@@ -368,21 +343,21 @@ fun RoomyApp(modifier: Modifier) {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
-                    .padding(16.dp),  // Optional: add some padding around
+                    .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center  // Center content vertically
+                verticalArrangement = Arrangement.Center
             ) {
                 Icon(
-                    imageVector = Icons.Filled.Warning,  // Use a network-off icon
+                    imageVector = Icons.Filled.Warning,
                     contentDescription = "No internet connection",
-                    modifier = Modifier.size(100.dp),  // Adjust size of the icon
-                    tint = Color.Gray  // Optional: Set the icon color to gray
+                    modifier = Modifier.size(100.dp),
+                    tint = Color.Gray
                 )
-                Spacer(modifier = Modifier.height(16.dp))  // Space between icon and text
+                Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = "Please connect to the internet and restart the Application.",
-                    style = MaterialTheme.typography.titleLarge,  // Use h6 style for text
-                    color = Color.Gray,  // Set text color to gray
+                    style = MaterialTheme.typography.titleLarge,
+                    color = Color.Gray,
                     textAlign = TextAlign.Center
                 )
             }
@@ -392,7 +367,7 @@ fun RoomyApp(modifier: Modifier) {
     }
 }
 
-
+// navigation
 @Composable
 fun AppNavHost(
     navController: NavHostController,
@@ -400,7 +375,6 @@ fun AppNavHost(
     userViewModel: UserViewModel,
     groupViewModel: GroupViewModel,
     itemViewModel: ItemViewModel,
-    balanceRepository: BalanceRepository,
     balanceViewModel: BalanceViewModel,
     currentGroup: GroupState,
     allGroupsState: List<GroupState>,
@@ -410,11 +384,7 @@ fun AppNavHost(
         navController = navController,
         startDestination = startDestination,
         modifier = modifier
-//                .padding(horizontal = if (currentDestination != Screens.Login.name) 0.dp else 20.dp),
-//            .padding(horizontal = 20.dp),
     ) {
-
-
         composable(
             Screens.Login.route,
         ) {
@@ -446,7 +416,6 @@ fun AppNavHost(
 
             Box {
                 Home(
-
                     navController,
                     groupViewModel,
                     userViewModel,
@@ -500,6 +469,7 @@ fun AppNavHost(
                 )
             }
         }
+
         composable(
             Screens.GroupMembers.route
         ) {
@@ -524,11 +494,10 @@ fun AppNavHost(
                 )
             }
         }
-
-
     }
 }
 
+// Bottom navigation bar
 @Composable
 fun BottomNavigationBar(
     navController: NavController,
@@ -562,17 +531,13 @@ fun BottomNavigationBar(
     }
 }
 
+// Header
 @Composable
 fun Header(
     navController: NavController,
     currentDestination: String?,
     group: GroupState
 ) {
-//    val currentGroup by groupViewModel.currentGroup.collectAsState()
-//    val groupMemberInformation by groupViewModel.groupMembers.collectAsState(
-//        initial = GroupMembersUiState(emptyList())
-//    )
-
     Column(
         modifier = Modifier
             .height(100.dp)

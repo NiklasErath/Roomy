@@ -1,5 +1,6 @@
 package com.example.roomy.ui
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,7 +11,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -21,7 +26,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -73,11 +80,23 @@ fun Balance(
         Column {
 
             Text(
-                text = "BALANCE",
+                text = "Group Balance",
                 modifier = Modifier.fillMaxWidth(), fontWeight = FontWeight.Bold
             )
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                thickness = 1.dp,
+                color = Color.Gray
+            )
 
-            LazyColumn {
+            LazyColumn(
+                modifier = Modifier
+                    .height(200.dp)
+                    .fillMaxWidth()
+                    .padding(top = 12.dp, bottom = 12.dp)
+            ) {
                 itemsIndexed(balanceUi.value.userBalance) { index: Int, Balance ->
                     val owedBy =
                         currentGroup.groupMembers.find { it.id == Balance.owedBy }?.username
@@ -86,102 +105,139 @@ fun Balance(
                         currentGroup.groupMembers.find { it.id == Balance.owedTo }?.username
                             ?: "Unknown User"
                     if (Balance.owedBy != currentUser.userId) {
-                        OutlinedCard(modifier = Modifier.padding(12.dp)) {
+                        OutlinedCard(modifier = Modifier.padding(8.dp)) {
                             Text(text = "$owedTo owes $owedBy ${Balance.amount} $")
                         }
                     } else {
-                        OutlinedCard(modifier = Modifier.padding(12.dp)) {
-                            Text(text = "$owedBy lent $owedTo ${Balance.amount} $")
-                        }
-                    }
-                }
-            }
-
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-            ) {
-
-                Text(
-                    text = "Payments",
-                    modifier = Modifier.fillMaxWidth(), fontWeight = FontWeight.Bold
-                )
-                Box(
-                    modifier = Modifier
-                        .height(400.dp)
-                        .fillMaxWidth()
-                ) {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp)
-                    ) {
-                        itemsIndexed(payments.asReversed()) { index: Int, Payment ->
-                            val userName =
-                                currentGroup.groupMembers.find { it.id == Payment.paidBy }?.username
-                                    ?: "Unknown User"
-                            OutlinedCard(modifier = Modifier.padding(12.dp)) {
-                                Text(text = "$userName bought ${Payment.items} for ${Payment.amount} $")
+                        OutlinedCard(
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .fillMaxWidth()
+                        ) {
+                            Column(modifier = Modifier.padding(8.dp)) {
+                                Text(text = "$owedBy lent $owedTo ${Balance.amount} $")
                             }
                         }
                     }
                 }
-
             }
+
             Column(
                 Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
             ) {
-                if (addPayment) {
-                    Text(text = "Add new Payment")
-                    OutlinedTextField(
-                        value = newPayment,
-                        onValueChange = { newValue ->
-                            val filteredValue = newValue.filter { it.isDigit() || it == ',' }
-                            newPayment = filteredValue
-                        },
-                        placeholder = { Text(text = "Amount") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                    )
-                    OutlinedTextField(
-                        value = itemsBought,
-                        onValueChange = { newValue -> itemsBought = newValue },
-                        placeholder = { Text(text = "Items you bought") },
-                    )
-                    Row() {
-                        Button(onClick = {
-                            val groupSize = currentGroup.groupMembers.size
-                            if (paymentAmount != 0) {
-                                balanceViewModel.addPayment(
-                                    currentUser.userId,
-                                    currentGroupIdInt,
-                                    paymentAmount,
-                                    itemsBought,
-                                    groupSize,
-                                    currentGroup.groupMembers
-                                )
-                                addPayment = false
-                                newPayment = ""
-                                itemsBought = ""
+                LazyColumn {
+                    item {
+                        Text(
+                            text = "Payments",
+                            modifier = Modifier.fillMaxWidth(), fontWeight = FontWeight.Bold
+                        )
+                        HorizontalDivider(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            thickness = 1.dp,
+                            color = Color.Gray
+                        )
+                    }
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .height(300.dp)
+                                .fillMaxWidth()
+                        ) {
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                            ) {
+                                itemsIndexed(payments.asReversed()) { index: Int, Payment ->
+                                    val userName =
+                                        currentGroup.groupMembers.find { it.id == Payment.paidBy }?.username
+                                            ?: "Unknown User"
+                                    OutlinedCard(
+                                        modifier = Modifier
+                                            .padding(12.dp)
+                                            .fillMaxWidth()
+                                    ) {
+                                        Text(text = "$userName bought ${Payment.items} for ${Payment.amount} $", modifier = Modifier.padding(8.dp))
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    item {
+                        HorizontalDivider(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            thickness = 1.dp,
+                            color = Color.Gray
+                        )
+                    }
+                    item {
+                        Column(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = 20.dp)
+                        ) {
+                            if (addPayment) {
+                                Box(modifier = Modifier.fillMaxWidth()) {
+                                    Column (modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally){
+                                        Text(text = "Add new Payment", modifier = Modifier.padding(bottom = 8.dp))
+
+                                        OutlinedTextField(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                                            value = newPayment,
+                                            onValueChange = { newValue ->
+                                                val filteredValue =
+                                                    newValue.filter { it.isDigit() || it == ',' }
+                                                newPayment = filteredValue
+                                            },
+                                            placeholder = { Text(text = "Amount") },
+                                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                                        )
+                                        OutlinedTextField(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                                            value = itemsBought,
+                                            onValueChange = { newValue -> itemsBought = newValue },
+                                            placeholder = { Text(text = "Items you bought") },
+                                        )
+                                        Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
+                                            Button(onClick = {
+                                                val groupSize = currentGroup.groupMembers.size
+                                                if (paymentAmount != 0) {
+                                                    balanceViewModel.addPayment(
+                                                        currentUser.userId,
+                                                        currentGroupIdInt,
+                                                        paymentAmount,
+                                                        itemsBought,
+                                                        groupSize,
+                                                        currentGroup.groupMembers
+                                                    )
+                                                    addPayment = false
+                                                    newPayment = ""
+                                                    itemsBought = ""
+                                                } else {
+                                                    addPayment = false
+                                                    newPayment = ""
+                                                    itemsBought = ""
+                                                }
+                                            }) {
+                                                Text(text = "Add new Payment")
+                                            }
+                                            Button(onClick = {
+                                                addPayment = false
+                                                newPayment = ""
+                                                itemsBought = ""
+                                            }) { Text(text = "Cancel") }
+                                        }
+                                    }
+                                }
                             } else {
-                                addPayment = false
-                                newPayment = ""
-                                itemsBought = ""
+                                Button(onClick = { addPayment = true }, modifier = Modifier.fillMaxWidth()) {
+                                    Text(text = "Add new Payment")
+                                }
                             }
-                        }) {
-                            Text(text = "Add new Payment")
                         }
-                        Button(onClick = {
-                            addPayment = false
-                            newPayment = ""
-                            itemsBought = ""
-                        }) { Text(text = "Cancel") }
-                    }
-                } else {
-                    Button(onClick = { addPayment = true }) {
-                        Text(text = "Add new Payment")
                     }
                 }
             }

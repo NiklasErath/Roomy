@@ -107,6 +107,11 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
+
+//    Pull to refresh Library
+    implementation("dev.materii.pullrefresh:pullrefresh:1.4.0-beta02")
+
+
     // Navigation in Compose
     implementation(libs.androidx.navigation.compose)
 

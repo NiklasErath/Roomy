@@ -24,6 +24,7 @@ import androidx.navigation.NavController
 import com.example.roomy.ui.Screens
 import com.example.roomy.ui.States.GroupMembersUiState
 import com.example.roomy.ui.States.GroupState
+import okhttp3.internal.notifyAll
 
 
 @Composable
@@ -32,6 +33,14 @@ fun Header(
     currentDestination: String?,
     group: GroupState
 ) {
+
+    val maxFontSize = 28
+
+    val fontSize = if (group.groupName.length > 16) {
+        maxFontSize - (group.groupName.length / 3)
+    } else {
+        maxFontSize
+    }
 
     Column(
         modifier = Modifier
@@ -60,7 +69,7 @@ fun Header(
 
                     Text(
                         text = group.groupName,
-                        fontSize = 28.sp,
+                        fontSize = fontSize.sp,
                         modifier = Modifier
                             .weight(1f)
                             .align(Alignment.CenterVertically),
@@ -90,7 +99,7 @@ fun Header(
                     }
                     Text(
                         text = group.groupName,
-                        fontSize = 28.sp,
+                        fontSize = fontSize.sp,
                         modifier = Modifier
                             .weight(1f)
                             .align(Alignment.CenterVertically),
@@ -113,7 +122,7 @@ fun Header(
                 } else {
                     Text(
                         text = group.groupName,
-                        fontSize = 28.sp,
+                        fontSize = fontSize.sp,
                         modifier = Modifier
                             .weight(1f)
                             .align(Alignment.CenterVertically),

@@ -8,8 +8,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.roomy.db.ItemRepository
 import com.example.roomy.db.data.Item
-import com.example.roomy.ui.States.ItemsUiState
-import com.example.roomy.ui.States.newGroupState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

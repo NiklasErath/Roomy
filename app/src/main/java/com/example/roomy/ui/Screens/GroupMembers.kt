@@ -30,7 +30,7 @@ import com.example.roomy.ui.States.GroupMembersUiState
 import com.example.roomy.ui.ViewModels.GroupViewModel
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import com.example.roomy.ui.States.newGroupState
+import com.example.roomy.ui.States.GroupState
 import com.example.roomy.ui.ViewModels.UserViewModel
 
 
@@ -40,7 +40,7 @@ fun GroupMembers(
     navController: NavController,
     groupViewModel: GroupViewModel,
     userViewModel: UserViewModel,
-    currentGroup: newGroupState
+    currentGroup: GroupState
 
 ) {
     val context = LocalContext.current

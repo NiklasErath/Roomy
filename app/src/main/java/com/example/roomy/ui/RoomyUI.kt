@@ -1,7 +1,6 @@
 package com.example.roomy.ui
 
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -69,7 +68,7 @@ import com.example.roomy.db.Supabase.UserSessionManager
 import com.example.roomy.ui.Composables.Snackbar
 import com.example.roomy.ui.Factory.BalanceViewModelFactory
 import com.example.roomy.ui.Factory.StateViewModelFactory
-import com.example.roomy.ui.States.newGroupState
+import com.example.roomy.ui.States.GroupState
 import com.example.roomy.ui.ViewModels.BalanceViewModel
 import com.example.roomy.ui.ViewModels.StateViewModel
 import kotlinx.coroutines.launch
@@ -87,11 +86,7 @@ enum class Screens(val route: String) {
 }
 
 @Composable
-fun RoomyApp(
-    modifier: Modifier = Modifier,
-    ) {
-
-
+fun RoomyApp() {
 
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -101,11 +96,8 @@ fun RoomyApp(
     val balanceRepository = BalanceRepository()
     val paymentsRepository = PaymentsRepository()
 
-
     val networkConnection = remember { NetworkConnection() }
 
-
-//    val networkConnection = NetworkConnection()
     val context = LocalContext.current
 
     if (!networkConnection.isNetworkAvailable(context)) {
@@ -113,45 +105,43 @@ fun RoomyApp(
             .show()
     }
 
+    // check the current screen
     val currentDestination = navBackStackEntry?.destination?.route
     val displayBottomBarAndHeader = when (currentDestination) {
         Screens.Login.name, Screens.Register.name, Screens.Home.name -> false
         else -> true
     }
 
-
-
-
-//    Initialize StateViewModel which hold our global UI States and pass it to other ViewModels for updates
     val stateViewModel: StateViewModel = viewModel(
         factory = StateViewModelFactory()
     )
-
 
     val userViewModel: UserViewModel = viewModel(
         factory = UserViewModelFactory(userRepository, stateViewModel)
     )
 
-
-
-
-//    Check currentUser session
-
-    val startDestination: String
-
-    if (UserSessionManager.getSessionToken(context) != null){
-        userViewModel.logInAndFetchInformationWithSessionToken(context)
-        startDestination = Screens.Home.name
-
-    }else{
-        startDestination = Screens.Login.name
-    }
-
-
     val itemViewModel: ItemViewModel = viewModel(
         factory = ItemViewModelFactory(itemRepository, stateViewModel)
     )
 
+    val balanceViewModel: BalanceViewModel = viewModel(
+        factory = BalanceViewModelFactory(
+            balanceRepository,
+            paymentsRepository,
+            groupRepository,
+            stateViewModel
+        )
+    )
+
+    val startDestination: String
+
+    // redirect the user to the home screen when there is a user loggedIn and get his information or to the login screen when no user is loggedIn
+    if (UserSessionManager.getSessionToken(context) != null) {
+        userViewModel.logInAndFetchInformationWithSessionToken(context)
+        startDestination = Screens.Home.name
+    } else {
+        startDestination = Screens.Login.name
+    }
 
     val groupViewModel: GroupViewModel = viewModel(
         factory = GroupViewModelFactory(
@@ -161,34 +151,22 @@ fun RoomyApp(
             balanceRepository,
             paymentsRepository,
             stateViewModel
-            )
+        )
     )
 
-
-
-
-
-
-
-
-
-    val balanceViewModel: BalanceViewModel = viewModel(
-        factory = BalanceViewModelFactory(balanceRepository, paymentsRepository, groupRepository, stateViewModel)
-    )
-
+    // get the current group information
     val currentGroupInformation by groupViewModel.currentGroupInformation.collectAsState()
 
-    // Step 2: Collect all groups state
     val allGroupsState by stateViewModel.allGroupsState.collectAsState(
         initial = emptyList()
     )
 
-    // Step 3: Find the corresponding GroupState based on the currentGroup.id
+    // get the corresponding GroupState based on the currentGroup.id
     val currentGroup by remember(currentGroupInformation.id, allGroupsState) {
         derivedStateOf {
-            // Find the corresponding GroupState based on the currentGroup.id
+            // find the state based on the currentGroup.id
             allGroupsState.find { it.groupId == currentGroupInformation.id }
-                ?: newGroupState(
+                ?: GroupState(
                     groupId = -1,
                     groupName = "Unknown",
                     creatorId = "Unknown",
@@ -196,20 +174,19 @@ fun RoomyApp(
                     shoppingListItems = emptyList(),
                     inventoryItems = emptyList(),
                     itemCount = 0
-                )  // Fallback default group state
+                )
         }
     }
 
-//    Snackbar
-    val snackbarHostState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()
-    var snackbarData : String
 
-
+    // error message display
     val userErrorMessage by userViewModel.userError.collectAsState()
     val itemErrorMessage by itemViewModel.itemError.collectAsState()
     val groupErrorMessage by groupViewModel.error.collectAsState()
     val balanceErrorMessage by balanceViewModel.balanceError.collectAsState()
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
     val currentBackStackEntry = navController.currentBackStackEntryAsState()
 
@@ -231,6 +208,7 @@ fun RoomyApp(
                 userViewModel.clearUserError()
 
             }
+
             itemErrorMessage.message.isNotEmpty() -> {
                 coroutineScope.launch {
                     snackbarHostState.showSnackbar(
@@ -240,6 +218,7 @@ fun RoomyApp(
                 itemViewModel.clearItemError()
 
             }
+
             groupErrorMessage.message.isNotEmpty() -> {
                 coroutineScope.launch {
                     snackbarHostState.showSnackbar(
@@ -249,6 +228,7 @@ fun RoomyApp(
                 groupViewModel.clearGroupError()
 
             }
+
             balanceErrorMessage.message.isNotEmpty() -> {
                 coroutineScope.launch {
                     snackbarHostState.showSnackbar(
@@ -268,13 +248,21 @@ fun RoomyApp(
 
             snackbarHost = {
                 Column(
-                    modifier = Modifier.fillMaxSize().imePadding().padding(vertical=100.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .imePadding()
+                        .padding(vertical = 100.dp),
                     verticalArrangement = Arrangement.Top,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     SnackbarHost(
                         hostState = snackbarHostState,
-                        snackbar = { snackbarData -> Snackbar(snackbarData, Modifier.padding(top = 80.dp)) },
+                        snackbar = { snackbarData ->
+                            Snackbar(
+                                snackbarData,
+                                Modifier.padding(top = 80.dp)
+                            )
+                        },
 //                            modifier = Modifier
 //                                .padding(top = 16.dp) // Add some padding from the top edge
                     )
@@ -300,8 +288,6 @@ fun RoomyApp(
             ) { innerPadding ->
 
 
-
-
             AppNavHost(
                 navController,
                 Modifier
@@ -322,13 +308,16 @@ fun RoomyApp(
         }
 
 
-    } else if(networkConnection.isNetworkAvailable(context)) {
+    } else if (networkConnection.isNetworkAvailable(context)) {
 
         Scaffold(
 
             snackbarHost = {
                 Column(
-                    modifier = Modifier.fillMaxSize().imePadding().padding(vertical=100.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .imePadding()
+                        .padding(vertical = 100.dp),
                     verticalArrangement = Arrangement.Top,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -367,7 +356,7 @@ fun RoomyApp(
 
     }
 //    If there is no Internet Connection show this Screen as a warning
-    else{
+    else {
 
         Scaffold(
 
@@ -413,8 +402,8 @@ fun AppNavHost(
     itemViewModel: ItemViewModel,
     balanceRepository: BalanceRepository,
     balanceViewModel: BalanceViewModel,
-    currentGroup: newGroupState,
-    allGroupsState: List<newGroupState>,
+    currentGroup: GroupState,
+    allGroupsState: List<GroupState>,
     startDestination: String
 ) {
     NavHost(
@@ -577,7 +566,8 @@ fun BottomNavigationBar(
 fun Header(
     navController: NavController,
     currentDestination: String?,
-    group: newGroupState) {
+    group: GroupState
+) {
 //    val currentGroup by groupViewModel.currentGroup.collectAsState()
 //    val groupMemberInformation by groupViewModel.groupMembers.collectAsState(
 //        initial = GroupMembersUiState(emptyList())
@@ -626,8 +616,7 @@ fun Header(
                     ) {
                         UserProfileCirclesStacked(GroupMembersUiState(group.groupMembers))
                     }
-                }
-                else if (currentDestination == "GroupMembers" || currentDestination == "RecipeSuggestion") {
+                } else if (currentDestination == "GroupMembers" || currentDestination == "RecipeSuggestion") {
                     IconButton(
                         onClick = { navController.navigateUp() },
                         modifier = Modifier.align(Alignment.CenterVertically)
@@ -651,7 +640,11 @@ fun Header(
                     Row(
                         modifier = Modifier
                             .wrapContentSize()
-                            .clickable { if(currentDestination != Screens.GroupMembers.name){ navController.navigate(Screens.GroupMembers.route) }},
+                            .clickable {
+                                if (currentDestination != Screens.GroupMembers.name) {
+                                    navController.navigate(Screens.GroupMembers.route)
+                                }
+                            },
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.End
                     ) {

@@ -18,8 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.roomy.db.api.getSuggestedRecipe
-import com.example.roomy.ui.States.ItemsUiState
-import com.example.roomy.ui.States.newGroupState
+import com.example.roomy.ui.States.GroupState
 import com.example.roomy.ui.ViewModels.ItemViewModel
 import com.example.roomy.ui.ViewModels.UserViewModel
 
@@ -27,7 +26,7 @@ import com.example.roomy.ui.ViewModels.UserViewModel
 fun RecipeSuggestion(
     navController: NavController,
     itemViewModel: ItemViewModel,
-    currentGroup: newGroupState
+    currentGroup: GroupState
 ) {
 
     var recipe by remember { mutableStateOf("Fetching Recipe ...") }

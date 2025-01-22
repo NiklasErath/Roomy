@@ -54,8 +54,7 @@ import androidx.navigation.NavController
 import com.example.roomy.R
 import com.example.roomy.ui.Composables.ExpandingAddItemElement
 import com.example.roomy.ui.Composables.RecipeButton
-import com.example.roomy.ui.States.ItemsUiState
-import com.example.roomy.ui.States.newGroupState
+import com.example.roomy.ui.States.GroupState
 import com.example.roomy.ui.ViewModels.GroupViewModel
 import com.example.roomy.ui.ViewModels.ItemViewModel
 
@@ -66,7 +65,7 @@ fun Group(
     itemViewModel: ItemViewModel,
     navController: NavController,
     previousScreen: String,
-    currentGroup: newGroupState
+    currentGroup: GroupState
 ) {
 
 

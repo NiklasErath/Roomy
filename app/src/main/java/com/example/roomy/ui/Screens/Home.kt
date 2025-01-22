@@ -41,7 +41,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -49,16 +48,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.roomy.R
-import com.example.roomy.db.NetworkConnection
 import com.example.roomy.ui.Composables.AddGroupButton
-import com.example.roomy.ui.States.GroupsUiState
-import com.example.roomy.ui.States.newGroupState
+import com.example.roomy.ui.States.GroupState
 import com.example.roomy.ui.ViewModels.AddGroupState
 import com.example.roomy.ui.ViewModels.GroupViewModel
 import com.example.roomy.ui.ViewModels.ItemViewModel
 import com.example.roomy.ui.ViewModels.LoginState
 import com.example.roomy.ui.ViewModels.UserViewModel
-import kotlinx.coroutines.delay
 
 @Composable
 fun Home(
@@ -66,7 +62,7 @@ fun Home(
     groupViewModel: GroupViewModel,
     userViewModel: UserViewModel,
     itemViewModel: ItemViewModel,
-    allGroupsState: List<newGroupState>,
+    allGroupsState: List<GroupState>,
     previousScreen: String
 ) {
 
@@ -238,7 +234,6 @@ fun Home(
                                     groupViewModel.clearGroupError()
                                 } else {
                                     addedUsers.add(usernameAdd)
-                                    Log.d("Users", "$addedUsers")
                                     usernameAdd = ""
                                 }
                             }

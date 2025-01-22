@@ -244,8 +244,8 @@ class UserViewModel(
     // update the username and check if he already exists
     fun updateUserName(username: String, userId: String) {
         viewModelScope.launch {
-            val newUsername = userRepository.getUserByName(username)
-            if (newUsername == null) {
+            val newUsername = userRepository.checkExistingUserName(username)
+            if (newUsername) {
                 _userError.update { oldState ->
                     oldState.copy("Username already exists")
                 }

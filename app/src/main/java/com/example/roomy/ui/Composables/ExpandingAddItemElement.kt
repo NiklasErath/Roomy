@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.roomy.R
 import com.example.roomy.ui.Item
-import com.example.roomy.ui.States.newGroupState
+import com.example.roomy.ui.States.GroupState
 import com.example.roomy.ui.ViewModels.ItemViewModel
 
 @Composable
@@ -52,7 +52,7 @@ fun ExpandingAddItemElement(
     updateFocusState: (Boolean) -> Unit,
     updateExpandState: (Boolean) -> Unit,
     updateItemName: (String) -> Unit,
-    currentGroup: newGroupState,
+    currentGroup: GroupState,
     itemViewModel: ItemViewModel,
     resetAfterItemAdded: () -> Unit
 ) {

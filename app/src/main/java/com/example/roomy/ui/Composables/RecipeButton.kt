@@ -34,12 +34,12 @@ import androidx.navigation.NavController
 import com.example.roomy.R
 import com.example.roomy.db.data.Item
 import com.example.roomy.ui.Screens
-import com.example.roomy.ui.States.newGroupState
+import com.example.roomy.ui.States.GroupState
 import com.example.roomy.ui.ViewModels.GroupViewModel
 
 @Composable
 fun RecipeButton(
-    currentGroup: newGroupState,
+    currentGroup: GroupState,
     context: Context,
     navController: NavController,
     groupViewModel: GroupViewModel

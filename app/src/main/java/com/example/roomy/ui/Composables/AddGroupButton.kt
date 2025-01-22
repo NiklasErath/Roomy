@@ -36,7 +36,6 @@ import androidx.navigation.NavController
 import com.example.roomy.R
 import com.example.roomy.db.data.Item
 import com.example.roomy.ui.Screens
-import com.example.roomy.ui.States.newGroupState
 
 @Composable
 fun AddGroupButton(

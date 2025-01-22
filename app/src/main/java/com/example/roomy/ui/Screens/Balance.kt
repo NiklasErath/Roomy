@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.roomy.db.BalanceRepository
 import com.example.roomy.ui.States.GroupMembersUiState
-import com.example.roomy.ui.States.newGroupState
+import com.example.roomy.ui.States.GroupState
 import com.example.roomy.ui.ViewModels.BalanceViewModel
 import com.example.roomy.ui.ViewModels.GroupViewModel
 import com.example.roomy.ui.ViewModels.StateViewModel
@@ -41,7 +41,7 @@ fun Balance(
     balanceViewModel: BalanceViewModel,
     groupViewModel: GroupViewModel,
     userViewModel: UserViewModel,
-    currentGroup: newGroupState,
+    currentGroup: GroupState,
 ) {
 
     val currentGroupInformation by groupViewModel.currentGroupInformation.collectAsState()

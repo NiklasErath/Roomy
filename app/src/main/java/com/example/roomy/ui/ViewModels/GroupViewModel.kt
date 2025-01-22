@@ -13,9 +13,7 @@ import com.example.roomy.db.data.GroupInformation
 import com.example.roomy.db.data.Groups
 import com.example.roomy.db.data.UserInformation
 import com.example.roomy.ui.States.GroupMembersUiState
-import com.example.roomy.ui.States.GroupsUiState
-import com.example.roomy.ui.States.PaymentsUiState
-import com.example.roomy.ui.States.newGroupState
+import com.example.roomy.ui.States.GroupState
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -113,8 +111,8 @@ class GroupViewModel(
                     )
                     val groupPayments = allPayments.filter { it.groupId == groupId }
 
-                    // set the values for newGroupState with the fetched data
-                    newGroupState(
+                    // set the values for GroupState with the fetched data
+                    GroupState(
                         groupId = groupId,
                         groupName = groupInfo?.name ?: "Unknown",
                         creatorId = groupInfo?.creatorId ?: "Unknown",

@@ -6,7 +6,7 @@ import com.example.roomy.db.data.Balance
 import com.example.roomy.db.data.Item
 import com.example.roomy.db.data.Payments
 import com.example.roomy.db.data.UserInformation
-import com.example.roomy.ui.States.newGroupState
+import com.example.roomy.ui.States.GroupState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -18,12 +18,12 @@ class StateViewModel(
 ) : ViewModel() {
 
     // contains all data from all groups the user is in and allows seamless UI Rendering without the need to fetch data again
-    private val _allGroupsState = MutableStateFlow<List<newGroupState>>(emptyList())
+    private val _allGroupsState = MutableStateFlow<List<GroupState>>(emptyList())
     val allGroupsState = _allGroupsState.asStateFlow()
 
     //    Initially set the new global group state frm the group viewmodel
-    fun setAllGroupsState(newGroupState: List<newGroupState>) {
-        _allGroupsState.update { newGroupState }
+    fun setAllGroupsState(GroupState: List<GroupState>) {
+        _allGroupsState.update { GroupState }
     }
 
 

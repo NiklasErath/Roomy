@@ -26,14 +26,14 @@ import com.example.roomy.R
 import com.example.roomy.db.data.GroupInformation
 import com.example.roomy.ui.Composables.UserProfileCirclesStacked
 import com.example.roomy.ui.States.GroupMembersUiState
-import com.example.roomy.ui.States.newGroupState
+import com.example.roomy.ui.States.GroupState
 import com.example.roomy.ui.ViewModels.GroupViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun GroupCard(
     groupViewModel: GroupViewModel,
-    currentGroup: newGroupState,
+    currentGroup: GroupState,
     navController: NavController,
 ){
 

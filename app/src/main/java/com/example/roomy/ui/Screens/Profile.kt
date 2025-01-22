@@ -1,5 +1,7 @@
 package com.example.roomy.ui
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -32,15 +35,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 
 import com.example.roomy.ui.Composables.UserProfileCircle
 import com.example.roomy.ui.States.GroupState
+import com.example.roomy.ui.ViewModels.GroupViewModel
 import com.example.roomy.ui.ViewModels.UserViewModel
 
 @Composable
 fun Profile(
     userViewModel: UserViewModel,
+    groupViewModel: GroupViewModel,
     navController: NavController,
     currentGroup: GroupState
 ) {
@@ -52,6 +58,9 @@ fun Profile(
     var isChangeUsernameVisible by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
+
+    var deleteGroup by remember { mutableStateOf(false) }
+    var leaveGroup by remember { mutableStateOf(false) }
 
 
     Column(
@@ -125,56 +134,91 @@ fun Profile(
                                 )
 
                                 if (isChangeUsernameVisible) {
-
-                                    OutlinedTextField(
-                                        value = username,
-                                        onValueChange = { newValue -> username = newValue },
-                                        Modifier.fillMaxWidth(),
-                                        label = { Text("new username") },
-                                        leadingIcon = {
-                                            Icon(
-                                                imageVector = Icons.Filled.Person,
-                                                contentDescription = "username",
-                                                modifier = Modifier
-                                            )
-                                        }
-
-
-                                    )
-                                    if (username.length in 1..2) {
-                                        Text(
-                                            text = "The username must be at least 3 characters long",
-                                            color = Color.Red,
-                                        )
-                                    }
-                                    Row {
-                                        Button(onClick = {
-                                            if (username.length >= 3) {
-                                                userViewModel.updateUserName(
-                                                    username,
-                                                    currentUser.userId,
-                                                )
-                                                isChangeUsernameVisible = false
-                                                username = ""
-                                            }
-                                        }) {
-                                            Text(text = "Change username")
-                                        }
-                                        Button(onClick = {
+                                    Dialog(
+                                        onDismissRequest = {
                                             isChangeUsernameVisible = false
                                             username = ""
-                                        }) {
-                                            Text(text = "Cancel")
+                                        }
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(16.dp)
+                                                .background(
+                                                    Color.White,
+                                                    shape = RoundedCornerShape(8.dp)
+                                                )
+                                        ) {
+                                            Column(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(16.dp),
+                                                horizontalAlignment = Alignment.CenterHorizontally
+                                            ) {
+                                                Text(
+                                                    text = "Change Username",
+                                                    modifier = Modifier.padding(bottom = 8.dp),
+                                                    color = Color.Black
+                                                )
+                                                OutlinedTextField(
+                                                    value = username,
+                                                    onValueChange = { newValue ->
+                                                        username = newValue
+                                                    },
+                                                    Modifier.fillMaxWidth(),
+                                                    label = { Text("new username") },
+                                                    leadingIcon = {
+                                                        Icon(
+                                                            imageVector = Icons.Filled.Person,
+                                                            contentDescription = "username",
+                                                            modifier = Modifier
+                                                        )
+                                                    }
+
+
+                                                )
+                                                if (username.length in 1..2) {
+                                                    Text(
+                                                        text = "The username must be at least 3 characters long",
+                                                        color = Color.Red,
+                                                    )
+                                                }
+                                                Row(
+                                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .padding(top = 8.dp)
+                                                ) {
+                                                    Button(onClick = {
+                                                        if (username.length >= 3) {
+                                                            userViewModel.updateUserName(
+                                                                username,
+                                                                currentUser.userId,
+                                                            )
+                                                            isChangeUsernameVisible = false
+                                                            username = ""
+                                                        }
+                                                    }) {
+                                                        Text(text = "Change username")
+                                                    }
+                                                    Button(onClick = {
+                                                        isChangeUsernameVisible = false
+                                                        username = ""
+                                                    }) {
+                                                        Text(text = "Cancel")
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
-                                } else {
-                                    Button(
-                                        onClick = { isChangeUsernameVisible = true },
-                                        modifier = Modifier.fillMaxWidth()
-                                    ) {
-                                        Text(text = "Change username")
-                                    }
                                 }
+                                Button(
+                                    onClick = { isChangeUsernameVisible = true },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(text = "Change username")
+                                }
+
                                 Button(
                                     onClick = {
                                         userViewModel.logout({ loggedOut ->
@@ -247,6 +291,90 @@ fun Profile(
                             ) {
                                 Text(text = "Manage Members")
                             }
+                            if (currentUser.userId == currentGroup.creatorId) {
+                                Button(onClick = {
+                                    deleteGroup = true
+                                }, modifier = Modifier.fillMaxWidth()) {
+                                    Text(text = "Delete group")
+                                }
+                            } else {
+                                Button(onClick = {
+                                    leaveGroup = true
+                                }, modifier = Modifier.fillMaxWidth()) {
+                                    Text(text = "Leave group")
+                                }
+                            }
+                        }
+                    }
+                    if (leaveGroup || deleteGroup) {
+                        Dialog(onDismissRequest = {
+                            deleteGroup = false
+                            leaveGroup = false
+                        }) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                                    .background(Color.White, shape = RoundedCornerShape(8.dp))
+                            ) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    if (leaveGroup) {
+                                        Text(
+                                            text = "You really want to leave ${currentGroup.groupName}?",
+                                            modifier = Modifier.padding(bottom = 8.dp),
+                                            color = Color.Black,
+                                        )
+                                        Row(
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                        ) {
+                                        Button(onClick = {
+                                            leaveGroup = false
+                                            groupViewModel.kickUser(
+                                                currentUser.userId,
+                                                currentGroup.groupId
+                                            )
+                                            navController.navigate("Home")
+
+                                        }) {
+                                            Text(text = "Leave")
+                                        }
+                                        Button(onClick = {
+                                            leaveGroup = false
+                                        }) { Text(text = "Cancel") }
+                                            }
+                                    } else {
+                                        Text(
+                                            text = "You really want to delete ${currentGroup.groupName}?",
+                                            modifier = Modifier.padding(bottom = 8.dp),
+                                            color = Color.Black,
+                                        )
+                                        Row(
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                        ) {
+                                            Button(onClick = {
+                                                groupViewModel.deleteGroup(currentGroup.groupId)
+                                                navController.navigate("Home")
+                                                deleteGroup = false
+                                            }) {
+                                                Text(text = "Delete")
+                                            }
+                                            Button(onClick = {
+                                                deleteGroup = false
+                                            }) { Text(text = "Cancel") }
+                                        }
+                                    }
+                                }
+
+                            }
                         }
                     }
                 }
@@ -254,3 +382,4 @@ fun Profile(
         }
     }
 }
+

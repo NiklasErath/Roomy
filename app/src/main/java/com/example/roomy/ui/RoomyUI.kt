@@ -467,6 +467,7 @@ fun AppNavHost(
             Box {
                 Profile(
                     userViewModel,
+                    groupViewModel,
                     navController,
                     currentGroup
                 )

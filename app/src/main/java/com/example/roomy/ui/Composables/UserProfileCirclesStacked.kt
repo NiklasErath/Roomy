@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,6 +22,14 @@ import com.example.roomy.ui.States.GroupMembersUiState
 
 @Composable
 fun UserProfileCirclesStacked(groupMemberInformation: GroupMembersUiState,  ) {
+
+    val circleColors = listOf(
+        MaterialTheme.colorScheme.secondary,
+        MaterialTheme.colorScheme.primary,
+        MaterialTheme.colorScheme.surfaceContainer,
+
+    )
+
 
     Box(
         modifier = Modifier
@@ -44,10 +53,12 @@ fun UserProfileCirclesStacked(groupMemberInformation: GroupMembersUiState,  ) {
                             .offset(x = (-index * 12).dp)
                             .zIndex((maxVisible - index).toFloat())
                     ) {
+                        val circleColor = circleColors[index % circleColors.size]
+
                         UserProfileCircle(
                             groupMembers.username,
                             28.dp,
-                            Color.Blue
+                            circleColor
                         )
                     }
                 }
@@ -55,6 +66,7 @@ fun UserProfileCirclesStacked(groupMemberInformation: GroupMembersUiState,  ) {
 
         if (extraMembers > 0) {
             Text(
+                color = Color.Black ,
                 text = "+$extraMembers",
                 modifier = Modifier.align(Alignment.CenterEnd)
             )

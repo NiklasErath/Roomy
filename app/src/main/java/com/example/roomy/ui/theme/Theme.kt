@@ -67,10 +67,12 @@ fun RoomyTheme(
 
 //        Outline for TextinputFields
         outline = colorResource(id = R.color.dimPrimary),
+
 //      Color for BottomBar
         surface = colorResource(R.color.background),
         surfaceContainer = colorResource(R.color.highlight),
 
+//        Colors for GroupCards
         primaryContainer = Color.White,
         onPrimaryContainer = Color.Black
 

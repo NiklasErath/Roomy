@@ -33,7 +33,8 @@ fun Item(
     item: Item,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
-    context: Context
+    context: Context,
+    color: Color = MaterialTheme.colorScheme.primary
 
 ) {
 
@@ -65,7 +66,7 @@ fun Item(
         modifier = Modifier
             .fillMaxWidth()
             .aspectRatio(1.1f)
-            .background(MaterialTheme.colorScheme.primary)
+            .background(color)
             .padding(bottom = 4.dp)
             .combinedClickable(
                 onClick = onClick,

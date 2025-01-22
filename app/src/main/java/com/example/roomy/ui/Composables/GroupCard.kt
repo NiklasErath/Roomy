@@ -14,11 +14,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.integerResource
@@ -41,9 +43,7 @@ fun GroupCard(
 ){
 
     OutlinedCard(
-        Modifier
-            .shadow(20.dp, shape = RoundedCornerShape(8.dp))
-            // set the current group by clicking on a group card
+        modifier = Modifier // set the current group by clicking on a group card
             //navigate to manageMember Screen on long click
             .combinedClickable(
                 onClick = {
@@ -56,8 +56,7 @@ fun GroupCard(
                     navController.navigate(Screens.GroupMembers.name)
                 }
             )
-            .fillMaxWidth()
-            ,
+            .fillMaxWidth(),
 
         ) {
         Column (Modifier.fillMaxWidth() .background(Color.White).padding(12.dp).height(120.dp)
@@ -82,7 +81,7 @@ fun GroupCard(
                     Box(
                         modifier = Modifier
                             .padding(8.dp) // Adds padding around the Box
-                            .background(Color.Red, shape = RoundedCornerShape(50.dp)) // Rounded shape
+                            .background(color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(30.dp)) // Rounded shape
                             .padding(horizontal = 8.dp, vertical = 2.dp), // Padding inside the Box
                         contentAlignment = Alignment.Center // Centers the text inside the Box
                     ) {
@@ -106,7 +105,7 @@ fun GroupCard(
             }
 
             Row(
-                Modifier.padding(horizontal = 10.dp),
+                Modifier.padding(),
 
                 horizontalArrangement = Arrangement.Start
             ) {

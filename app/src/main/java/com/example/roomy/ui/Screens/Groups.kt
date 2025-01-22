@@ -197,7 +197,7 @@ fun Group(
                 Modifier
                     .fillMaxSize()
                     .padding(horizontal = 20.dp)
-                    .padding(bottom = 50.dp)
+                    .padding(bottom = 50.dp, top = 12.dp)
                     .verticalScroll(rememberScrollState())
             ) {
 
@@ -332,7 +332,8 @@ fun Group(
                                             itemViewModel.deleteItem(item, currentGroup.groupId)
 
                                         },
-                                        context
+                                        context,
+                                        color = MaterialTheme.colorScheme.secondary
                                     )
 
                                 }

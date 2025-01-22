@@ -68,6 +68,8 @@ import androidx.compose.ui.text.style.TextAlign
 import com.example.roomy.db.BalanceRepository
 import com.example.roomy.db.PaymentsRepository
 import com.example.roomy.db.Supabase.UserSessionManager
+import com.example.roomy.ui.Composables.BottomNavigationBar
+import com.example.roomy.ui.Composables.Header
 import com.example.roomy.ui.Composables.Snackbar
 import com.example.roomy.ui.Factory.BalanceViewModelFactory
 import com.example.roomy.ui.Factory.StateViewModelFactory
@@ -199,7 +201,7 @@ fun RoomyApp(modifier: Modifier) {
 
     }
 
-    // if there is an error then display a snackbar with the error message
+
     LaunchedEffect(userErrorMessage, itemErrorMessage, groupErrorMessage, balanceErrorMessage) {
         when {
             userErrorMessage.message.isNotEmpty() -> {
@@ -215,7 +217,7 @@ fun RoomyApp(modifier: Modifier) {
             itemErrorMessage.message.isNotEmpty() -> {
                 coroutineScope.launch {
                     snackbarHostState.showSnackbar(
-                        message = itemErrorMessage.message
+                        message = itemErrorMessage.message // Pass message directly
                     )
                 }
                 itemViewModel.clearItemError()
@@ -225,7 +227,7 @@ fun RoomyApp(modifier: Modifier) {
             groupErrorMessage.message.isNotEmpty() -> {
                 coroutineScope.launch {
                     snackbarHostState.showSnackbar(
-                        message = groupErrorMessage.message
+                        message = groupErrorMessage.message // Pass message directly
                     )
                 }
                 groupViewModel.clearGroupError()
@@ -235,7 +237,7 @@ fun RoomyApp(modifier: Modifier) {
             balanceErrorMessage.message.isNotEmpty() -> {
                 coroutineScope.launch {
                     snackbarHostState.showSnackbar(
-                        message = balanceErrorMessage.message
+                        message = balanceErrorMessage.message // Pass message directly
                     )
                 }
                 balanceViewModel.clearBalanceError()
@@ -244,9 +246,11 @@ fun RoomyApp(modifier: Modifier) {
         }
     }
 
-    // set snackbar position if network connection and display bottom and header
+
     if (displayBottomBarAndHeader && networkConnection.isNetworkAvailable(context)) {
+
         Scaffold(
+
             snackbarHost = {
                 Column(
                     modifier = Modifier
@@ -264,18 +268,31 @@ fun RoomyApp(modifier: Modifier) {
                                 Modifier.padding(top = 80.dp)
                             )
                         },
+//                            modifier = Modifier
+//                                .padding(top = 16.dp) // Add some padding from the top edge
                     )
                 }
             },
 
             bottomBar = {
+
                 BottomNavigationBar(navController, currentDestination)
+
             },
 
             topBar = {
+
                 Header(navController, currentDestination, currentGroup)
+
+
             },
-            modifier = Modifier.fillMaxSize(),) { innerPadding ->
+
+
+            modifier = Modifier.fillMaxSize(),
+
+            ) { innerPadding ->
+
+
             AppNavHost(
                 navController,
                 Modifier
@@ -284,15 +301,22 @@ fun RoomyApp(modifier: Modifier) {
                 userViewModel,
                 groupViewModel,
                 itemViewModel,
+                balanceRepository,
                 balanceViewModel,
                 currentGroup,
                 allGroupsState,
                 startDestination
+
+
             )
+
         }
-        // set snackbar position if network connection
+
+
     } else if (networkConnection.isNetworkAvailable(context)) {
+
         Scaffold(
+
             snackbarHost = {
                 Column(
                     modifier = Modifier
@@ -305,6 +329,8 @@ fun RoomyApp(modifier: Modifier) {
                     SnackbarHost(
                         hostState = snackbarHostState,
                         snackbar = { snackbarData -> Snackbar(snackbarData, Modifier) },
+//                            modifier = Modifier
+//                                .padding(top = 16.dp) // Add some padding from the top edge
                     )
                 }
             },
@@ -321,6 +347,7 @@ fun RoomyApp(modifier: Modifier) {
                 userViewModel,
                 groupViewModel,
                 itemViewModel,
+                balanceRepository,
                 balanceViewModel,
                 currentGroup,
                 allGroupsState,
@@ -333,7 +360,7 @@ fun RoomyApp(modifier: Modifier) {
 
 
     }
-    // set snackbar position if network connection is not available
+//    If there is no Internet Connection show this Screen as a warning
     else {
 
         Scaffold(
@@ -346,21 +373,21 @@ fun RoomyApp(modifier: Modifier) {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
-                    .padding(16.dp),
+                    .padding(16.dp),  // Optional: add some padding around
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Center  // Center content vertically
             ) {
                 Icon(
-                    imageVector = Icons.Filled.Warning,
+                    imageVector = Icons.Filled.Warning,  // Use a network-off icon
                     contentDescription = "No internet connection",
-                    modifier = Modifier.size(100.dp),
-                    tint = Color.Gray
+                    modifier = Modifier.size(100.dp),  // Adjust size of the icon
+                    tint = Color.Gray  // Optional: Set the icon color to gray
                 )
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))  // Space between icon and text
                 Text(
                     text = "Please connect to the internet and restart the Application.",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = Color.Gray,
+                    style = MaterialTheme.typography.titleLarge,  // Use h6 style for text
+                    color = Color.Gray,  // Set text color to gray
                     textAlign = TextAlign.Center
                 )
             }
@@ -370,7 +397,7 @@ fun RoomyApp(modifier: Modifier) {
     }
 }
 
-// navigation
+
 @Composable
 fun AppNavHost(
     navController: NavHostController,
@@ -378,6 +405,7 @@ fun AppNavHost(
     userViewModel: UserViewModel,
     groupViewModel: GroupViewModel,
     itemViewModel: ItemViewModel,
+    balanceRepository: BalanceRepository,
     balanceViewModel: BalanceViewModel,
     currentGroup: GroupState,
     allGroupsState: List<GroupState>,
@@ -387,7 +415,11 @@ fun AppNavHost(
         navController = navController,
         startDestination = startDestination,
         modifier = modifier
+//                .padding(horizontal = if (currentDestination != Screens.Login.name) 0.dp else 20.dp),
+//            .padding(horizontal = 20.dp),
     ) {
+
+
         composable(
             Screens.Login.route,
         ) {
@@ -419,6 +451,7 @@ fun AppNavHost(
 
             Box {
                 Home(
+
                     navController,
                     groupViewModel,
                     userViewModel,
@@ -467,13 +500,11 @@ fun AppNavHost(
             Box {
                 Profile(
                     userViewModel,
-                    groupViewModel,
                     navController,
                     currentGroup
                 )
             }
         }
-
         composable(
             Screens.GroupMembers.route
         ) {
@@ -498,173 +529,8 @@ fun AppNavHost(
                 )
             }
         }
+
+
     }
 }
-
-// Bottom navigation bar
-@Composable
-fun BottomNavigationBar(
-    navController: NavController,
-    currentDestination: String?
-) {
-
-    NavigationBar(containerColor = MaterialTheme.colorScheme.background){
-        NavigationBarItem(
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color.White,
-                unselectedIconColor = Color.Black,
-                indicatorColor = MaterialTheme.colorScheme.primary,
-                selectedTextColor = Color.White,
-                unselectedTextColor = Color.Black
-            ),
-
-
-            selected = (currentDestination == Screens.Groups.route),
-            onClick = { navController.navigate(Screens.Groups.route) },
-            icon = { Icon(imageVector = Icons.Filled.CheckCircle, contentDescription = "Home") },
-            label = { Text("Lists") }
-        )
-        NavigationBarItem(
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color.White,
-                unselectedIconColor = Color.Black,
-                indicatorColor = MaterialTheme.colorScheme.primary,
-                selectedTextColor = Color.White,
-                unselectedTextColor = Color.Black
-            ),
-            selected = (currentDestination == Screens.Balance.route),
-            onClick = { navController.navigate(Screens.Balance.route) },
-            icon = { Icon(imageVector = Icons.Filled.Refresh, contentDescription = "Overview") },
-            label = { Text("Balance") }
-        )
-        NavigationBarItem(
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color.White,
-                unselectedIconColor = Color.Black,
-                indicatorColor = MaterialTheme.colorScheme.primary,
-                selectedTextColor = Color.White,
-                unselectedTextColor = Color.Black
-            ),
-            selected = (currentDestination == Screens.Profile.route),
-            onClick = { navController.navigate(Screens.Profile.route) },
-            icon = {
-                Icon(
-                    imageVector = Icons.Filled.AccountCircle,
-                    contentDescription = "Overview"
-                )
-            },
-            label = { Text("Profile") }
-        )
-    }
-}
-
-// Header
-@Composable
-fun Header(
-    navController: NavController,
-    currentDestination: String?,
-    group: GroupState
-) {
-    Column(
-        modifier = Modifier
-            .height(100.dp)
-            .fillMaxWidth()
-            .padding(top = 40.dp),
-        verticalArrangement = Arrangement.Center
-    ) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                if (currentDestination == "Groups") {
-                    IconButton(
-                        onClick = { navController.navigate(Screens.Home.name) },
-                        modifier = Modifier.align(Alignment.CenterVertically)
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Go Back"
-                        )
-                    }
-
-                    Text(
-                        text = group.groupName,
-                        fontSize = 20.sp,
-                        modifier = Modifier
-                            .weight(1f)
-                            .align(Alignment.CenterVertically),
-                        textAlign = TextAlign.Center
-                    )
-
-                    Row(
-                        modifier = Modifier
-                            .wrapContentSize()
-                            .clickable { navController.navigate(Screens.GroupMembers.route) },
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.End
-                    ) {
-                        UserProfileCirclesStacked(GroupMembersUiState(group.groupMembers))
-                    }
-                } else if (currentDestination == "GroupMembers" || currentDestination == "RecipeSuggestion") {
-                    IconButton(
-                        onClick = { navController.navigateUp() },
-                        modifier = Modifier.align(Alignment.CenterVertically)
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Go Back"
-                        )
-
-
-                    }
-                    Text(
-                        text = group.groupName,
-                        fontSize = 20.sp,
-                        modifier = Modifier
-                            .weight(1f)
-                            .align(Alignment.CenterVertically),
-                        textAlign = TextAlign.Center
-                    )
-
-                    Row(
-                        modifier = Modifier
-                            .wrapContentSize()
-                            .clickable {
-                                if (currentDestination != Screens.GroupMembers.name) {
-                                    navController.navigate(Screens.GroupMembers.route)
-                                }
-                            },
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.End
-                    ) {
-                        UserProfileCirclesStacked(GroupMembersUiState(group.groupMembers))
-                    }
-                } else {
-                    Text(
-                        text = group.groupName,
-                        fontSize = 20.sp,
-                        modifier = Modifier
-                            .weight(1f)
-                            .align(Alignment.CenterVertically),
-                        textAlign = TextAlign.Start
-                    )
-
-                    Row(
-                        modifier = Modifier
-                            .wrapContentSize()
-                            .clickable { navController.navigate(Screens.GroupMembers.route) },
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.End
-                    ) {
-                        UserProfileCirclesStacked(GroupMembersUiState(group.groupMembers))
-                    }
-                }
-            }
-        }
-    }
-}
-
 

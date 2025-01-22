@@ -86,7 +86,7 @@ enum class Screens(val route: String) {
 }
 
 @Composable
-fun RoomyApp() {
+fun RoomyApp(modifier: Modifier) {
 
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()

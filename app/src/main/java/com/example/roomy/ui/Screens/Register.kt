@@ -18,7 +18,6 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -65,10 +64,10 @@ fun Register(
         Text(text = "Sign up", fontSize = integerResource(id = R.integer.heading1).sp)
         Spacer(Modifier.height(100.dp))
 
-        OutlinedTextField(
+        CustomOutlinedTextField(
             value = email,
             onValueChange = { newValue: String -> email = newValue },
-            Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             label = { Text("Email") },
             leadingIcon = { Icon(imageVector = Icons.Filled.Email, contentDescription = "Email") },
             placeholder = { Text(text = "example@outlook.com") },
@@ -78,10 +77,10 @@ fun Register(
 
         Spacer(Modifier.height(10.dp))
 
-        OutlinedTextField(
+        CustomOutlinedTextField(
             value = username,
             onValueChange = { newValue: String -> username = newValue },
-            Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             label = { Text("Username") },
             leadingIcon = {
                 Icon(
@@ -97,10 +96,10 @@ fun Register(
 
         Spacer(Modifier.height(10.dp))
 
-        OutlinedTextField(
+        CustomOutlinedTextField(
             value = password,
             onValueChange = { newValue: String -> password = newValue },
-            Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             label = { Text("Password") },
             leadingIcon = {
                 Icon(
@@ -117,10 +116,10 @@ fun Register(
         }
         Spacer(Modifier.height(10.dp))
 
-        OutlinedTextField(
+        CustomOutlinedTextField(
             value = confirmPassword,
             onValueChange = { newValue: String -> confirmPassword = newValue },
-            Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             label = { Text("Confirm Password") },
             leadingIcon = {
                 Icon(

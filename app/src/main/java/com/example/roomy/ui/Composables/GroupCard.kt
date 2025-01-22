@@ -1,7 +1,9 @@
 package com.example.roomy.ui
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.unit.dp
@@ -39,6 +42,7 @@ fun GroupCard(
 
     OutlinedCard(
         Modifier
+            .shadow(20.dp, shape = RoundedCornerShape(8.dp))
             // set the current group by clicking on a group card
             //navigate to manageMember Screen on long click
             .combinedClickable(
@@ -56,7 +60,8 @@ fun GroupCard(
             ,
 
         ) {
-        Column (Modifier.fillMaxWidth().padding(12.dp).height(120.dp), verticalArrangement = Arrangement.SpaceBetween) {
+        Column (Modifier.fillMaxWidth() .background(Color.White).padding(12.dp).height(120.dp)
+            , verticalArrangement = Arrangement.SpaceBetween) {
 
             Row(
                 Modifier
@@ -64,7 +69,7 @@ fun GroupCard(
                 , horizontalArrangement = Arrangement.Start
             ) {
 
-                Text(text = " ${currentGroup.groupName}" , fontSize = integerResource(id = R.integer.heading2).sp)
+                Text(text = " ${currentGroup.groupName}" , fontSize = integerResource(id = R.integer.heading2).sp, color = Color.Black)
             }
 
             Row(

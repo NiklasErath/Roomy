@@ -41,6 +41,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -140,7 +141,7 @@ fun Home(
                 LoadingIndicator(modifier = Modifier.padding(bottom = 300.dp))
             } else {
                 LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(20.dp),
                     modifier = Modifier.weight(1f) // Ensures the LazyColumn takes up remaining space
                 ) {
                     if (allGroupsState.isEmpty()) {
@@ -183,7 +184,9 @@ fun Home(
             Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .clickable { },
+                .clickable { }
+                .shadow(0.dp)
+            ,
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly
         ) {
@@ -198,10 +201,10 @@ fun Home(
                 Text(text = "Add Group", fontSize = integerResource(id = R.integer.heading1).sp)
             }
 
-            OutlinedTextField(
+            CustomOutlinedTextField(
                 value = newGroupName,
                 onValueChange = { newValue -> newGroupName = newValue },
-                Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Filled.Edit,
@@ -211,13 +214,12 @@ fun Home(
                 label = { Text("Groupname") },
             )
 
-            OutlinedTextField(
+            CustomOutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = usernameAdd,
                 onValueChange = { newValue -> usernameAdd = newValue },
                 label = { Text("Invite someone New") },
                 placeholder = { Text("username") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 trailingIcon = {
                     Icon(
                         imageVector = Icons.Filled.Add,

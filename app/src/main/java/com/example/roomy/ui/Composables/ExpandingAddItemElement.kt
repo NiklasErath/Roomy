@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -37,6 +38,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.roomy.R
+import com.example.roomy.ui.CustomOutlinedTextField
 import com.example.roomy.ui.Item
 import com.example.roomy.ui.States.GroupState
 import com.example.roomy.ui.ViewModels.ItemViewModel
@@ -83,7 +85,7 @@ fun ExpandingAddItemElement(
         Column(
             Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                .clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
                 .height(animatedHeight)
                 .align(Alignment.BottomCenter)
                 .background(MaterialTheme.colorScheme.background)
@@ -101,6 +103,7 @@ fun ExpandingAddItemElement(
 
                         .weight(1f, false)
                         .padding(horizontal = 20.dp)
+                        .padding(top = 12.dp)
 
 
                 ) {
@@ -171,23 +174,23 @@ fun ExpandingAddItemElement(
                 Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
-
-                    .border(width = 0.dp, color = Color.Transparent)
+                    .height(64.dp)
                     .zIndex(4f)
                     .clickable { }
-                    .background(MaterialTheme.colorScheme.primary)
-                    .padding(horizontal = 20.dp)
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(horizontal = 20.dp),
+                contentAlignment = Alignment.Center
+
 // Ensure the TextField appears above the overlay
             ) {
-                OutlinedTextField(
+                CustomOutlinedTextField(
                     modifier = Modifier
+
                         .fillMaxWidth()
                         .border(
                             width = 0.dp, // Thicker border
                             color = Color.Transparent,
                         )
-                        .clip(RoundedCornerShape(16.dp))
-
                         .background(MaterialTheme.colorScheme.background)
                         .focusRequester(focusRequester)
                         .onFocusChanged { focusState ->

@@ -2,6 +2,7 @@ package com.example.roomy.ui
 
 import android.annotation.SuppressLint
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +18,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -29,6 +32,7 @@ import androidx.navigation.NavController
 import com.example.roomy.ui.States.GroupMembersUiState
 import com.example.roomy.ui.ViewModels.GroupViewModel
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import com.example.roomy.ui.States.GroupState
 import com.example.roomy.ui.ViewModels.UserViewModel
@@ -70,7 +74,8 @@ fun GroupMembers(
             }
         }
         Column(modifier = Modifier.fillMaxWidth()) {
-            OutlinedTextField(
+
+            CustomOutlinedTextField(
                 value = usernameAdd,
                 onValueChange = { newValue -> usernameAdd = newValue },
                 label = { Text(text = "Add a new Member to the Group") },

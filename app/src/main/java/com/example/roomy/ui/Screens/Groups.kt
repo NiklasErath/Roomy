@@ -96,7 +96,7 @@ fun Group(
     var isExpanded by remember { mutableStateOf(false) }
 
     val animatedHeight by animateDpAsState(
-        targetValue = if (isExpanded) (0.6 * LocalConfiguration.current.screenHeightDp).dp else 56.dp
+        targetValue = if (isExpanded) (0.6 * LocalConfiguration.current.screenHeightDp).dp else 64.dp
     )
 
     val focusRequester = remember { FocusRequester() }
@@ -151,6 +151,7 @@ fun Group(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.primaryContainer)
     ) {
 
         if (currentGroup.shoppingListItems.isEmpty() && currentGroup.inventoryItems.isEmpty()) {
@@ -174,14 +175,17 @@ fun Group(
                 Text(
                     text = "Add your first Articles",
                     textAlign = TextAlign.Center,
-                    fontSize = integerResource(id = R.integer.heading3).sp
+                    fontSize = integerResource(id = R.integer.heading3).sp,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
                 Spacer(Modifier.height(8.dp))
 
                 Text(
                     text = "Type them freely into the search bar below and select what you need!",
                     textAlign = TextAlign.Center,
-                    fontSize = 18.sp
+                    fontSize = 18.sp,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+
                 )
 
             }
@@ -197,12 +201,21 @@ fun Group(
                     .verticalScroll(rememberScrollState())
             ) {
 
-                Text(text = "ShoppingList", fontSize = integerResource(id = R.integer.heading3).sp)
+                Text(
+                    text = "ShoppingList",
+                    fontSize = integerResource(id = R.integer.heading3).sp,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
                 Spacer(Modifier.height(8.dp))
 
 
                 if (currentGroup.shoppingListItems.isEmpty()) {
-                    Column(Modifier.padding(horizontal = 20.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Column(
+                        Modifier
+                            .padding(horizontal = 20.dp)
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
 
 
                         Image(
@@ -215,7 +228,9 @@ fun Group(
                         Text(
                             text = "Nothing here yet, add a new Item to your Shopping List",
                             textAlign = TextAlign.Center,
-                            fontSize = 18.sp
+                            fontSize = 18.sp,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+
                         )
                     }
 
@@ -259,11 +274,20 @@ fun Group(
                     }
                 }
                 Spacer(Modifier.height(30.dp))
-                Text(text = "Inventory", fontSize = integerResource(id = R.integer.heading3).sp)
+                Text(
+                    text = "Inventory",
+                    fontSize = integerResource(id = R.integer.heading3).sp,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
                 Spacer(Modifier.height(8.dp))
 
                 if (currentGroup.inventoryItems.isEmpty()) {
-                    Column(Modifier.padding(horizontal = 20.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Column(
+                        Modifier
+                            .padding(horizontal = 20.dp)
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
 
 
                         Image(
@@ -276,9 +300,12 @@ fun Group(
                         Text(
                             text = "Nothing here yet, add a new Item to your Inventory",
                             textAlign = TextAlign.Center,
-                            fontSize = 18.sp
+                            fontSize = 18.sp,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+
                         )
-                    }                } else {
+                    }
+                } else {
 
                     currentGroup.inventoryItems.chunked(3).forEach { rowItems ->
                         Row(
@@ -367,62 +394,6 @@ fun Group(
 
     }
 }
-
-
-//ExpandingItemELement no as composable but in Group/Home Composable - leave here for future testing
-//
-//Column(
-//Modifier
-//.fillMaxWidth()
-//.height(animatedHeight)
-//.align(Alignment.BottomCenter)
-//.background(MaterialTheme.colorScheme.background)
-//.border(1.dp, Color.White)
-//.zIndex(3f)
-//.clickable { }, // Ensure this column is rendered above other elements
-//verticalArrangement = if (isExpanded || isFocused) Arrangement.SpaceBetween else Arrangement.Bottom
-//) {
-////            Spacer(Modifier.height(0.dp))
-//    // Additional Content at the top
-//    if (isExpanded) {
-//        Text(
-//            text = "Additional Content Shown in Overlay",
-//            modifier = Modifier.padding(16.dp),
-//            style = MaterialTheme.typography.bodyLarge
-//        )
-//    }
-//
-//    // TextField at the bottom
-//    Box(
-//        Modifier
-//            .fillMaxWidth()
-//            .zIndex(3f)
-//            .clickable { }// Ensure the TextField appears above the overlay
-//    ) {
-//        OutlinedTextField(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .focusRequester(focusRequester)
-//                .onFocusChanged { focusState ->
-//                    isFocused = focusState.isFocused
-//                    if (isFocused) isExpanded = true
-//                },
-//            value = itemName,
-//            onValueChange = { newValue -> itemName = newValue },
-//            placeholder = { Text(text = "We could use ...") },
-//            trailingIcon = {
-//                Icon(
-//                    imageVector = Icons.Filled.AddCircle,
-//                    contentDescription = "Add Item",
-//                    Modifier.clickable {
-//                        isExpanded = true
-//                        // Logic to add items
-//                    }
-//                )
-//            }
-//        )
-//    }
-//}
 
 
 

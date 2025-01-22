@@ -4,12 +4,19 @@ import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
+import com.example.roomy.R
+
 
 private val DarkColorScheme = darkColorScheme(
     primary = customRed,
@@ -50,8 +57,29 @@ fun RoomyTheme(
         else -> LightColorScheme
     }
 
+    val customColorScheme = lightColorScheme(
+        primary = colorResource(id = R.color.primary),
+        onPrimary = Color.White,
+
+        secondary = colorResource(id = R.color.secondary),
+        background = colorResource(id = R.color.background),
+        onBackground = Color.White,
+
+//        Outline for TextinputFields
+        outline = colorResource(id = R.color.dimPrimary),
+//      Color for BottomBar
+        surface = colorResource(R.color.background),
+        surfaceContainer = colorResource(R.color.highlight),
+
+        primaryContainer = Color.White,
+        onPrimaryContainer = Color.Black
+
+
+        )
+
+
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = customColorScheme,
         typography = Typography,
         content = content
     )

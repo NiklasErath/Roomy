@@ -2,5 +2,7 @@
 <resources>
     <integer name="heading1">32</integer>
     <integer name="heading2">24</integer>
+    <integer name="heading3">20</integer>
+
 
 </resources>

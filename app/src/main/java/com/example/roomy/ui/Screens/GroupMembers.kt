@@ -2,6 +2,7 @@ package com.example.roomy.ui
 
 import android.annotation.SuppressLint
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -45,12 +47,10 @@ fun GroupMembers(
     val currentUser by userViewModel.loggedInUser.collectAsState()
     var usernameAdd by remember { mutableStateOf("") }
 
-    Column {
+    Column(Modifier.padding(horizontal = 20.dp)) {
         LazyColumn {
             itemsIndexed(currentGroup.groupMembers) { index: Int, memberInformation ->
                 OutlinedCard(
-                    modifier = Modifier
-                        .padding(12.dp)
                 ) {
                     Row() {
                         Text(text = memberInformation.username)
@@ -73,45 +73,47 @@ fun GroupMembers(
             OutlinedTextField(
                 value = usernameAdd,
                 onValueChange = { newValue -> usernameAdd = newValue },
+                label = { Text(text = "Add a new Member to the Group") },
                 modifier = Modifier.fillMaxWidth(),
-                leadingIcon = {
+                trailingIcon = {
                     Icon(
-                        imageVector = Icons.Filled.AddCircle,
-                        contentDescription = "username"
-                    )
-                }
-            )
-            Button(
-                onClick = {
-                    if (usernameAdd.isBlank()) {
-                        Toast.makeText(context, "Please enter a username", Toast.LENGTH_LONG).show()
-                    } else {
-                        groupViewModel.addMemberByNameToGroup(usernameAdd, currentGroup.groupId)
-                        usernameAdd = ""
-                    }
-                },
-                modifier = Modifier.padding(top = 8.dp)
-            ) {
-                Text(text = "Add")
-            }
-            if (currentUser.userId == currentGroup.creatorId) {
-                Button(onClick = {
-                    groupViewModel.deleteGroup(currentGroup.groupId)
-                    navController.navigate("Home")
-                }) {
-                    Text(text = "Delete group")
-                }
-            } else {
-                Button(onClick = {
-                    groupViewModel.kickUser(currentUser.userId, currentGroup.groupId)
-                    navController.navigate("Home")
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = "Add",
+                        Modifier.clickable {
+                            if (usernameAdd.isBlank()) {
+                                groupViewModel.setGroupError("Please enter a username")
+                            } else {
+                                groupViewModel.addMemberByNameToGroup(
+                                    usernameAdd,
+                                    currentGroup.groupId
+                                )
+                                usernameAdd = ""
+                            }
 
-                }) {
-                    Text(text = "Leave group")
-                }
-            }
+                        }
+                    )
+                },
+            )
         }
 
+        if (currentUser.userId == currentGroup.creatorId) {
+            Button(onClick = {
+                groupViewModel.deleteGroup(currentGroup.groupId)
+                navController.navigate("Home")
+            }) {
+                Text(text = "Delete group")
+            }
+        } else {
+            Button(onClick = {
+                groupViewModel.kickUser(currentUser.userId, currentGroup.groupId)
+                navController.navigate("Home")
+
+            }) {
+                Text(text = "Leave group")
+            }
+        }
     }
+
 }
+
 

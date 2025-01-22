@@ -4,6 +4,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -38,11 +39,14 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -64,7 +68,6 @@ fun Group(
     previousScreen: String,
     currentGroup: newGroupState
 ) {
-
 
 
     val context = LocalContext.current
@@ -138,7 +141,6 @@ fun Group(
 //    }
 
 
-
     //            Note change this to our errorhandling process later on
 
 
@@ -152,92 +154,172 @@ fun Group(
             .fillMaxSize()
     ) {
 
+        if (currentGroup.shoppingListItems.isEmpty() && currentGroup.inventoryItems.isEmpty()) {
 
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(horizontal = 20.dp)
-                .padding(bottom = 50.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
+            Column(
+                Modifier
+                    .padding(bottom = 200.dp)
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
 
-            Text(text = "ShoppingList")
+                Image(
+                    modifier = Modifier.padding(horizontal = 30.dp),
+                    painter = painterResource(id = R.drawable.grocery),
+                    contentDescription = "Groceries",
+                    contentScale = ContentScale.FillWidth,
+                )
+                Spacer(Modifier.height(20.dp))
 
-            if (currentGroup.shoppingListItems.isEmpty()) {
-                Text(text = "Nothing here yet, add a new Item to your Shopping List")
-            } else {
+                Text(
+                    text = "Add your first Articles",
+                    textAlign = TextAlign.Center,
+                    fontSize = integerResource(id = R.integer.heading3).sp
+                )
+                Spacer(Modifier.height(8.dp))
 
+                Text(
+                    text = "Type them freely into the search bar below and select what you need!",
+                    textAlign = TextAlign.Center,
+                    fontSize = 18.sp
+                )
 
-
-                currentGroup.shoppingListItems.chunked(3).forEach { rowItems ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(3.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        rowItems.forEach { item ->
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                            ) {
-                                Item(
-                                    item,
-                                    onClick = {
-                                        itemViewModel.moveToInventory(item, currentGroup.groupId)
-                                    },
-                                    onLongClick = {
-                                        itemViewModel.deleteItem(item, currentGroup.groupId)
-                                    })
-                            }
-                        }
-
-                        repeat(3 - rowItems.size) {
-                            Spacer(modifier = Modifier.weight(1f))
-                        }
-                    }
-                    Spacer(Modifier.height(3.dp))
-                }
             }
-            Spacer(Modifier.height(50.dp))
-            Text(text = "Inventory")
 
-            if (currentGroup.inventoryItems.isEmpty()) {
-                Text(text = "Nothing here yet, add a new Item to your Shopping List")
-            } else {
-
-                currentGroup.inventoryItems.chunked(3).forEach { rowItems ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(3.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        rowItems.forEach { item ->
+        } else {
 
 
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                            ) {
-                                Item(
-                                    item,
-                                    onClick = {
-                                        itemViewModel.moveToShoppingList(item, currentGroup.groupId)
-                                    },
-                                    onLongClick = {
-                                        itemViewModel.deleteItem(item, currentGroup.groupId)
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 20.dp)
+                    .padding(bottom = 50.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
 
-                                    })
+                Text(text = "ShoppingList", fontSize = integerResource(id = R.integer.heading3).sp)
+                Spacer(Modifier.height(8.dp))
+
+
+                if (currentGroup.shoppingListItems.isEmpty()) {
+                    Column(Modifier.padding(horizontal = 20.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+
+
+                        Image(
+                            modifier = Modifier.size(60.dp),
+                            painter = painterResource(id = R.drawable.emptycart),
+                            contentDescription = "Groceries",
+                            contentScale = ContentScale.FillWidth,
+                        )
+                        Spacer(Modifier.height(10.dp))
+                        Text(
+                            text = "Nothing here yet, add a new Item to your Shopping List",
+                            textAlign = TextAlign.Center,
+                            fontSize = 18.sp
+                        )
+                    }
+
+
+                } else {
+
+
+                    currentGroup.shoppingListItems.chunked(3).forEach { rowItems ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(3.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            rowItems.forEach { item ->
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                ) {
+                                    Item(
+                                        item,
+                                        onClick = {
+                                            itemViewModel.moveToInventory(
+                                                item,
+                                                currentGroup.groupId
+                                            )
+                                        },
+                                        onLongClick = {
+                                            itemViewModel.deleteItem(item, currentGroup.groupId)
+                                        },
+                                        context
+                                    )
+
+                                }
+                            }
+
+                            repeat(3 - rowItems.size) {
+                                Spacer(modifier = Modifier.weight(1f))
+                            }
+                        }
+                        Spacer(Modifier.height(3.dp))
+                    }
+                }
+                Spacer(Modifier.height(30.dp))
+                Text(text = "Inventory", fontSize = integerResource(id = R.integer.heading3).sp)
+                Spacer(Modifier.height(8.dp))
+
+                if (currentGroup.inventoryItems.isEmpty()) {
+                    Column(Modifier.padding(horizontal = 20.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+
+
+                        Image(
+                            modifier = Modifier.size(60.dp),
+                            painter = painterResource(id = R.drawable.emptycart),
+                            contentDescription = "Groceries",
+                            contentScale = ContentScale.FillWidth,
+                        )
+                        Spacer(Modifier.height(10.dp))
+                        Text(
+                            text = "Nothing here yet, add a new Item to your Inventory",
+                            textAlign = TextAlign.Center,
+                            fontSize = 18.sp
+                        )
+                    }                } else {
+
+                    currentGroup.inventoryItems.chunked(3).forEach { rowItems ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(3.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            rowItems.forEach { item ->
+
+
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                ) {
+                                    Item(
+                                        item,
+                                        onClick = {
+                                            itemViewModel.moveToShoppingList(
+                                                item,
+                                                currentGroup.groupId
+                                            )
+                                        },
+                                        onLongClick = {
+                                            itemViewModel.deleteItem(item, currentGroup.groupId)
+
+                                        },
+                                        context
+                                    )
+
+                                }
+
 
                             }
 
-
+                            repeat(3 - rowItems.size) {
+                                Spacer(modifier = Modifier.weight(1f))
+                            }
                         }
-
-                        repeat(3 - rowItems.size) {
-                            Spacer(modifier = Modifier.weight(1f))
-                        }
+                        Spacer(Modifier.height(3.dp))
                     }
-                    Spacer(Modifier.height(3.dp))
                 }
             }
         }
@@ -269,6 +351,7 @@ fun Group(
         }
 
         ExpandingAddItemElement(
+            context,
             animatedHeight,
             isExpanded,
             isFocused,

@@ -3,6 +3,7 @@ package com.example.roomy.ui
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,7 +28,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -158,14 +161,12 @@ fun Home(
         }
     }
 
-    if(!addGroupPopUp) {
+    if (!addGroupPopUp) {
         AddGroupButton(onClick = { addGroupPopUp = true })
     }
 
 
-
-
-        // Button positioned at the bottom center
+    // Button positioned at the bottom center
 //        Row(
 //            modifier = Modifier
 //                .fillMaxWidth()
@@ -186,7 +187,7 @@ fun Home(
             Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .clickable {  },
+                .clickable { },
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly
         ) {
@@ -211,20 +212,16 @@ fun Home(
                         contentDescription = "GroupName"
                     )
                 },
+                label = { Text("Groupname") },
             )
 
-            Row {
-
-            }
             OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
                 value = usernameAdd,
                 onValueChange = { newValue -> usernameAdd = newValue },
-                Modifier.fillMaxWidth(),
-//                leadingIcon = {Icon(imageVector = Icons.Filled.Edit, contentDescription = "AddUser")},
                 label = { Text("Invite someone New") },
                 placeholder = { Text("username") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-
                 trailingIcon = {
                     Icon(
                         imageVector = Icons.Filled.Add,
@@ -245,15 +242,17 @@ fun Home(
                                     usernameAdd = ""
                                 }
                             }
-//                    Add new member, if successfull make a list with added userss emails/usernames under this textfield - just save locally from input to display
-//                    If not succesfull, popup with error message ...
-//                    Ensure Users can only be added once
-
                         })
-                },
+
+                }
 
 
-                )
+            )
+
+
+
+
+
             if (addedUsers.isNotEmpty()) {
                 LazyColumn() {
                     itemsIndexed(addedUsers) { index, item ->

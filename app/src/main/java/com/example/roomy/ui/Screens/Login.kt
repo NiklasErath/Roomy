@@ -17,7 +17,6 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -71,10 +70,10 @@ fun Login(
         Text(text="Please sign in to continue")
         Spacer(Modifier.height(100.dp))
 
-        OutlinedTextField(
+        CustomOutlinedTextField(
             value = email,
             onValueChange = { newValue:String -> email = newValue },
-            Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             label = { Text("Email") },
             leadingIcon = {Icon(imageVector = Icons.Filled.Email, contentDescription = "Email")},
             placeholder = {Text(text="example@outlook.com")},
@@ -84,10 +83,10 @@ fun Login(
 
         Spacer(Modifier.height(10.dp))
 
-        OutlinedTextField(
+        CustomOutlinedTextField(
             value = password,
             onValueChange = { newValue:String -> password = newValue },
-            Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             label = { Text("Password") },
             leadingIcon = {Icon(imageVector = Icons.Filled.Lock, contentDescription = "Password")},
             visualTransformation =  PasswordVisualTransformation(),

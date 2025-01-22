@@ -1,6 +1,7 @@
 package com.example.roomy.ui
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,6 +26,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemColors
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -535,20 +538,43 @@ fun BottomNavigationBar(
     currentDestination: String?
 ) {
 
-    NavigationBar {
+    NavigationBar(containerColor = MaterialTheme.colorScheme.background){
         NavigationBarItem(
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = Color.White,
+                unselectedIconColor = Color.Black,
+                indicatorColor = MaterialTheme.colorScheme.primary,
+                selectedTextColor = Color.White,
+                unselectedTextColor = Color.Black
+            ),
+
+
             selected = (currentDestination == Screens.Groups.route),
             onClick = { navController.navigate(Screens.Groups.route) },
             icon = { Icon(imageVector = Icons.Filled.CheckCircle, contentDescription = "Home") },
             label = { Text("Lists") }
         )
         NavigationBarItem(
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = Color.White,
+                unselectedIconColor = Color.Black,
+                indicatorColor = MaterialTheme.colorScheme.primary,
+                selectedTextColor = Color.White,
+                unselectedTextColor = Color.Black
+            ),
             selected = (currentDestination == Screens.Balance.route),
             onClick = { navController.navigate(Screens.Balance.route) },
             icon = { Icon(imageVector = Icons.Filled.Refresh, contentDescription = "Overview") },
             label = { Text("Balance") }
         )
         NavigationBarItem(
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = Color.White,
+                unselectedIconColor = Color.Black,
+                indicatorColor = MaterialTheme.colorScheme.primary,
+                selectedTextColor = Color.White,
+                unselectedTextColor = Color.Black
+            ),
             selected = (currentDestination == Screens.Profile.route),
             onClick = { navController.navigate(Screens.Profile.route) },
             icon = {

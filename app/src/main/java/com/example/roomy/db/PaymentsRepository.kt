@@ -26,13 +26,16 @@ class PaymentsRepository {
     }
 
     // add a new payment to a group
-    suspend fun addPayment(userId: String, groupId: Int, amount: Int, items: String): Payments? {
+    suspend fun addPayment(userId: String, groupId: Int, amount: Double, items: String): Payments? {
         try {
             val newPayment =
                 Payments(groupId = groupId, paidBy = userId, amount = amount, items = items)
             supabase.from("payments").insert(newPayment)
+            Log.d("TAG", "PAYMENT")
             return newPayment
         } catch (e: Exception) {
+            Log.d("TAG", "PAYMENT FAIL")
+
             return null
         }
 

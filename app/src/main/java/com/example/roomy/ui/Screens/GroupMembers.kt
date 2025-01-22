@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
@@ -36,6 +38,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.example.roomy.R
 import com.example.roomy.ui.Composables.UserProfileCircle
@@ -57,15 +60,22 @@ fun GroupMembers(
     val currentUser by userViewModel.loggedInUser.collectAsState()
     var usernameAdd by remember { mutableStateOf("") }
 
+    var deleteGroup by remember { mutableStateOf(false) }
+    var leaveGroup by remember { mutableStateOf(false) }
+
     val circleColors = listOf(
         MaterialTheme.colorScheme.secondary,
         MaterialTheme.colorScheme.primary,
         MaterialTheme.colorScheme.surfaceContainer,
-        )
+    )
 
-    Column(Modifier.padding(top=20.dp), horizontalAlignment = Alignment.Start) {
+    Column(Modifier.padding(top = 20.dp), horizontalAlignment = Alignment.Start) {
 
-        Column(modifier = Modifier.padding(horizontal = 20.dp).fillMaxWidth()) {
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 20.dp)
+                .fillMaxWidth()
+        ) {
 
             CustomOutlinedTextField(
                 value = usernameAdd,
@@ -91,82 +101,153 @@ fun GroupMembers(
                     )
                 },
             )
+        }
+        Column(modifier = Modifier.padding(top = 20.dp)) {
+            LazyColumn() {
+                itemsIndexed(currentGroup.groupMembers) { index: Int, memberInformation ->
 
+
+                    val userCircleColor = circleColors[index % circleColors.size]
+
+
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .background(colorResource(id = R.color.dimBackground))
+                            .padding(horizontal = 20.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row {
+                            UserProfileCircle(
+                                username = memberInformation.username,
+                                circleColor = userCircleColor,
+                                circleSize = 50.dp
+                            )
+                            Spacer(Modifier.width(20.dp))
+                            Column {
+
+                                Text(
+                                    text = memberInformation.username,
+                                    fontSize = integerResource(id = R.integer.heading3).sp
+                                )
+                                Text(text = memberInformation.email)
+                            }
+
+                        }
+                        if (memberInformation.id != currentUser.userId) {
+                            Button(
+                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp),
+                                modifier = Modifier
+                                    .defaultMinSize(minWidth = 1.dp, minHeight = 1.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    MaterialTheme.colorScheme.error
+
+
+                                ),
+                                onClick = {
+                                    groupViewModel.kickUser(
+                                        memberInformation.id,
+                                        currentGroup.groupId
+                                    )
+                                }) {
+                                Text(text = "Kick Member", color = Color.White)
+                            }
+                        }
+                    }
+                    Spacer(Modifier.height(12.dp))
+                }
+            }
             if (currentUser.userId == currentGroup.creatorId) {
                 Button(onClick = {
-                    groupViewModel.deleteGroup(currentGroup.groupId)
-                    navController.navigate("Home")
-                }) {
+                    deleteGroup = true
+                }, modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp)
+                    ,colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)) {
                     Text(text = "Delete group")
                 }
             } else {
                 Button(onClick = {
-                    groupViewModel.kickUser(currentUser.userId, currentGroup.groupId)
-                    navController.navigate("Home")
+                    leaveGroup = true
 
-                }) {
+                }, modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp)
+                    , colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)) {
                     Text(text = "Leave group")
                 }
             }
-        }
-
-
-
-
-
-        LazyColumn(
-            modifier = Modifier.padding(top=20.dp)
-        ){
-            itemsIndexed(currentGroup.groupMembers) { index: Int, memberInformation ->
-
-
-                val userCircleColor = circleColors[index % circleColors.size]
-
-
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .background(colorResource(id = R.color.dimBackground))
-                        .padding(horizontal = 20.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row {
-                        UserProfileCircle(username = memberInformation.username, circleColor = userCircleColor, circleSize = 50.dp )
-                        Spacer(Modifier.width(20.dp))
-                        Column {
-
-                            Text(text = memberInformation.username, fontSize = integerResource(id = R.integer.heading3).sp )
-                            Text(text = memberInformation.email,)
-                        }
-
-                    }
-                    if (memberInformation.id != currentUser.userId) {
-                        Button(
-                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp),
+            if (leaveGroup || deleteGroup) {
+                Dialog(onDismissRequest = {
+                    deleteGroup = false
+                    leaveGroup = false
+                }) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .background(Color.White, shape = RoundedCornerShape(8.dp))
+                    ) {
+                        Column(
                             modifier = Modifier
-                                .defaultMinSize(minWidth = 1.dp, minHeight = 1.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                MaterialTheme.colorScheme.error
-
-
-                            ),
-                            onClick = {
-                                groupViewModel.kickUser(
-                                    memberInformation.id,
-                                    currentGroup.groupId
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            if (leaveGroup) {
+                                Text(
+                                    text = "Are you sure you want to leave ${currentGroup.groupName}?",
+                                    modifier = Modifier.padding(bottom = 8.dp),
+                                    color = Color.Black,
                                 )
-                            }) {
-                            Text(text = "Kick Member", color = Color.White)
+                                Row(
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                ) {
+                                    Button(onClick = {
+                                        leaveGroup = false
+                                        groupViewModel.kickUser(
+                                            currentUser.userId,
+                                            currentGroup.groupId
+                                        )
+                                        navController.navigate("Home")
+
+                                    }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)) {
+                                        Text(text = "Leave")
+                                    }
+                                    Button(onClick = {
+                                        leaveGroup = false
+                                    }) { Text(text = "Cancel") }
+                                }
+                            } else {
+                                Text(
+                                    text = "Are you sure you want to delete ${currentGroup.groupName}?",
+                                    modifier = Modifier.padding(bottom = 8.dp),
+                                    color = Color.Black,
+                                )
+                                Row(
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                ) {
+                                    Button(onClick = {
+                                        groupViewModel.deleteGroup(currentGroup.groupId)
+                                        navController.navigate("Home")
+                                        deleteGroup = false
+                                    }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)) {
+                                        Text(text = "Delete")
+                                    }
+                                    Button(onClick = {
+                                        deleteGroup = false
+                                    }) { Text(text = "Cancel") }
+                                }
+                            }
                         }
+
                     }
                 }
-                Spacer(Modifier.height(12.dp))
             }
+
         }
-
     }
-
 
 
 }

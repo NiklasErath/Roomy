@@ -17,9 +17,13 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -33,10 +37,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
+import com.example.roomy.R
 
 import com.example.roomy.ui.Composables.UserProfileCircle
 import com.example.roomy.ui.States.GroupState
@@ -69,9 +77,9 @@ fun Profile(
             .padding(horizontal = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Profile")
+        Text(text = "Your Profile", fontSize = 24.sp, fontWeight = FontWeight.Bold)
         Column(modifier = Modifier.padding(top = 20.dp)) {
-            UserProfileCircle(currentUser.username, 100.dp, Color.Gray)
+            UserProfileCircle(currentUser.username, 100.dp,MaterialTheme.colorScheme.primary, 50.sp)
         }
         Column(
             Modifier
@@ -88,7 +96,8 @@ fun Profile(
             )
             LazyColumn(modifier = Modifier.padding(bottom = 16.dp)) {
                 item {
-                    OutlinedCard(modifier = Modifier.padding(top = 12.dp)) {
+                    OutlinedCard(modifier = Modifier.padding(top = 12.dp),
+                        colors = CardDefaults.cardColors(colorResource(id = R.color.dimBackground)),  border = CardDefaults.outlinedCardBorder(false)) {
                         Column(
                             modifier = Modifier
                                 .padding(12.dp)
@@ -115,7 +124,8 @@ fun Profile(
                     }
                 }
                 item {
-                    OutlinedCard(modifier = Modifier.padding(top = 12.dp)) {
+                    OutlinedCard(modifier = Modifier.padding(top = 12.dp), colors = CardDefaults.cardColors(colorResource(id = R.color.dimBackground)),  border = CardDefaults.outlinedCardBorder(false)
+                        ) {
                         Column(
                             modifier = Modifier
                                 .padding(12.dp)
@@ -226,7 +236,7 @@ fun Profile(
                                                 navController.navigate(Screens.Login.route)
                                             }
                                         }, context)
-                                    }, modifier = Modifier.fillMaxWidth()
+                                    }, modifier = Modifier.fillMaxWidth(),  colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
                                 ) {
                                     Text(text = "Logout")
                                 }
@@ -237,7 +247,7 @@ fun Profile(
                 item {
 
 
-                    OutlinedCard(modifier = Modifier.padding(top = 12.dp)) {
+                    OutlinedCard(modifier = Modifier.padding(top = 12.dp), colors = CardDefaults.cardColors(colorResource(id = R.color.dimBackground)),  border = CardDefaults.outlinedCardBorder(false)) {
                         Column(
                             modifier = Modifier
                                 .padding(12.dp)
@@ -273,7 +283,7 @@ fun Profile(
                 }
                 item {
 
-                    OutlinedCard(modifier = Modifier.padding(top = 12.dp)) {
+                    OutlinedCard(modifier = Modifier.padding(top = 12.dp), colors = CardDefaults.cardColors(colorResource(id = R.color.dimBackground)), border = CardDefaults.outlinedCardBorder(false)) {
                         Column(modifier = Modifier.padding(12.dp)) {
                             Text(text = "Group settings")
 
@@ -294,13 +304,13 @@ fun Profile(
                             if (currentUser.userId == currentGroup.creatorId) {
                                 Button(onClick = {
                                     deleteGroup = true
-                                }, modifier = Modifier.fillMaxWidth()) {
+                                }, modifier = Modifier.fillMaxWidth(),  colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)) {
                                     Text(text = "Delete group")
                                 }
                             } else {
                                 Button(onClick = {
                                     leaveGroup = true
-                                }, modifier = Modifier.fillMaxWidth()) {
+                                }, modifier = Modifier.fillMaxWidth(),  colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)) {
                                     Text(text = "Leave group")
                                 }
                             }
@@ -325,7 +335,7 @@ fun Profile(
                                 ) {
                                     if (leaveGroup) {
                                         Text(
-                                            text = "You really want to leave ${currentGroup.groupName}?",
+                                            text = "Are you sure you want to leave ${currentGroup.groupName}?",
                                             modifier = Modifier.padding(bottom = 8.dp),
                                             color = Color.Black,
                                         )
@@ -342,7 +352,7 @@ fun Profile(
                                             )
                                             navController.navigate("Home")
 
-                                        }) {
+                                        },  colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)) {
                                             Text(text = "Leave")
                                         }
                                         Button(onClick = {
@@ -351,7 +361,7 @@ fun Profile(
                                             }
                                     } else {
                                         Text(
-                                            text = "You really want to delete ${currentGroup.groupName}?",
+                                            text = "Are you sure you want to delete ${currentGroup.groupName}?",
                                             modifier = Modifier.padding(bottom = 8.dp),
                                             color = Color.Black,
                                         )
@@ -364,7 +374,7 @@ fun Profile(
                                                 groupViewModel.deleteGroup(currentGroup.groupId)
                                                 navController.navigate("Home")
                                                 deleteGroup = false
-                                            }) {
+                                            },  colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)) {
                                                 Text(text = "Delete")
                                             }
                                             Button(onClick = {

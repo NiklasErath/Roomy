@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 
 class BalanceViewModel(
@@ -55,11 +57,12 @@ class BalanceViewModel(
     fun addPayment(
         userId: String,
         groupId: Int,
-        amount: Int,
+        amount: Double,
         items: String,
         groupSize: Int,
         groupMembers: List<UserInformation>
     ) {
+        Log.d("TAG", "PAYMENT 1")
         viewModelScope.launch {
             val payment = paymentsRepository.addPayment(userId, groupId, amount, items)
             if (payment == null) {
@@ -68,7 +71,8 @@ class BalanceViewModel(
                 }
             } else {
                 stateViewModel.addNewPayment(payment, groupId)
-                val dividedAmount = amount / groupSize
+                val dividedAmount = BigDecimal(amount)
+                    .divide(BigDecimal(groupSize), 2, RoundingMode.HALF_UP)
                 coroutineScope {
                     groupMembers.map { member ->
                         if (member.id != userId) {
@@ -76,7 +80,7 @@ class BalanceViewModel(
                                 groupId,
                                 userId,
                                 member.id,
-                                dividedAmount
+                                dividedAmount.toDouble()
                             )
 
                             if (updatedBalance != null) {

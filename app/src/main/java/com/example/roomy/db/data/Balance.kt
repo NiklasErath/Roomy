@@ -10,5 +10,5 @@ data class Balance(
     @SerialName("group_id") val groupId: Int,
     @SerialName("owed_by") val owedBy: String,
     @SerialName("owed_to") val owedTo: String,
-    val amount: Int,
+    val amount: Double,
 )

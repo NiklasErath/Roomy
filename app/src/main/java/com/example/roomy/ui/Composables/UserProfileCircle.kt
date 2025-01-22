@@ -15,10 +15,12 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
-fun UserProfileCircle(username: String, circleSize: Dp, circleColor: Color) {
+fun UserProfileCircle(username: String, circleSize: Dp, circleColor: Color, fontSize: TextUnit = 16.sp) {
     Box(
         modifier = Modifier
 
@@ -30,6 +32,7 @@ fun UserProfileCircle(username: String, circleSize: Dp, circleColor: Color) {
     ) {
         Text(
             text = username.firstOrNull()?.toString()?.uppercase() ?: "",
+            fontSize = fontSize
 
             )
     }

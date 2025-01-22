@@ -56,7 +56,7 @@ class BalanceRepository {
 
     // Balance function
     // add Balance when there is a new payment
-    suspend fun addBalance(groupId: Int, owedBy: String, owedTo: String, amount: Int): Balance? {
+    suspend fun addBalance(groupId: Int, owedBy: String, owedTo: String, amount: Double): Balance? {
 
         var updatedBalance: Balance? = null
         try {

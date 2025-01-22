@@ -162,23 +162,6 @@ fun Home(
         AddGroupButton(onClick = { addGroupPopUp = true })
     }
 
-
-    // Button positioned at the bottom center
-//        Row(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .background(Color.Transparent)
-//                .padding(bottom = 40.dp) // Optional padding
-//                .align(Alignment.BottomCenter),
-//            horizontalArrangement = Arrangement.End
-//        ) {
-//            Button(onClick = { addGroupPopUp = true }) {
-//                Icon(imageVector = Icons.Filled.Add, contentDescription = "Add Group")
-//            }
-//        }
-//    }
-
-
     if (addGroupPopUp) {
         Column(
             Modifier
@@ -245,9 +228,6 @@ fun Home(
 
 
             )
-
-
-
 
 
             if (addedUsers.isNotEmpty()) {

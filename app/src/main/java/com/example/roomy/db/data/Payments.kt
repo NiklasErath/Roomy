@@ -9,6 +9,6 @@ data class Payments (
     @SerialName("created_at") val created: String? = null,
     @SerialName("group_id")val groupId: Int,
     @SerialName("paid_by")val paidBy: String,
-    val amount: Int,
+    val amount: Double,
     val items: String
 )

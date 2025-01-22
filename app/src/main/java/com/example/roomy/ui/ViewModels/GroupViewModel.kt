@@ -25,15 +25,14 @@ import kotlinx.coroutines.launch
 
 
 sealed class AddGroupState {
-    object Idle : AddGroupState()
-    object Success : AddGroupState()
+    data object Idle : AddGroupState()
+    data object Success : AddGroupState()
     data class Error(val message: String) : AddGroupState()
 }
 
 sealed class GroupError {
     data class Error(val message: String)
 }
-
 
 class GroupViewModel(
     private val groupRepository: GroupRepository,
@@ -45,37 +44,29 @@ class GroupViewModel(
 
 ) : ViewModel() {
 
-//    private val _allGroupsState = MutableStateFlow<List<newGroupState>>(emptyList())
-//    val allGroupsState = _allGroupsState.asStateFlow()
-
-
+    // update state when a group gets added
     private val _addGroupState = mutableStateOf<AddGroupState>(AddGroupState.Idle)
     val addGroupState: State<AddGroupState> = _addGroupState
+
+    // reset the groupState
     fun resetGroupState() {
         _addGroupState.value = AddGroupState.Idle
     }
 
-    private val _groupsInformation = MutableStateFlow(GroupsUiState(emptyList()))
-    private val _allGroupsMembers = MutableStateFlow<List<GroupMembersUiState>>(emptyList())
-    private val _groupMembers = MutableStateFlow(GroupMembersUiState(emptyList()))
-
+    // state for fetching all the information from the database - for the loading screen
     private val _fetchingAllGroups = MutableStateFlow(true)
     val fetchingAllGroups = _fetchingAllGroups.asStateFlow()
-
 
     // error State
     private val _groupError = MutableStateFlow(GroupError.Error(""))
     val error = _groupError.asStateFlow()
 
-    val groupsInformation = _groupsInformation.asStateFlow()
-    val allGroupsMembers = _allGroupsMembers.asStateFlow()
-
-    val groupMembers = _groupMembers.asStateFlow()
-
+    // current group information to display whe selected group information
     private val _currentGroupInformation =
         MutableStateFlow(GroupInformation(id = -1, name = "Placeholder", creatorId = "-1"))
     val currentGroupInformation: StateFlow<GroupInformation> get() = _currentGroupInformation
 
+    // set current group information
     fun setCurrentGroupInformation(group: GroupInformation) {
         _currentGroupInformation.value = group
     }
@@ -93,32 +84,36 @@ class GroupViewModel(
                 }
             } else {
 
-                val groupIds = groups.map{group ->
+                val groupIds = groups.map { group ->
                     group.groupId
                 }
 
 
-//                Fetch all needed data from supabase with asynchronous requests
+                // fetch all the necessary data for a group with an async
                 val groupInformationDeferred = async { groupRepository.getGroupInformationByIds(groupIds) ?: emptyList() }
                 val groupMembersDeferred = async { getAllGroupsMembers(groupIds) }
                 val itemsDeferred = async { itemViewModel.getAllItemsForGroups(groupIds) }
-                val paymentsDeferred = async { paymentsRepository.getPaymentsByGroupIds(groupIds) ?: emptyList()}
+                val paymentsDeferred = async { paymentsRepository.getPaymentsByGroupIds(groupIds) ?: emptyList() }
 
 
-                // Wait for all async tasks to complete
+                // wait for all functions to be done
                 val groupInformation = groupInformationDeferred.await()
                 val groupMembers = groupMembersDeferred.await()
                 val items = itemsDeferred.await()
                 val allPayments = paymentsDeferred.await()
 
-//                Create a combined Group State containing all Necessary Information for UI Rendering
+                // combine the data to have all data in one state
                 val combinedGroupState = groupIds.map { groupId ->
                     val groupInfo = groupInformation.find { it.id == groupId }
                     val membersUiState = groupMembers.find { it.groupId == groupId }
                     val members = membersUiState?.memberInformation ?: emptyList()
-                    val (shoppingListItems, inventoryItems) = items[groupId] ?: Pair(emptyList(), emptyList())
+                    val (shoppingListItems, inventoryItems) = items[groupId] ?: Pair(
+                        emptyList(),
+                        emptyList()
+                    )
                     val groupPayments = allPayments.filter { it.groupId == groupId }
 
+                    // set the values for newGroupState with the fetched data
                     newGroupState(
                         groupId = groupId,
                         groupName = groupInfo?.name ?: "Unknown",
@@ -131,10 +126,10 @@ class GroupViewModel(
                     )
                 }
 
-//                Set the new GroupState
+                // set the new GroupState
                 stateViewModel.setAllGroupsState(combinedGroupState)
 
-//                Used to display the loader in the Home screen while fetching
+                // update the state that the fetch process is done
                 _fetchingAllGroups.update { false }
 
 
@@ -144,152 +139,41 @@ class GroupViewModel(
     }
 
 
-    // Function to get all members for all groups
-//    private fun getAllGroupsMembers(groups: List<Groups>) {
-//        viewModelScope.launch {
-////               For each group, fetch its members
-//            val allMembers = mutableListOf<GroupMembersUiState>()
-//            for (group in groups) {
-//                // Step 3: Fetch members for each group
-//                val groupMembers = groupRepository.getGroupMembers(group.groupId)
-//
-//                if (groupMembers != null) {
-//                    val groupMemberInfo = groupMembers.map { member ->
-//                        // Assuming userRepository.getUserById returns a UserInformation object
-//                        userRepository.getUserById(member.userId)
-//                    }.filterNotNull()
-//
-//                    // Step 4: Add the group members to the list
-//                    allMembers.add(GroupMembersUiState(groupMemberInfo))
-//                } else {
-//                    _groupError.update { oldState ->
-//                        oldState.copy("Could not get All Group Members")
-//                    }
-//                }
-//            }
-//            // Step 5: Update _allGroupsMembers with the fetched members
-//            _allGroupsMembers.update {
-//                allMembers
-//            }
-//        }
-//    }
-
-
-//    private fun getAllGroupsMembers(groupIds: List<Int>) {
-//        viewModelScope.launch {
-//            val usersInGroups = userRepository.getUsersByGroupIds(groupIds) ?: emptyList()
-//
-//            Log.d("llllllllllllllllllllllllllllllllllllllllll", "$usersInGroups")
-//
-//
-//
-//            val userIds = usersInGroups.map { it.userId }
-//
-//            val userInformation = userRepository.getUserInformationByIds(userIds) ?: emptyList()
-//
-//
-//            mapToGroupMembersUiState(usersInGroups, userInformation)
-//
-//        }
-//    }
-//
-
-
-//Get all GroupMembers the user is in, returns a List of GroupmemberUIStates
+    // get all GroupMembers for the groups the user is in, returns a List of GroupMemberUIStates
     private suspend fun getAllGroupsMembers(groupIds: List<Int>): List<GroupMembersUiState> {
         val usersInGroups = userRepository.getUsersByGroupIds(groupIds) ?: emptyList()
         val userIds = usersInGroups.map { it.userId }
         val userInformation = userRepository.getUserInformationByIds(userIds) ?: emptyList()
 
-        // Map the fetched UserInformations and map them to a GroupUIState with groupID to use them for filling the Global UI State
-        // Return group member UI state for each group
+        // return group member UI state for each group
         return mapToGroupMembersUiState(usersInGroups, userInformation)
     }
 
 
-////    With all the fetched data we create one groupMember UI State with all groups containing all members
-//    private fun mapToGroupMembersUiState(groups: List<Groups>, allUserInformation: List<UserInformation>) {
-//        // Step 1: Create a map of user ID to UserInformation for quick lookup
-//        val userInfoMap = allUserInformation.associateBy { it.id }
-//
-//        // Step 2: Group the users by their groupId
-//        val groupedByGroupId = groups.groupBy { it.groupId }  // Group by groupId
-//
-//        // Step 3: For each groupId, fetch the corresponding user information and create GroupMembersUiState
-//        val groupMembersUiStateList = groupedByGroupId.map { (groupId, usersInGroup) ->
-//            // Fetch all user information for the current group
-//            val members = usersInGroup.mapNotNull { group ->
-//                userInfoMap[group.userId]  // Lookup user information by userId
-//            }
-//
-//            // Step 4: Create GroupMembersUiState for the group
-//            GroupMembersUiState(
-//                memberInformation = members
-//            )
-//        }
-//
-//        // Update the state with the newly created list
-//        _allGroupsMembers.value = groupMembersUiStateList
-//
-//        Log.d("allGroupMembers", "$_allGroupsMembers")
-//
-//    }
+    // map a list of groups and user information to a list of GroupMembersUiState
+    private fun mapToGroupMembersUiState(
+        groups: List<Groups>,
+        allUserInformation: List<UserInformation>
+    ): List<GroupMembersUiState> {
 
-//Takes a List of Users/Group Entities from the database and maps it to a List of GroupUIStated to further process
-    private fun mapToGroupMembersUiState(groups: List<Groups>, allUserInformation: List<UserInformation>): List<GroupMembersUiState> {
+        // create a map where the key is the userId and the value is the user information
         val userInfoMap = allUserInformation.associateBy { it.id }
+
+        // create a map where the key is the groupId and the value is the list of user information
         val groupedByGroupId = groups.groupBy { it.groupId }
+
 
         return groupedByGroupId.map { (groupId, usersInGroup) ->
             val members = usersInGroup.mapNotNull { group -> userInfoMap[group.userId] }
+            // create an object with the groupId and the list of the member information
             GroupMembersUiState(groupId = groupId, memberInformation = members)
         }
     }
 
 
-
-
-
-//
-//    // get the Group information by the group Id
-//    private fun getGroupInformationByGroupId(groups: List<Groups>) {
-//        viewModelScope.launch {
-//            val household = groups.map { group ->
-//                Log.d("IDS", "${group.groupId}")
-//                groupRepository.getGroupInformationById(group.groupId)
-//            }
-////            val houseHoldMembers = groups.map{group ->
-////                val groups = groupRepository.getGroupMembers(group.groupId)
-////            }
-//
-//            _groupsInformation.update {
-//                it.copy(groupsInformation = household.filterNotNull())
-//            }
-//        }
-//    }
-
-
-    // get all the Group information by the group Id
-    private fun getGroupInformationByGroupId(groupIds: List<Int>) {
-        viewModelScope.launch {
-
-            val households =
-                groupRepository.getGroupInformationByIds(groupIds) ?: emptyList()
-
-//            val houseHoldMembers = groups.map{group ->
-//                val groups = groupRepository.getGroupMembers(group.groupId)
-//            }
-
-            _groupsInformation.update {
-                it.copy(groupsInformation = households)
-            }
-        }
-    }
-
-
-    // create a new group with information needed
+    // create a new group with all the information needed
     fun createNewGroup(groupName: String, userId: String, addedUsers: List<String>) {
-//        Set this state to true here to give the allow loader rendering while UIState has to update
+
         _fetchingAllGroups.update { true }
 
         viewModelScope.launch {
@@ -307,25 +191,17 @@ class GroupViewModel(
                         }
                     }
                     try {
-
                         addedUsers.forEach { item ->
                             addMemberByNameToGroup(item, groupId)
-
                         }
                     } catch (e: Exception) {
                         _groupError.update { oldState ->
                             oldState.copy("Failed to add Members")
                         }
                     }
-
-//                    stateViewModel.addNewGroup(newGroupState(creatorId = newGroup.creatorId, groupId = newGroup.id, groupMembers = ))
-
+                    // update the currentGroup state and the state for all groups
                     setCurrentGroupInformation(newGroup)
                     _addGroupState.value = AddGroupState.Success
-
-
-                } ?: run {
-                    Log.d("TAG", "Group ID is null. Cannot add member.")
                 }
             }
         }
@@ -341,6 +217,7 @@ class GroupViewModel(
                     oldState.copy("Group could not be deleted")
                 }
             } else {
+                // delete everything related to the group
                 stateViewModel.deleteGroup(groupId)
                 balanceRepository.deleteBalanceByGroupId(groupId)
                 paymentsRepository.deleteGroupPayments(groupId)
@@ -348,7 +225,7 @@ class GroupViewModel(
         }
     }
 
-    // kick a user
+    // kick a user by the userId and groupId
     fun kickUser(userId: String, groupId: Int) {
         viewModelScope.launch {
             val kicked = groupRepository.kickMemberFromGroup(userId, groupId)
@@ -357,6 +234,7 @@ class GroupViewModel(
                     oldState.copy("Kick user failed")
                 }
             } else {
+                // delete everything from the group that is related to the kicked user
                 stateViewModel.kickUser(groupId, userId)
                 balanceRepository.deleteBalanceByUserId(groupId, userId)
                 paymentsRepository.deleteUserPayments(userId, groupId)
@@ -367,7 +245,6 @@ class GroupViewModel(
     //add a member to a group by his username
     fun addMemberByNameToGroup(username: String, groupId: Int) {
 
-
         viewModelScope.launch {
 
             val user = userRepository.getUserByName(username)
@@ -376,7 +253,6 @@ class GroupViewModel(
                     oldState.copy("No user found")
                 }
             } else {
-                stateViewModel.addUser(groupId, user)
 
                 val adduser = groupRepository.addMemberToGroup(user.id, groupId)
                 if (!adduser) {
@@ -384,25 +260,15 @@ class GroupViewModel(
                         oldState.copy("User already in the group")
                     }
                 } else {
-                    _groupMembers.update { oldState ->
-                        val updatedMembers = oldState.memberInformation.toMutableList()
-                        updatedMembers.add(user)
-                        oldState.copy(memberInformation = updatedMembers)
-                    }
-//                    Also update the current AllGroupMembers here if a new group is created
-                    _allGroupsMembers.update { oldGroups ->
-                        oldGroups + _groupMembers.value
-                    }
-
+                    stateViewModel.addUser(groupId, user)
                 }
             }
-
         }
-
     }
 
-    fun setGroupError(newError:String){
-        _groupError.update { oldState->
+    // update the group error state
+    fun setGroupError(newError: String) {
+        _groupError.update { oldState ->
             oldState.copy(newError)
         }
     }
@@ -413,6 +279,4 @@ class GroupViewModel(
             oldState.copy("")
         }
     }
-
-
 }

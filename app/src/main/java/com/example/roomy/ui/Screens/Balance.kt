@@ -55,6 +55,8 @@ fun Balance(
 
     val payments = currentGroup.payments
 
+    val balanceUi = balanceViewModel.balance.collectAsState()
+
     val currentUser by userViewModel.loggedInUser.collectAsState()
 
     var addPayment by remember { mutableStateOf(false) }
@@ -71,12 +73,12 @@ fun Balance(
         Column {
 
             Text(
-                text = "BALANCE LOADING .... ",
+                text = "BALANCE",
                 modifier = Modifier.fillMaxWidth(), fontWeight = FontWeight.Bold
             )
-            Text(text = "Coming soon ... ")
+
             LazyColumn {
-                itemsIndexed(balanceViewModel.balance.value.userBalance) { index: Int, Balance ->
+                itemsIndexed(balanceUi.value.userBalance) { index: Int, Balance ->
                     val owedBy =
                         currentGroup.groupMembers.find { it.id == Balance.owedBy }?.username
                             ?: "Unknown User"
@@ -160,6 +162,7 @@ fun Balance(
                                     groupSize,
                                     currentGroup.groupMembers
                                 )
+                                addPayment = false
                                 newPayment = ""
                                 itemsBought = ""
                             } else {

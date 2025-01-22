@@ -27,34 +27,17 @@ class GroupRepository {
         }
     }
 
-    // get the group information of a group by groupId
-//    suspend fun getGroupInformationById(groupId: Int): GroupInformation? {
-//        try {
-//            val response = supabase
-//                .from("group_information")
-//                .select { filter { eq("group_id", groupId) } }
-//                .decodeSingle<GroupInformation>()
-//            return response
-//        } catch (e: Exception) {
-//            Log.d("TAG", "Could not get the groups: ${e.message}")
-//            return null
-//        }
-//    }
-
-    // get the group information of a group by groupId
-
+    // get the group information of a group by groupIds the user is in
     suspend fun getGroupInformationByIds(groupIds: List<Int>): List<GroupInformation>? {
         try {
             val response = supabase
                 .from("group_information")
-                .select (columns = Columns.ALL){
-                    filter{
+                .select(columns = Columns.ALL) {
+                    filter {
                         isIn("group_id", groupIds)
                     }
                 }
                 .decodeList<GroupInformation>()
-            Log.d("GroupInfooooooooooooooooooooooooooooo", "$response")
-
             return response
         } catch (e: Exception) {
             Log.d("TAG", "Could not get the groups: ${e.message}")
@@ -68,7 +51,6 @@ class GroupRepository {
             val group = GroupInformation(name = groupName, creatorId = userId)
             val response = supabase.from("group_information").insert(group) { select() }
                 .decodeSingle<GroupInformation>()
-            Log.d("TAG", "$response")
             return response
         } catch (e: Exception) {
             Log.d("TAG", "Could not create group: ${e.message}")
@@ -111,12 +93,9 @@ class GroupRepository {
                     eq("user_id", userId)
                 }
             }.decodeList<Groups>()
-            Log.d("EXIST", "$existingRelation")
-
             if (existingRelation.isEmpty()) {
                 val relation = Groups(userId = userId, groupId = groupId)
                 supabase.from("parent_group").insert(relation)
-                Log.d("MMM", "Add member success")
             } else {
                 return false
             }

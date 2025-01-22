@@ -331,26 +331,6 @@ class GroupViewModel(
         }
     }
 
-    // get all the group members and their information for a group by groupid
-    fun getGroupMembers(groupId: Int) {
-        viewModelScope.launch {
-            val users = groupRepository.getGroupMembers(groupId)
-            if (users == null) {
-                _groupError.update { oldState ->
-                    oldState.copy("Could not fetch group Members")
-                }
-            } else {
-                val usersInformation = users.map { users ->
-                    Log.d("IDS FOR INFO", users.userId)
-                    userRepository.getUserById(users.userId)
-
-                }
-                _groupMembers.update { it.copy(memberInformation = usersInformation.filterNotNull()) }
-                Log.d("User INFO", "$usersInformation")
-            }
-        }
-    }
-
     // delete a group by groupId
     fun deleteGroup(groupId: Int) {
 

@@ -12,36 +12,31 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 
-//Holds globalstate of all groups the user is part of and updates it accordingly when things change
+//Holds global state of all groups the user is part of and updates it accordingly when things change
 //This removes the need to always refetch data when something changes and lets us update the state directly
 class StateViewModel(
 ) : ViewModel() {
 
-    //Contains all data from all groups the user is in and allows seamless UI Rendering without the need to fetch data again
+    // contains all data from all groups the user is in and allows seamless UI Rendering without the need to fetch data again
     private val _allGroupsState = MutableStateFlow<List<newGroupState>>(emptyList())
     val allGroupsState = _allGroupsState.asStateFlow()
 
-    //    Initially set the new global Groupstate frm the groupviewmodel
+    //    Initially set the new global group state frm the group viewmodel
     fun setAllGroupsState(newGroupState: List<newGroupState>) {
         _allGroupsState.update { newGroupState }
     }
 
 
-    // Function to update the shopping list and inventory for the current group
+    // update the state when an item gets moved to the inventory
     fun moveItemToInventory(groupId: Int, item: Item) {
         _allGroupsState.update { groups ->
             groups.map { group ->
                 if (group.groupId == groupId) {
-                    Log.d(
-                        "ShoppingListssssssssssssssssssss",
-                        "Shopping List Items: ${group.shoppingListItems}"
-                    )
 
-                    // Move the item from shopping list to inventory
+                    // move the item from shopping list to inventory
                     val updatedShoppingList = group.shoppingListItems.filter { it.id != item.id }
                     val updatedInventoryList = group.inventoryItems + item
 
-                    // Return the updated group with the new item lists
                     group.copy(
                         shoppingListItems = updatedShoppingList,
                         inventoryItems = updatedInventoryList
@@ -53,16 +48,15 @@ class StateViewModel(
         }
     }
 
-    // Function to update the shopping list and inventory for the current group
+    // update the state when an item get moved to the shopping list
     fun moveItemToShoppingList(groupId: Int, item: Item) {
         _allGroupsState.update { groups ->
             groups.map { group ->
                 if (group.groupId == groupId) {
-                    // Move the item from shopping list to inventory
+                    // move the item from shopping list to inventory
                     val updatedInventoryList = group.inventoryItems.filter { it.id != item.id }
                     val updatedShoppingList = group.shoppingListItems + item
 
-                    // Return the updated group with the new item lists
                     group.copy(
                         shoppingListItems = updatedShoppingList,
                         inventoryItems = updatedInventoryList
@@ -74,7 +68,7 @@ class StateViewModel(
         }
     }
 
-    //    Delete an Item from the current Group
+    // update the state when deleting an item from a group
     fun deleteItemFromGroup(groupId: Int, item: Item) {
         _allGroupsState.update { groups ->
             groups.map { group ->
@@ -104,7 +98,7 @@ class StateViewModel(
         }
     }
 
-    //    Add a new item to the group
+    // update the state when adding a new item to a group
     fun addItemToGroup(groupId: Int, item: Item) {
         _allGroupsState.update { groups ->
             groups.map { group ->
@@ -123,14 +117,14 @@ class StateViewModel(
         }
     }
 
-    //Delete a group from the global state
+    // delete a grpup from the state
     fun deleteGroup(groupId: Int) {
         _allGroupsState.update { groups ->
-            groups.filterNot { it.groupId == groupId }  // Exclude the group with matching groupId
+            groups.filterNot { it.groupId == groupId }
         }
     }
 
-    //    Kick out a user
+    // update state when kicking a user out of the group or a user leaves
     fun kickUser(groupId: Int, userId: String) {
 
         _allGroupsState.update { groups ->
@@ -152,7 +146,7 @@ class StateViewModel(
     }
 
 
-    //    Add a new user to a group
+    // update the state when adding a new User to a group
     fun addUser(groupId: Int, user: UserInformation) {
 
         _allGroupsState.update { groups ->
@@ -174,7 +168,7 @@ class StateViewModel(
 
     }
 
-    //    Update the username
+    // update the state when changing the username
     fun updateUserName(userName: String, userId: String) {
 
         _allGroupsState.update { groups ->
@@ -195,32 +189,7 @@ class StateViewModel(
         }
     }
 
-    fun addBalance(balance: Balance, groupId: Int) {
-        _allGroupsState.update { groups ->
-            groups.map { group ->
-                if (group.groupId == groupId) {
-                    group.copy(balances = group.balances + balance)
-                } else {
-                    group
-                }
-            }
-        }
-    }
-
-    fun deleteBalance(deletedBalance: Balance, groupId: Int) {
-        _allGroupsState.update { groups ->
-            groups.map { group ->
-                if (group.groupId == groupId) {
-                    group.copy(
-                        balances = group.balances - deletedBalance
-                    )
-                } else {
-                    group
-                }
-            }
-        }
-    }
-
+    // update the State when adding a new Payment
     fun addNewPayment(addedPayment: Payments, groupId: Int) {
         _allGroupsState.update { groups ->
             groups.map { group ->
@@ -233,18 +202,7 @@ class StateViewModel(
         }
     }
 
-    fun deletePayments(deletedPayments: Payments, groupId: Int) {
-        _allGroupsState.update { groups ->
-            groups.map { group ->
-                if (group.groupId == groupId) {
-                    group.copy(payments = group.payments - deletedPayments)
-                } else {
-                    group
-                }
-            }
-        }
-    }
-
+    // clear the Group state if necessary - e.g. when logout
     fun clearGroupsState() {
 
         _allGroupsState.value = emptyList()

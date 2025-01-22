@@ -19,16 +19,16 @@ import java.util.UUID
 import kotlin.concurrent.timer
 
 sealed class LoginState {
-    object Idle : LoginState()
-    object Loading : LoginState()
-    object Success : LoginState()
+    data object Idle : LoginState()
+    data object Loading : LoginState()
+    data object Success : LoginState()
     data class Error(val message: String) : LoginState()
 }
 
 sealed class RegisterState {
-    object Idle : RegisterState()
-    object Loading : RegisterState()
-    object Success : RegisterState()
+    data object Idle : RegisterState()
+    data object Loading : RegisterState()
+    data object Success : RegisterState()
     data class Error(val message: String) : RegisterState()
 }
 
@@ -52,28 +52,33 @@ class UserViewModel(
     private val _userError = MutableStateFlow(UserError.Error(""))
     val userError = _userError.asStateFlow()
 
+    // login State to redirect the user if necessary
     private val _loginState = mutableStateOf<LoginState>(LoginState.Idle)
     val loginState: State<LoginState> = _loginState
 
+    // register State to redirect the user if necessary
     private val _registerState = mutableStateOf<RegisterState>(RegisterState.Idle)
     val registerState: State<RegisterState> = _registerState
 
     // Login user
-    suspend fun logInUser(userEmail: String, userPassword: String, context: Context) {
-        userRepository.signIn(userEmail, userPassword)
-        Log.d("SIGN IN ", "USER SIGN IN")
+    private suspend fun logInUser(userEmail: String, userPassword: String, context: Context) {
+        val signIn = userRepository.signIn(userEmail, userPassword)
         val currentSession = userRepository.getSessionAndAccessToken(context)
         _session.update { oldState ->
             oldState.copy(
                 userId = currentSession
             )
         }
+        if (!signIn) {
+            _userError.update { oldState ->
+                oldState.copy("Failed to login! Try again!")
+            }
+        }
 
     }
 
-    // get the Information of the user by ID
-    suspend fun getUserInformation() {
-        Log.d("Tag", currentUserSession.value.userId)
+    // get the Information of the current logged in user by ID
+    private suspend fun getUserInformation() {
 
         val user = userRepository.getUserById(currentUserSession.value.userId)
         if (user == null) {
@@ -89,14 +94,12 @@ class UserViewModel(
                 )
             }
         }
-
     }
 
     // login the user and get all his information
     fun logInAndFetchUserInformation(userEmail: String, userPassword: String, context: Context) {
         viewModelScope.launch {
             _loginState.value = LoginState.Loading
-
             try {
                 logInUser(userEmail, userPassword, context)
                 getUserInformation()
@@ -104,58 +107,50 @@ class UserViewModel(
                 resetLoginState()
 
             } catch (e: Exception) {
-                _loginState.value = LoginState.Error(e.message ?: "Unknown Error")
-
-
+                _userError.update { oldState ->
+                    oldState.copy("Username or Password is wrong")
+                }
             }
-
-
         }
     }
 
 
+    // check if there is already a session when launching the app and if there is one fetch all the needed data
     fun logInAndFetchInformationWithSessionToken(context: Context) {
         val token = UserSessionManager.getSessionToken(context)
 
         if (token == null) {
-            // If token is null, immediately exit and notify user
             _loginState.value = LoginState.Idle
             _userError.update { oldState -> oldState.copy("Login from Session failed") }
-            return
-        }
+        } else {
 
-        // If the token exists, proceed with session fetching
-        viewModelScope.launch {
-            try {
-                val session = userRepository.fetchSessionWithToken(token)
+            // if a  session exists get all the information
+            viewModelScope.launch {
+                try {
+                    val session = userRepository.fetchSession()
 
-//                Log.e("SIGN IN ERROR", "Failed to log in: ${e.message}")
+                    if (session?.user != null) {
+                        val currentUserId = session.user!!.id
+                        _session.update { oldState -> oldState.copy(userId = currentUserId) }
 
-                if (session?.user != null) {
-                    val currentUserId = session.user!!.id
-                    _session.update { oldState -> oldState.copy(userId = currentUserId) }
+                        getUserInformation()
+                        _loginState.value = LoginState.Success
+                        resetLoginState()
 
-                    getUserInformation()
-                    _loginState.value = LoginState.Success
-                    resetLoginState()
+                    } else {
+                        _loginState.value = LoginState.Error("NavLogin")
+                    }
+                } catch (e: Exception) {
+                    Log.e("SIGN IN ERROR", "Failed to log in: ${e.message}")
 
-                } else {
-                    _loginState.value = LoginState.Error("NavLogin")
+                    _userError.update { oldState -> oldState.copy("Failed to get user information from token") }
+                    _loginState.value = LoginState.Idle
                 }
-                // Update login state to success
-            } catch (e: Exception) {
-                // Handle any exceptions that occur during the session fetching
-                Log.e("SIGN IN ERROR", "Failed to log in: ${e.message}")
-
-                // Notify user error
-                _userError.update { oldState -> oldState.copy("Failed to get user information from token") }
-
-                // Reset login state to idle
-                _loginState.value = LoginState.Idle
             }
         }
     }
 
+    // logout function
     fun logout(callback: (Boolean) -> Unit, context: Context) {
         viewModelScope.launch {
             val logout = userRepository.logout()
@@ -176,54 +171,58 @@ class UserViewModel(
                 _loginState.value = LoginState.Idle
                 callback(false)
             }
-
-
         }
     }
 
-    // register
+    // register a new user
     fun signUp(userEmail: String, userPassword: String, userName: String, context: Context) {
         viewModelScope.launch {
-
+            clearUserError()
             try {
 
-
+                // check if the username and email is still available
                 val emailExists = userRepository.checkExistingEmail(userEmail)
                 val userNameExists = userRepository.checkExistingUserName(userName)
 
-                if (emailExists) throw IllegalArgumentException("Email already exists")
-                else if (userNameExists) throw IllegalArgumentException("Username already exists")
-
-                userRepository.signUp(userEmail, userPassword)
-                userRepository.signIn(userEmail, userPassword)
-
-                val currentSession = userRepository.getSessionAndAccessToken(context)
-                _session.update { oldState ->
-                    oldState.copy(
-                        userId = currentSession
-                    )
+                if (emailExists) {
+                    _userError.update { oldState ->
+                        oldState.copy("Email address is already taken")
+                    }
+                }
+                if (userNameExists) {
+                    _userError.update { oldState ->
+                        oldState.copy("Username is already taken")
+                    }
                 }
 
-                userRepository.updateUserInformation(currentSession, userName)
+                if (!emailExists && !userNameExists) {
+                    userRepository.signUp(userEmail, userPassword)
+                    userRepository.signIn(userEmail, userPassword)
 
-                _loggedInUser.update { oldState ->
-                    oldState.copy(
-                        userId = currentSession,
-                        username = userName,
-                        email = userEmail
-                    )
+                    val currentSession = userRepository.getSessionAndAccessToken(context)
+                    _session.update { oldState ->
+                        oldState.copy(
+                            userId = currentSession
+                        )
+                    }
+
+                    userRepository.updateUserInformation(currentSession, userName)
+
+                    _loggedInUser.update { oldState ->
+                        oldState.copy(
+                            userId = currentSession,
+                            username = userName,
+                            email = userEmail
+                        )
+                    }
+
+                    _registerState.value = RegisterState.Success
                 }
-
-                _registerState.value = RegisterState.Success
-
-
             } catch (e: Exception) {
-                _registerState.value = RegisterState.Error(e.message ?: "Unknown Error")
-
-
+                _userError.update { oldState ->
+                    oldState.copy("Sign up failed! Try again!")
+                }
             }
-
-
         }
     }
 
@@ -245,8 +244,8 @@ class UserViewModel(
     // update the username and check if he already exists
     fun updateUserName(username: String, userId: String) {
         viewModelScope.launch {
-            val newUsername = userRepository.checkExistingUserName(username)
-            if (newUsername) {
+            val newUsername = userRepository.getUserByName(username)
+            if (newUsername == null) {
                 _userError.update { oldState ->
                     oldState.copy("Username already exists")
                 }
@@ -273,7 +272,7 @@ class UserViewModel(
     }
 
     //  Clear LoginState for Future Logins
-    fun resetLoginState() {
+    private fun resetLoginState() {
         viewModelScope.launch {
             delay(100) // Adjust the delay time as needed (e.g., 2 seconds)
             _loginState.value = LoginState.Idle

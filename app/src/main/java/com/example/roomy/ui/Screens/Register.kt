@@ -53,15 +53,11 @@ fun Register(
 
 
     val registerState by userViewModel.registerState
-    var context = LocalContext.current
+    val context = LocalContext.current
 
     LaunchedEffect(registerState) {
         if (registerState is RegisterState.Success) {
             navController.navigate(Screens.Home.name)
-        }
-        if (registerState is RegisterState.Error) {
-            val errorMessage = (registerState as RegisterState.Error).message
-            Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
         }
     }
 

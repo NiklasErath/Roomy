@@ -28,6 +28,7 @@ class ItemViewModel(
 
     private val _finishedFetching = mutableStateOf<Boolean>(false)
     val finishedFetching: State<Boolean> = _finishedFetching
+
     fun resetFinishedFetching() {
         _finishedFetching.value = false
     }
@@ -36,16 +37,22 @@ class ItemViewModel(
     private val _itemError = MutableStateFlow(ItemErrorState.Error(""))
     val itemError = _itemError.asStateFlow()
 
+
     // move item to the inventory
     fun moveToInventory(item: Item, groupId: Int) {
 
         val newItem = Item(item.id, item.name, item.groupId, "inventory", item.quantity, item.icon)
 
-        stateViewModel.moveItemToInventory(groupId, newItem)
-
         viewModelScope.launch {
 
-            itemRepository.updateItem(newItem)
+            val success =itemRepository.updateItem(newItem)
+            if (success) {
+                stateViewModel.moveItemToInventory(groupId, newItem)
+            } else {
+                _itemError.update { oldState ->
+                    oldState.copy("Oops, something went wrong")
+                }
+            }
 
         }
     }
@@ -53,65 +60,63 @@ class ItemViewModel(
     // move Item to the shopping list
     fun moveToShoppingList(item: Item, groupId: Int) {
 
-        val newItem =
-            Item(item.id, item.name, item.groupId, "shoppingList", item.quantity, item.icon)
-
-        stateViewModel.moveItemToShoppingList(groupId, newItem)
+        val newItem = Item(item.id, item.name, item.groupId, "shoppingList", item.quantity, item.icon)
 
         viewModelScope.launch {
-            itemRepository.updateItem(newItem)
+            val success = itemRepository.updateItem(newItem)
 
+            if (success) {
+                stateViewModel.moveItemToShoppingList(groupId, newItem)
+            } else {
+                _itemError.update { oldState ->
+                    oldState.copy("Oops, something went wrong")
+                }
+            }
         }
     }
 
-    // Get all Items for all groups the user is in, return them in a Map of GroupId to Pair of(ShoppingListItems, InventoryItems)
+    // get all the items for all the groups the user is a member of - map them
     suspend fun getAllItemsForGroups(groupIds: List<Int>): Map<Int, Pair<List<Item>, List<Item>>> {
         val groupItemsMap = mutableMapOf<Int, Pair<List<Item>, List<Item>>>()
 
 
         try {
-//            Fetch all items for the groups at once
+            // get all the items for all the groups
             val allItems: Pair<List<Item>, List<Item>>? =
                 itemRepository.getAllItemsForGroups(groupIds)
 
-//            If the result is null, return empty lists for each group
             if (allItems == null) {
                 groupIds.forEach { groupId ->
                     groupItemsMap[groupId] = Pair(emptyList(), emptyList())
                 }
                 _itemError.update { oldState -> oldState.copy("Failed to get Items") }
             } else {
-                //Split shopping list items and inventory items for further processing
+
                 val (shoppingListItems, inventoryItems) = allItems
 
-                // Process shopping list and inventory items, and map them to each groupId
+                // filter the items by groupId
                 groupIds.forEach { groupId ->
-                    // Filter shopping list items for the current groupId
+
                     val itemsForGroup = shoppingListItems.filter { it.groupId == groupId }
-                    // Filter inventory items for the current groupId
                     val inventoryForGroup = inventoryItems.filter { it.groupId == groupId }
 
-                    // Add the filtered items as a pair (shopping list items, inventory items) to the map
+                    // pair the items and map them
                     groupItemsMap[groupId] = Pair(itemsForGroup, inventoryForGroup)
                 }
             }
         } catch (e: Exception) {
-            // Return empty lists for each group in casde of errors for now
+
             groupIds.forEach { groupId ->
                 groupItemsMap[groupId] = Pair(emptyList(), emptyList())
             }
             _itemError.update { oldState -> oldState.copy("Failed to get Items") }
         }
 
-        // Return the map containing the list of items for each group split into shopping and inventory
         return groupItemsMap
     }
 
 
-    // add an Item to your List
-//    Not this still requires a call to first set the item in supabase to work
-//    Otherwise we dont have the itemid yet which is used to handle updates
-//    Create dummy random id maybe later on
+    // add an item
     fun addItem(item: Item, groupId: Int) {
         viewModelScope.launch {
             val newItem = itemRepository.addItem(item)
@@ -129,14 +134,15 @@ class ItemViewModel(
     // delete an item
     fun deleteItem(item: Item, groupId: Int) {
 
-        stateViewModel.deleteItemFromGroup(groupId, item)
-
         viewModelScope.launch {
             val delete = itemRepository.deleteItem(item)
+
             if (!delete) {
                 _itemError.update { oldState ->
                     oldState.copy("Failed to delete Item")
                 }
+            } else {
+                stateViewModel.deleteItemFromGroup(groupId, item)
             }
         }
     }

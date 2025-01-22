@@ -9,6 +9,8 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="background">#28432A</color>
+    <color name="dimBackground">#233323</color>
+
     <color name="primary">#8FA650</color>
     <color name="dimPrimary">#596637</color>
 

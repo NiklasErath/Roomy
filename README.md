@@ -52,15 +52,13 @@ We believe users will find it intuitive to navigate between different groups bec
 •	Error Rate 
 •	Think Aloud Observation
 •	Task completion time 
-•	SUS
-•	Ease 
+•	Single Ease Questionaire
 
 ### Tasks:
 
 The tasks will be done step by step like the bullet points. The success rate, error rate and the completion time will be tracked for the whole task. 
 The time gets recorded by screen recordings and will be evaluated afterwards by reviewing the videos. 
-After each task will be a USE questionnaire.
-A sus will be handed to the participant after he finished all tasks. 
+After each task will be a SEQ questionnaire.
 
 ### Task 1: Create an Account and Create a Group
 Please create an account and then create a group. Once the group is created, add the users “Jakob” and “Niklas” to your group.

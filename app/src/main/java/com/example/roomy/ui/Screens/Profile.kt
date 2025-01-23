@@ -79,7 +79,7 @@ fun Profile(
     ) {
         Text(text = "Your Profile", fontSize = 24.sp, fontWeight = FontWeight.Bold)
         Column(modifier = Modifier.padding(top = 20.dp)) {
-            UserProfileCircle(currentUser.username, 100.dp,MaterialTheme.colorScheme.primary, 50.sp)
+            UserProfileCircle(currentUser.username, 100.dp,MaterialTheme.colorScheme.secondary, 50.sp)
         }
         Column(
             Modifier
@@ -116,7 +116,7 @@ fun Profile(
                             Box() {
                                 Column {
                                     Text(text = "Name: ${currentUser.username}", color = Color.Black)
-                                    Text(text = "ID: ${currentUser.userId}", color = Color.Black)
+//                                    Text(text = "ID: ${currentUser.userId}", color = Color.Black)
                                     Text(text = "Email: ${currentUser.email}", color = Color.Black)
                                 }
                             }
@@ -247,39 +247,41 @@ fun Profile(
                 item {
 
 
-                    OutlinedCard(modifier = Modifier.padding(top = 12.dp), colors = CardDefaults.cardColors(Color.White),  border = CardDefaults.outlinedCardBorder(false)) {
-                        Column(
-                            modifier = Modifier
-                                .padding(12.dp)
-                                .fillMaxWidth()
-                        ) {
-                            Text(text = "Theme settings", color = Color.Black, fontSize = 20.sp)
+//                    Theme Settings Button for future implementation
 
-                            HorizontalDivider(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp),
-                                thickness = 1.dp,
-                                color = Color.Gray
-                            )
-
-                            Button(
-                                onClick = {
-                                    if (theme == "dark") {
-                                        theme = "white"
-                                    } else {
-                                        theme = "dark"
-                                    }
-                                }, modifier = Modifier.fillMaxWidth()
-                            ) {
-                                if (theme == "dark") {
-                                    Text(text = "Change to White mode")
-                                } else {
-                                    Text(text = "Change to Dark mode")
-                                }
-                            }
-                        }
-                    }
+//                    OutlinedCard(modifier = Modifier.padding(top = 12.dp), colors = CardDefaults.cardColors(Color.White),  border = CardDefaults.outlinedCardBorder(false)) {
+//                        Column(
+//                            modifier = Modifier
+//                                .padding(12.dp)
+//                                .fillMaxWidth()
+//                        ) {
+//                            Text(text = "Theme settings", color = Color.Black, fontSize = 20.sp)
+//
+//                            HorizontalDivider(
+//                                modifier = Modifier
+//                                    .fillMaxWidth()
+//                                    .padding(vertical = 8.dp),
+//                                thickness = 1.dp,
+//                                color = Color.Gray
+//                            )
+//
+//                            Button(
+//                                onClick = {
+//                                    if (theme == "dark") {
+//                                        theme = "white"
+//                                    } else {
+//                                        theme = "dark"
+//                                    }
+//                                }, modifier = Modifier.fillMaxWidth()
+//                            ) {
+//                                if (theme == "dark") {
+//                                    Text(text = "Change to White mode")
+//                                } else {
+//                                    Text(text = "Change to Dark mode")
+//                                }
+//                            }
+//                        }
+//                    }
                 }
                 item {
 

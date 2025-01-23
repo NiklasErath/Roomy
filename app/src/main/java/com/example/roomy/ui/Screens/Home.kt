@@ -5,8 +5,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,6 +21,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -39,12 +42,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.roomy.R
 import com.example.roomy.ui.Composables.AddGroupButton
+import com.example.roomy.ui.Composables.UserProfileCircle
 import com.example.roomy.ui.States.GroupState
 import com.example.roomy.ui.ViewModels.AddGroupState
 import com.example.roomy.ui.ViewModels.GroupViewModel
@@ -75,7 +80,6 @@ fun Home(
     var fetchingAllGroups = groupViewModel.fetchingAllGroups.collectAsState()
 
     val pullDownRefreshState = groupViewModel.pullDownRefreshState.collectAsState()
-
 
 
     val loginState by userViewModel.loginState
@@ -127,10 +131,19 @@ fun Home(
     var addGroupPopUp by remember { mutableStateOf(false) }
 
 
-    var pullRefreshState = rememberPullRefreshState(refreshing = pullDownRefreshState.value, onRefresh = {
-        groupViewModel.updatePullDownRefreshState(true)
-        groupViewModel.getGroupsByUserId(currentUserId)
-        groupViewModel.resetGroupState()})
+    var pullRefreshState =
+        rememberPullRefreshState(refreshing = pullDownRefreshState.value, onRefresh = {
+            groupViewModel.updatePullDownRefreshState(true)
+            groupViewModel.getGroupsByUserId(currentUserId)
+            groupViewModel.resetGroupState()
+        })
+
+
+    val circleColors = listOf(
+        MaterialTheme.colorScheme.secondary,
+        MaterialTheme.colorScheme.primary,
+        MaterialTheme.colorScheme.surfaceContainer,
+    )
 
 
     Box(
@@ -158,7 +171,7 @@ fun Home(
                             contentColor = MaterialTheme.colorScheme.primary
                         )
                     }
-                ){
+                ) {
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(20.dp),
                         modifier = Modifier.weight(1f) // Ensures the LazyColumn takes up remaining space
@@ -178,9 +191,6 @@ fun Home(
                 }
 
 
-
-
-
             }
         }
     }
@@ -195,8 +205,7 @@ fun Home(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
                 .clickable { }
-                .shadow(0.dp)
-            ,
+                .shadow(0.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly
         ) {
@@ -222,6 +231,7 @@ fun Home(
                     )
                 },
                 label = { Text("Groupname") },
+                unfocusedLabelColor = Color.White
             )
 
             CustomOutlinedTextField(
@@ -258,23 +268,57 @@ fun Home(
 
 
             if (addedUsers.isNotEmpty()) {
+
                 LazyColumn() {
-                    itemsIndexed(addedUsers) { index, item ->
-                        OutlinedCard(
-                            modifier = Modifier
+                    itemsIndexed(addedUsers) { index: Int, memberInformation ->
+
+
+                        val userCircleColor = circleColors[index % circleColors.size]
+
+
+                        Row(
+                            Modifier
                                 .fillMaxWidth()
+                                .background(colorResource(id = R.color.dimBackground))
+                                .padding(horizontal = 20.dp, vertical = 8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Row(modifier = Modifier.padding(12.dp)) {
-                                Text(text = item)
-                                Button(onClick = { addedUsers.remove(item) }) {
-                                    Text(text = "remove")
-                                }
+                            Row (verticalAlignment = Alignment.CenterVertically){
+                                UserProfileCircle(
+                                    username = memberInformation,
+                                    circleColor = userCircleColor,
+                                    circleSize = 50.dp
+                                )
+                                Spacer(Modifier.width(20.dp))
+                                Text(
+                                        text = memberInformation,
+                                        fontSize = integerResource(id = R.integer.heading3).sp
+                                    )
+
+
+                            }
+                            Button(
+                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp),
+                                modifier = Modifier
+                                    .defaultMinSize(minWidth = 1.dp, minHeight = 1.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    MaterialTheme.colorScheme.error
+
+
+                                ),
+                                onClick = {
+                                    addedUsers.remove(memberInformation)
+                                }) {
+                                Text(text = "Remove", color = Color.White)
                             }
                         }
+                        Spacer(Modifier.height(12.dp))
                     }
                 }
             }
             Button(
+                modifier = Modifier.fillMaxWidth(),
                 onClick = {
                     groupViewModel.createNewGroup(newGroupName, currentUserId, addedUsers)
                     addGroupPopUp = false

@@ -30,7 +30,8 @@ fun CustomOutlinedTextField(
     leadingIcon: @Composable (() -> Unit)? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     placeholder: @Composable (() -> Unit)? = null,
-    visualTransformation: VisualTransformation = VisualTransformation.None // Pass the visual transformation here
+    visualTransformation: VisualTransformation = VisualTransformation.None, // Pass the visual transformation here,
+    unfocusedLabelColor: Color = Color.Black
 
 ) {
     // Custom colors for the TextField
@@ -39,7 +40,7 @@ fun CustomOutlinedTextField(
         focusedContainerColor = Color.White,
         unfocusedContainerColor = Color.White,
         focusedLabelColor = Color.White,  // Color of the label when focused
-        unfocusedLabelColor = Color.Black,  // Color of the label when unfocused
+        unfocusedLabelColor = unfocusedLabelColor,  // Color of the label when unfocused
 
 
         )

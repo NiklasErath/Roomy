@@ -26,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -67,9 +68,9 @@ fun RecipeButton(
                     .border(
                         border = BorderStroke(
                             3.dp, Brush.linearGradient(
-                                colors = listOf(Color.Cyan, Color.Magenta, Color.Yellow),
+                                colors = listOf(MaterialTheme.colorScheme.error, MaterialTheme.colorScheme.surfaceContainer , MaterialTheme.colorScheme.secondary, colorResource(R.color.purple_500), MaterialTheme.colorScheme.error, MaterialTheme.colorScheme.surfaceContainer , MaterialTheme.colorScheme.secondary, colorResource(R.color.purple_500)),
                                 start = Offset(0f, 0f),
-                                end = Offset(100f, 100f)
+                                end = Offset(500f, 500f)
                             )
                         ),
                         shape = CircleShape

@@ -46,6 +46,14 @@ class GroupViewModel(
     private val _addGroupState = mutableStateOf<AddGroupState>(AddGroupState.Idle)
     val addGroupState: State<AddGroupState> = _addGroupState
 
+
+    private val _pullDownRefreshState = MutableStateFlow(false)
+    val pullDownRefreshState = _pullDownRefreshState.asStateFlow()
+
+    fun updatePullDownRefreshState(state: Boolean) {
+        _pullDownRefreshState.value = state
+    }
+
     // reset the groupState
     fun resetGroupState() {
         _addGroupState.value = AddGroupState.Idle
@@ -130,6 +138,8 @@ class GroupViewModel(
                 // update the state that the fetch process is done
                 _fetchingAllGroups.update { false }
 
+//              Reset Pull to Refresh Indicator
+                _pullDownRefreshState.update { false }
 
             }
 

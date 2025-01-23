@@ -140,9 +140,9 @@ fun Balance(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     if (owedTo == currentUser.username) {
-                                        Text(text = "You owe $owedBy ${Balance.amount} $")
+                                        Text(text = "You owe $owedBy ${Balance.amount} €")
                                     } else {
-                                        Text(text = "$owedTo owes $owedBy ${Balance.amount} $")
+                                        Text(text = "$owedTo owes $owedBy ${Balance.amount} €")
                                     }
                                 }
                             } else {

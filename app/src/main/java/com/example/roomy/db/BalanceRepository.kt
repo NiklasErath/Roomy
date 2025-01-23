@@ -177,29 +177,13 @@ class BalanceRepository {
         }
     }
 
-    // use when a user leaves the group/ gets kicked
-    suspend fun deleteUserBalanceByGroupId(groupId: Int, userId: String): Boolean {
-        try {
-            supabase.from("balance").delete {
-                filter {
-                    eq("user_Id", userId)
-                    eq("group_id", groupId)
-                }
-            }
-            return true
-        } catch (e: Exception) {
-            return false
-        }
-
-    }
-
-    // delete all balances of a user when he wants to delete his account
+    // delete all balances of a user when leaves the group/gets kicked
     suspend fun deleteBalanceByUserId(groupId: Int, userId: String): Boolean {
         try {
             supabase.from("balance").delete {
                 filter {
                     eq("owed_by", userId)
-                    eq("group_id", userId)
+                    eq("group_id", groupId)
                 }
             }
             supabase.from("balance").delete {

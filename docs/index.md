@@ -4,6 +4,16 @@ This project was created over the span of 2 weeks in the 3rd Creative Code Lab o
 
 Niklas Erath(Link to github) and Jakob Huber(Link to github)
 
+# Instructions
+
+To run the App on your phone, download and install the APK located in the APK Folder in the root directory.
+
+To access the OpenAI Recipe Feature with your own API key add this line in your gradle.properties file
+
+OPENAI_API_KEY="yourkey"
+
+Clean, Sync and Rebuild the Project
+
 # App Concept
 
 Managing shared responsibilities has never been easier! With our app, streamline finances, shopping lists, and group coordination all in one place. Whether you’re sharing a space with family, friends, or roommates, stay organized and stress-free with these key features:
@@ -26,16 +36,4 @@ Profile Management: Create a profile, connect with other users, and manage multi
 Perfect for families, roommates, or any shared living or collaboration setup, this app eliminates the hassle of managing group finances and grocery lists. Save time, avoid misunderstandings, and make group collaboration smooth and efficient.
 
 Stay organized, stay balanced, and focus on what matters most—your group.
-
-
-
-# Instructions
-
-To run the App on your phone, download and install the APK located in the APK Folder in the root directory.
-
-To access the OpenAI Recipe Feature with your own API key add this line in your gradle.properties file
-
-OPENAI_API_KEY="yourkey"
-
-Clean, Sync and Rebuild the Project
 

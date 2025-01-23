@@ -101,6 +101,8 @@ The tasks will be done step by step as outlined below. The success rate, error r
 ### Participants
 - **Number**: 5 volunteers.
 - **Demographics**: All participants were within the target group (students, shared households) with a 40/60 gender distribution.
+
+  
   ![Gender Distribution](images/gender.png)
  
 

@@ -1,6 +1,6 @@
 # Documentation 
 
-### ### Database structure:
+### Database structure:
 
 Our database includes an auth.user table which have all the login information and is connected to the user_information which has all the information of the user in it (e.g. username). Furthermore, we decided to have a parent_group table where all the users have their connection to a group. For all the group information we created a separate table to differentiate the group from the user.
 
@@ -10,7 +10,7 @@ E.g. if there are user x and user y in one group and user x buys something in th
 
 There is an item table for the items a user creates when they are not available in the app already. All Items have a group id included as well as an Icon id which lets us easily fetch and display all items from a group.
 
-![databse](images/datbase.png)
+![database](images/database.png)
 
 
 

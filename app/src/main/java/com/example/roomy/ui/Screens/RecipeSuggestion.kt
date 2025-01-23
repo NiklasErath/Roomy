@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.roomy.db.api.getSuggestedRecipe
 import com.example.roomy.ui.States.GroupState
@@ -48,13 +49,12 @@ fun RecipeSuggestion(
     Column(
         Modifier
             .fillMaxSize()
-            .padding(horizontal = 20.dp)
-            .padding(bottom = 50.dp)
+            .padding(horizontal = 20.dp, vertical = 10.dp)
             .verticalScroll(rememberScrollState())
     ) {
 
 
-        Text(text = recipe)
+        Text(text = recipe, fontSize = 18.sp)
     }
 
 

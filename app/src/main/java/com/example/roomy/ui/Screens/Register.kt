@@ -70,13 +70,11 @@ fun Register(
         Column (Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally){
 
             Image(
-                modifier = Modifier.padding(horizontal = 30.dp),
+                modifier = Modifier.padding(horizontal = 30.dp).size(width = 200.dp, height = 64.dp),
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Groceries",
                 contentScale = ContentScale.FillWidth,
             )
-            Spacer(Modifier.height(10.dp))
-
 
             Text(text="Make Room for Shared Convenience")
 

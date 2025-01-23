@@ -10,10 +10,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
@@ -59,7 +61,7 @@ fun GroupCard(
             .fillMaxWidth(),
 
         ) {
-        Column (Modifier.fillMaxWidth() .background(Color.White).padding(12.dp).height(120.dp)
+        Column (Modifier.fillMaxWidth() .background(Color.White).padding(12.dp).defaultMinSize(minHeight = 120.dp)
             , verticalArrangement = Arrangement.SpaceBetween) {
 
             Row(
@@ -70,6 +72,13 @@ fun GroupCard(
 
                 Text(text = " ${currentGroup.groupName}" , fontSize = integerResource(id = R.integer.heading2).sp, color = Color.Black)
             }
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                thickness = 1.dp,
+                color = Color.Gray
+            )
 
             Row(
                 Modifier

@@ -106,43 +106,6 @@ fun Group(
     var isFocused by remember { mutableStateOf(false) }
 
 
-    var triggerNavCheck by remember { mutableStateOf(true) }
-
-
-//    LaunchedEffect(previousScreen) {
-//        if (triggerNavCheck) {
-//            when (previousScreen) {
-//                Screens.Groups.name, Screens.Balance.name, Screens.Profile.name -> renderAfterFetching =
-//                    true
-//
-//                else -> renderAfterFetching = false
-//            }
-//            triggerNavCheck = false
-//        }
-//    }
-
-
-//    LaunchedEffect(Unit) {
-//
-////        Fix later - this doesnt have to be done on launch, just acces the newGroupsState
-////        itemViewModel.setAllItems(currentGroup)
-////        groupViewModel.getGroupMembers(currentGroupIdInt)
-//
-//    }
-
-//    Still needed? Im not sure
-//    LaunchedEffect(finishedFetching) {
-//        if (finishedFetching) {
-//            renderAfterFetching = true
-//            itemViewModel.resetFinishedFetching()
-//
-//        }
-//    }
-
-
-    //            Note change this to our errorhandling process later on
-
-
     RecipeButton(currentGroup, context, navController, groupViewModel)
 
 

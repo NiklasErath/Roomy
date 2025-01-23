@@ -97,13 +97,13 @@ fun Profile(
             LazyColumn(modifier = Modifier.padding(bottom = 16.dp)) {
                 item {
                     OutlinedCard(modifier = Modifier.padding(top = 12.dp),
-                        colors = CardDefaults.cardColors(colorResource(id = R.color.dimBackground)),  border = CardDefaults.outlinedCardBorder(false)) {
+                        colors = CardDefaults.cardColors(Color.White),  border = CardDefaults.outlinedCardBorder(false)) {
                         Column(
                             modifier = Modifier
                                 .padding(12.dp)
                                 .fillMaxWidth()
                         ) {
-                            Text(text = "User Info")
+                            Text(text = "User Info", color = Color.Black, fontSize = 20.sp)
 
                             HorizontalDivider(
                                 modifier = Modifier
@@ -115,16 +115,16 @@ fun Profile(
 
                             Box() {
                                 Column {
-                                    Text(text = "Name: ${currentUser.username}")
-                                    Text(text = "ID: ${currentUser.userId}")
-                                    Text(text = "Email: ${currentUser.email}")
+                                    Text(text = "Name: ${currentUser.username}", color = Color.Black)
+                                    Text(text = "ID: ${currentUser.userId}", color = Color.Black)
+                                    Text(text = "Email: ${currentUser.email}", color = Color.Black)
                                 }
                             }
                         }
                     }
                 }
                 item {
-                    OutlinedCard(modifier = Modifier.padding(top = 12.dp), colors = CardDefaults.cardColors(colorResource(id = R.color.dimBackground)),  border = CardDefaults.outlinedCardBorder(false)
+                    OutlinedCard(modifier = Modifier.padding(top = 12.dp), colors = CardDefaults.cardColors(Color.White),  border = CardDefaults.outlinedCardBorder(false)
                         ) {
                         Column(
                             modifier = Modifier
@@ -133,7 +133,7 @@ fun Profile(
                         ) {
 
                             Column() {
-                                Text(text = "User settings")
+                                Text(text = "User settings", color = Color.Black, fontSize = 20.sp)
 
                                 HorizontalDivider(
                                     modifier = Modifier
@@ -247,13 +247,13 @@ fun Profile(
                 item {
 
 
-                    OutlinedCard(modifier = Modifier.padding(top = 12.dp), colors = CardDefaults.cardColors(colorResource(id = R.color.dimBackground)),  border = CardDefaults.outlinedCardBorder(false)) {
+                    OutlinedCard(modifier = Modifier.padding(top = 12.dp), colors = CardDefaults.cardColors(Color.White),  border = CardDefaults.outlinedCardBorder(false)) {
                         Column(
                             modifier = Modifier
                                 .padding(12.dp)
                                 .fillMaxWidth()
                         ) {
-                            Text(text = "Theme settings")
+                            Text(text = "Theme settings", color = Color.Black, fontSize = 20.sp)
 
                             HorizontalDivider(
                                 modifier = Modifier
@@ -283,9 +283,9 @@ fun Profile(
                 }
                 item {
 
-                    OutlinedCard(modifier = Modifier.padding(top = 12.dp), colors = CardDefaults.cardColors(colorResource(id = R.color.dimBackground)), border = CardDefaults.outlinedCardBorder(false)) {
+                    OutlinedCard(modifier = Modifier.padding(top = 12.dp), colors = CardDefaults.cardColors(Color.White), border = CardDefaults.outlinedCardBorder(false)) {
                         Column(modifier = Modifier.padding(12.dp)) {
-                            Text(text = "Group settings")
+                            Text(text = "Group settings", color = Color.Black, fontSize = 20.sp)
 
                             HorizontalDivider(
                                 modifier = Modifier

@@ -219,7 +219,8 @@ fun Balance(
                                     UserProfileCircle(
                                         username = userName,
                                         circleColor = userCircleColor,
-                                        circleSize = 50.dp
+                                        circleSize = 50.dp,
+                                        fontSize = 26.sp
                                     )
                                     Spacer(Modifier.width(20.dp))
                                     Column {

@@ -21,7 +21,7 @@ import androidx.compose.ui.zIndex
 import com.example.roomy.ui.States.GroupMembersUiState
 
 @Composable
-fun UserProfileCirclesStacked(groupMemberInformation: GroupMembersUiState,  ) {
+fun UserProfileCirclesStacked(groupMemberInformation: GroupMembersUiState, textColor: Color = Color.Black) {
 
     val circleColors = listOf(
         MaterialTheme.colorScheme.secondary,
@@ -66,7 +66,7 @@ fun UserProfileCirclesStacked(groupMemberInformation: GroupMembersUiState,  ) {
 
         if (extraMembers > 0) {
             Text(
-                color = Color.Black ,
+                color = textColor,
                 text = "+$extraMembers",
                 modifier = Modifier.align(Alignment.CenterEnd)
             )

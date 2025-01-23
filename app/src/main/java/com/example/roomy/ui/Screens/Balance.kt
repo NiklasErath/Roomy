@@ -127,7 +127,7 @@ fun Balance(
                                 // color depends on lent or owe
                                 val background =
                                     if (owedTo == currentUser.username) {
-                                        Color.Red
+                                        MaterialTheme.colorScheme.error
                                     } else {
                                         colorResource(id = R.color.background)
                                     }

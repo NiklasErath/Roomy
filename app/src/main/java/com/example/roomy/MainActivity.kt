@@ -22,20 +22,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
-        enableEdgeToEdge()
-        setContent {
-            RoomyTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    RoomyApp(
-                        modifier = Modifier.padding(innerPadding),
-
-                        )
-                }
-            }
-        }
-
         enableEdgeToEdge()
         setContent {
             RoomyTheme {

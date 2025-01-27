@@ -108,7 +108,9 @@ The tasks will be done step by step as outlined below. The success rate, error r
 
 ### Metrics
 We collected the completion times for each Task and the smaller tasks within a task to see where we must improve. Before the start of the test, we designed tasks that must be done in under one minute and each small task in a time between 15 – 20 seconds.
+
 In the charts we saw where we must improve efficiency to have a better and faster experience for the user. We were happy to see that the completion times matched our estimates.
+
 As you can see below in the diagram the 1. Task had the highest average completion time which depends on the long loading time we had when we started our tests. The other Tasks were done under a minute which we think is a good time for the first experience doing tasks the app is made for.
 
 
@@ -119,7 +121,6 @@ As you can see below in the diagram the 1. Task had the highest average completi
 
 ## Most Useful Feedback and Problems Found
 
-### Critical Issues
 - Long loading time without feedback on sign-up. 
 - Add members input field lacked clear description.
 - Confusion about navigation between the bottom bar and header back arrow.
@@ -132,8 +133,6 @@ As you can see below in the diagram the 1. Task had the highest average completi
 ## Updates Made Based on Feedback
 Since we carried out the user tests at the end of week 1, we got a lot of Information on what can be improved in the second half of the CCL. Most notable changes we implemented based on this feedback were:
 
-
-### Changes Implemented
 - Added tips and pointers for empty shopping lists.
 - Fixed navigation inconsistencies.
 - Enabled group card holding to access the Edit Members screen.

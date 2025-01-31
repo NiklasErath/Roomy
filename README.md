@@ -33,15 +33,9 @@ Perfect for families, roommates, or any shared living or collaboration setup, th
 
 Stay organized, stay balanced, and focus on what matters most—your group.
 
-# Final Screenshots and Screen Recording
+# Final Screenshots
 
 ![screenshots](/docs/images/screenshots.png)
-
-<video width="640" height="360" controls>
-  <source src="/docs/images/screenrecording.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
-
 
 
 # Instructions

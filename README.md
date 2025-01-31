@@ -46,9 +46,9 @@ Stay organized, stay balanced, and focus on what matters most—your group.
 
 # Instructions
 
-To run the App on your phone, download and install the APK located in the APK Folder in the \docs directory or click on the Download Link in the header.
+To run the App on your phone, download and install the APK located in the \docs directory or click on the download link on our [gitPage](https://niklaserath.github.io/Roomy/).
 
-Unfortunately as of now the Feature to generate a Recipe is not available in the APK file, since the key will get blocked automatically when included in the public git repository.
+Unfortunately as of now the Feature to generate a Recipe is not available in the APK file, since the API-Key will get blocked automatically when included in the public git repository.
 A separate server to handle the requests between the App and OpenAI is needed, which will be a future addition.
 
 To access the OpenAI Recipe Feature with your own API key add this line in your gradle.properties file

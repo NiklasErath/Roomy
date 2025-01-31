@@ -6,7 +6,7 @@ This project was created over the span of 2 weeks in the 3rd Creative Code Lab o
 
 # Instructions
 
-To run the App on your phone, download and install the APK located in the APK Folder in the root directory or click on the Download Link in the header.
+To run the App on your phone, download and install the APK located in the APK Folder in the \docs directory or click on the Download Link in the header.
 
 Unfortunately as of now the Feature to generate a Recipe is not available in the APK file, since the key will get blocked automatically when included in the public git repository.
 A separate server to handle the requests between the App and OpenAI is needed, which will be a future addition.
@@ -53,4 +53,8 @@ Stay organized, stay balanced, and focus on what matters most—your group.
 </video>
 
 
+# Asset Credits
 
+All Icons by [Icons8](https://icons8.com/)
+
+Grocery bag and Cart Stickers by [kerismaker](https://www.flaticon.com/auteurs/kerismaker)

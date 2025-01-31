@@ -7,7 +7,7 @@
 
 ### Development Process
 
-We started the Code lab with splitting the initial work into Database Setup[Niklas] and Compose Setup with Navigation[Jakob]. After some minor Hiccups we were able to finish our base setup withing the 2nd day and started working on more detailed screens and features.
+We started the Code lab with splitting the initial work into Database Setup[Niklas] and Compose Setup with Navigation[Jakob]. After some minor Hiccups we were able to finish our base setup within the 2nd day and started working on more detailed screens and features.
 
 In the first week we finished almost all of our main features including group creation, item creation, balances and AI Recipe features. The functionality was all there, finalizing these features and some refactoring was done in the 2nd week.
 
